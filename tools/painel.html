@@ -82,8 +82,11 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;
   border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
-.arquivo:hover{border-color:var(--mute);color:var(--white)}
-.arquivo input{display:none}
+.arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
+.arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
+/* o seletor de arquivos fica fora da tela (não display:none: alguns navegadores
+   se recusam a abrir o diálogo a partir de um input escondido) */
+#seletor{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 .dica{color:var(--mute);font-size:.88rem}
 
 /* telas médias: a gaveta passa a flutuar sobre o site
@@ -136,6 +139,10 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
     <div id="form"></div>
   </aside>
 </main>
+
+<!-- seletor de arquivos do painel: um só para todos os campos, criado uma vez só
+     (assim trocar o formulário no meio da escolha não perde o arquivo) -->
+<input type="file" id="seletor" multiple tabindex="-1" aria-hidden="true">
 
 <script>
 /* token injetado pelo servidor ao servir esta página */
@@ -272,9 +279,8 @@ function linhaMidia(m, i, total) {
       ${ehImg ? "" : `<label>capa (opcional)
         <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa">
       </label>`}
-      <label class="arquivo">${ehImg ? "escolher imagem" : "escolher capa"}
-        <input type="file" data-upload="${ehImg ? "src" : "poster"}">
-      </label>
+      <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${
+        ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
       ${preview
         ? (WEB_IMG.test(preview)
             ? `<img class="mini" src="/${esc(preview)}" alt="">`
@@ -436,28 +442,101 @@ $("#form").addEventListener("change", async e => {
     desenharForm();
     return;
   }
+});
 
-  const arq = e.target.closest("[data-upload]");
-  if (!arq || !arq.files[0]) return;
-  const mi = +arq.closest("[data-mi]").dataset.mi;
-  const alvo = arq.dataset.upload;
-  try {
-    status("enviando arquivo…");
-    const dados = await lerBase64(arq.files[0]);
-    const r = await api("/api/arquivo", { pasta: slug(projetos[sel].title?.pt), nome: arq.files[0].name, dados });
-    projetos[sel].media[mi][alvo] = r.caminho;
-    marcarSujo();
-    desenharForm();
-    const nome = r.caminho.split("/").pop();
-    const kb = r.bytes < 1024 ? r.bytes + " B" : Math.round(r.bytes / 1024) + " KB";
-    if (alvo === "src" && !WEB_IMG.test(r.caminho))
-      status("salvo " + nome + " (" + kb + ") — o site só garante webp, jpg, png, gif e avif; confira no preview", true);
-    else
-      status("arquivo salvo: " + r.caminho + " (" + kb + ")");
-  } catch (err) {
-    console.error(err);
-    status("erro: " + (err && err.message ? err.message : String(err)), true);
+/* ---------- escolher e enviar arquivos ---------- */
+const seletor = $("#seletor");
+
+// O botão só aponta o seletor para a mídia e o campo certos e abre o diálogo.
+function abrirSeletor(alvo, mi) {
+  seletor.value = "";                    // permite escolher o mesmo arquivo de novo
+  seletor.multiple = alvo === "src";     // várias imagens de uma vez; capa é uma só
+  seletor.dataset.alvo = alvo;
+  seletor.dataset.mi = String(mi);
+  status(alvo === "src" ? "escolha uma ou mais imagens…" : "escolha a imagem de capa…");
+  seletor.click();
+}
+
+seletor.addEventListener("change", () => {
+  const lista = [...seletor.files];
+  const alvo = seletor.dataset.alvo;
+  const mi = +seletor.dataset.mi;
+  seletor.value = "";
+  if (lista.length) enviarArquivos(lista, alvo, mi);
+});
+
+// Envia em fila: o primeiro arquivo ocupa a mídia clicada, os outros entram
+// logo depois dele, na ordem em que foram escolhidos.
+async function enviarArquivos(lista, alvo, mi0) {
+  const p = projetos[sel];
+  if (!p || !p.media || !p.media[mi0] || !lista.length) return;
+  const arquivos = [...lista];
+  if (alvo !== "src") arquivos.length = 1;   // capa é uma só
+
+  const pasta = slug(p.title?.pt);
+  let destino = mi0, ultimo = null, foraDoSite = [];
+
+  for (let k = 0; k < arquivos.length; k++) {
+    const f = arquivos[k];
+    try {
+      status(arquivos.length > 1
+        ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name
+        : "enviando " + f.name + "…");
+      const dados = await lerBase64(f);
+      const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
+      if (projetos[sel] !== p) return;        // trocou de projeto durante o envio
+      if (k > 0) {
+        p.media.splice(destino + 1, 0, { type: "image", src: "" });
+        destino += 1;
+      }
+      p.media[destino][alvo] = r.caminho;
+      ultimo = r;
+      if (alvo === "src" && !WEB_IMG.test(r.caminho)) foraDoSite.push(r.caminho.split("/").pop());
+      marcarSujo();
+      const rolagem = $("#form").scrollTop;
+      desenharForm();
+      $("#form").scrollTop = rolagem;
+    } catch (err) {
+      console.error(err);
+      marcarSujo();
+      desenharForm();
+      status("erro ao enviar " + f.name + ": " +
+        (err && err.message ? err.message : String(err)), true);
+      return;
+    }
   }
+
+  const kb = r => r.bytes < 1024 ? r.bytes + " B" : Math.round(r.bytes / 1024) + " KB";
+  const aviso = foraDoSite.length
+    ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") +
+      " no site (use webp, jpg, png, gif ou avif)"
+    : "";
+  if (arquivos.length === 1)
+    status("arquivo salvo: " + ultimo.caminho + " (" + kb(ultimo) + ")" + aviso, aviso !== "");
+  else
+    status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
+}
+
+// Soltar arquivos em cima do botão também funciona (evita o diálogo do sistema).
+$("#form").addEventListener("dragover", e => {
+  const alvo = e.target.closest("[data-escolher]");
+  if (!alvo) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "copy";
+  alvo.classList.add("recebendo");
+});
+$("#form").addEventListener("dragleave", e => {
+  const alvo = e.target.closest("[data-escolher]");
+  if (alvo) alvo.classList.remove("recebendo");
+});
+$("#form").addEventListener("drop", e => {
+  const alvo = e.target.closest("[data-escolher]");
+  if (!alvo) return;
+  e.preventDefault();
+  alvo.classList.remove("recebendo");
+  const lista = [...(e.dataTransfer?.files || [])];
+  const caixa = alvo.closest("[data-mi]");
+  if (caixa && lista.length) enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
 $("#form").addEventListener("click", e => {
@@ -467,7 +546,10 @@ $("#form").addEventListener("click", e => {
   const mi = caixa ? +caixa.dataset.mi : -1;
   const media = projetos[sel]?.media || [];
 
-  if (b.id === "add-midia") { projetos[sel].media.push({ type: "image", src: "" }); marcarSujo(); desenharForm(); }
+  if (b.hasAttribute("data-escolher")) {
+    if (caixa) abrirSeletor(b.dataset.escolher, mi);
+  }
+  else if (b.id === "add-midia") { projetos[sel].media.push({ type: "image", src: "" }); marcarSujo(); desenharForm(); }
   else if (b.id === "apagar") {
     if (confirm("Apagar este projeto da lista?")) {
       projetos.splice(sel, 1);
