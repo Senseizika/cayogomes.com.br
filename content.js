@@ -107,18 +107,23 @@ const SERVICES = {
 /* TEXTOS DA INTERFACE (pt/en). Edite aqui títulos, frases e botões.
    role: linha do topo; pitch/about_*: Sobre; contact_*: Contato;
    quote: selo de orçamento; close: botão do modal; img: texto do placeholder;
-   btn: rótulo do botão de idioma. */
+   btn: rótulo do botão de idioma;
+   prev/next/play/model3d/media/media_error: galeria do projeto aberto. */
 const UI = {
   pt:{ all:"Todos", filters:"Filtrar projetos", role:"ARTISTA DIGITAL / DESIGNER GRÁFICO / MODELADOR 3D",
        pitch:"Ideias ganham forma. Marcas ganham identidade.",
        about_p1:"Sou o Cayo, artista digital de Petrópolis, no Rio de Janeiro. Trabalho com modelagem 3D e design gráfico, e levo o mesmo clima sombrio e artesanal pras duas áreas.",
        about_p2:"Também experimento outras linguagens, então este site cresce com o meu trabalho. Se você tem uma ideia, me conte.",
        contact_h:"Contato", contact_p:"Escreva ou chame no WhatsApp.", quote:"Orçamento sem compromisso",
-       close:"FECHAR", img:"IMAGEM DO PROJETO", btn:"EN", lang:"pt-BR" },
+       close:"FECHAR", img:"IMAGEM DO PROJETO", btn:"EN", lang:"pt-BR",
+       prev:"Mídia anterior", next:"Próxima mídia", play:"Reproduzir", model3d:"Ver modelo 3D",
+       media:"Mídia", media_error:"Mídia indisponível" },
   en:{ all:"All", filters:"Filter projects", role:"DIGITAL ARTIST / GRAPHIC DESIGNER / 3D MODELER",
        pitch:"Ideas take shape. Brands gain identity.",
        about_p1:"I’m Cayo, a digital artist from Petrópolis, Rio de Janeiro. I work in 3D modeling and graphic design, and bring the same dark, handcrafted mood to both.",
        about_p2:"I also experiment with other mediums, so this site grows along with my work. If you have an idea, tell me about it.",
        contact_h:"Contact", contact_p:"Send an email or message me on WhatsApp.", quote:"Free quote, no commitment",
-       close:"CLOSE", img:"PROJECT IMAGE", btn:"PT", lang:"en" }
+       close:"CLOSE", img:"PROJECT IMAGE", btn:"PT", lang:"en",
+       prev:"Previous media", next:"Next media", play:"Play", model3d:"View 3D model",
+       media:"Media", media_error:"Media unavailable" }
 };
