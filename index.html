@@ -312,11 +312,15 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pad = n => String(n).padStart(3,"0");
 
-// Monta a imagem do card (ou o placeholder colorido). width/height evitam "pulo" no layout.
-function media(p){
-  return p.img
-    ? `<img src="${esc(p.img)}" alt="${esc(p.title[lang])}" width="600" height="450" loading="lazy" decoding="async">`
-    : `<div class="ph" style="--h:${p.h}">${UI[lang].img}</div>`;
+// Capa do projeto = primeira mídia da lista. Sem mídia, mostra o placeholder colorido.
+const capa = p => (p.media && p.media[0]) || null;
+
+// Monta a capa do card. width/height evitam "pulo" no layout.
+function capaHTML(p){
+  const c = capa(p);
+  const src = c && (c.type === "image" ? c.src : c.poster);
+  if (!src) return `<div class="ph" style="--h:${p.h}">${UI[lang].img}</div>`;
+  return `<img src="${esc(src)}" alt="${esc(p.title[lang])}" width="600" height="450" loading="lazy" decoding="async">`;
 }
 
 const pad2 = n => String(n).padStart(2,"0");
@@ -359,7 +363,7 @@ function render(){
     ${chips}
     <div class="grid${list.length > 2 ? " feat" : ""}">${list.map(([p,j]) => `
       <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${media(p)}</div>
+        <div class="thumb">${capaHTML(p)}</div>
         <h3>${esc(p.title[lang])}</h3>
       </button>`).join("")}</div>`;
   if (current !== null && $("#dlg").open) fill(current);
@@ -370,7 +374,7 @@ function fill(i){
   const p = PROJECTS[i];
   const a = AREAS.find(x => x.id === p.area);
   $("#d-bar").textContent = a.name[lang].toUpperCase() + " / " + pad(i+1);
-  $("#d-img").innerHTML = media(p);
+  $("#d-img").innerHTML = capaHTML(p);
   $("#d-title").textContent = p.title[lang];
   $("#d-meta").textContent = p.tools;
   $("#d-meta").hidden = !p.tools;

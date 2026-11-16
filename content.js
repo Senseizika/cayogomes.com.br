@@ -7,8 +7,7 @@
    1. Área nova: adicione um item em AREAS. A aba aparece sozinha.
       A ordem desta lista é a ordem das abas (a primeira abre por padrão).
    2. Projeto novo: adicione um item em PROJECTS com a área (area),
-      os textos em pt/en e o caminho da imagem em img
-      (ex.: "img/bau.webp"). Sem img, aparece um espaço reservado.
+      os textos em pt/en e a lista de mídias (media).
    3. Textos da interface (títulos, sobre, contato, botões): objeto UI.
    4. Serviços da seção Sobre: objeto SERVICES.
    ============================================================ */
@@ -29,53 +28,74 @@ const AREAS = [
           en:"Characters, creatures and props with carefully crafted textures and lighting."} }
 ];
 
+/* MÍDIA — a lista do que aparece no projeto, na ordem que você quiser.
+   Cada item tem um "type":
+
+     image      src: caminho do arquivo  ->  { type:"image", src:"img/projetos/nome/01.webp" }
+     video      src: link do YouTube     ->  { type:"video", src:"https://youtu.be/XXXX" }
+     sketchfab  src: link do modelo      ->  { type:"sketchfab", src:"https://sketchfab.com/3d-models/nome-ID" }
+
+   A PRIMEIRA da lista é a capa que aparece na grade.
+   Para vídeo/Sketchfab, "poster" é opcional: se faltar, o site tenta a
+   miniatura do próprio YouTube. */
+
 /* PROJETOS. A ordem desta lista = ordem na tela.
-   area: id de uma AREA. cat: id de uma categoria (opcional).
-   h: matiz 0-360 do fundo colorido usado quando não há imagem.
-   img: caminho da imagem ("" = mostra o espaço reservado).
-   tools: softwares exibidos no modal. title/desc: textos em pt/en. */
+   area: id de uma AREA.  cat: id de uma categoria (opcional).
+   h: matiz 0-360 do fundo colorido, usado quando media está vazia.
+   tools: softwares exibidos no modal.  title/desc: textos em pt/en.
+   media: lista de mídias (ver explicação acima). Vazia = espaço reservado. */
 const PROJECTS = [
-  { area:"3d", h:20, img:"", tools:"Blender · ZBrush · Substance Painter",
+  { area:"3d", h:20, tools:"Blender · ZBrush · Substance Painter",
     title:{pt:"Caveira com capacete", en:"Skull with helmet"},
     desc:{pt:"Cena com crânio e elmo corroído, focada em materiais envelhecidos, ferrugem e luz quente.",
-          en:"Scene with a skull and corroded helmet, focused on aged materials, rust and warm light."} },
-  { area:"3d", h:350, img:"", tools:"ZBrush",
+          en:"Scene with a skull and corroded helmet, focused on aged materials, rust and warm light."},
+    media:[] },
+  { area:"3d", h:350, tools:"ZBrush",
     title:{pt:"Criatura", en:"Creature bust"},
     desc:{pt:"Busto de criatura realista, com atenção à pele, às presas e à expressão.",
-          en:"Realistic creature bust, with attention to skin, fangs and expression."} },
-  { area:"3d", h:200, img:"", tools:"",
+          en:"Realistic creature bust, with attention to skin, fangs and expression."},
+    media:[] },
+  { area:"3d", h:200, tools:"",
     title:{pt:"Baú do tesouro", en:"Treasure chest"},
     desc:{pt:"Prop estilizado com madeira e metal pintados à mão.",
-          en:"Stylized prop with hand-painted wood and metal."} },
-  { area:"3d", h:190, img:"", tools:"",
+          en:"Stylized prop with hand-painted wood and metal."},
+    media:[] },
+  { area:"3d", h:190, tools:"",
     title:{pt:"Mascote", en:"Mascot"},
     desc:{pt:"Personagem cartoon em pose de destaque sobre base.",
-          en:"Cartoon character posing on a base."} },
-  { area:"3d", h:5, img:"", tools:"",
+          en:"Cartoon character posing on a base."},
+    media:[] },
+  { area:"3d", h:5, tools:"",
     title:{pt:"Drone hard surface", en:"Hard surface drone"},
     desc:{pt:"Modelagem hard surface com detalhes luminosos.",
-          en:"Hard surface model with glowing details."} },
+          en:"Hard surface model with glowing details."},
+    media:[] },
 
-  { area:"design", cat:"cartazes", h:30, img:"", tools:"Photoshop",
+  { area:"design", cat:"cartazes", h:30, tools:"Photoshop",
     title:{pt:"Arraiá Agostino do Xerifes", en:"Xerifes Arraiá poster"},
     desc:{pt:"Cartaz de festa junina com cenário de barraca, madeira, bandeirinhas e comida feitos em composição digital.",
-          en:"Festa junina poster built as a digital composite: wooden stall, bunting and food."} },
-  { area:"design", cat:"estampas", h:25, img:"", tools:"Illustrator",
+          en:"Festa junina poster built as a digital composite: wooden stall, bunting and food."},
+    media:[] },
+  { area:"design", cat:"estampas", h:25, tools:"Illustrator",
     title:{pt:"Estampa Xerifes Moto Clube", en:"Xerifes Moto Clube print"},
     desc:{pt:"Estampa para serigrafia no estilo gravura, com caveira de chapéu de xerife e faixas ornamentadas.",
-          en:"Engraving-style screen-print artwork with a sheriff-hat skull and ornate banners."} },
-  { area:"design", cat:"estampas", h:0, img:"", tools:"Illustrator",
+          en:"Engraving-style screen-print artwork with a sheriff-hat skull and ornate banners."},
+    media:[] },
+  { area:"design", cat:"estampas", h:0, tools:"Illustrator",
     title:{pt:"21ª Moto Romaria", en:"21st Moto Romaria"},
     desc:{pt:"Estampa em preto e branco com mãos em oração, rosas e espinhos.",
-          en:"Black and white artwork with praying hands, roses and thorns."} },
-  { area:"design", cat:"cartazes", h:10, img:"", tools:"Photoshop",
+          en:"Black and white artwork with praying hands, roses and thorns."},
+    media:[] },
+  { area:"design", cat:"cartazes", h:10, tools:"Photoshop",
     title:{pt:"Quinta sem Lei", en:"Quinta sem Lei"},
     desc:{pt:"Série de cartazes de shows com tipografia blackletter e tratamento duotone.",
-          en:"Gig poster series with blackletter type and a duotone treatment."} },
-  { area:"design", cat:"identidade", h:140, img:"img/identidade-cayo.webp", tools:"",
+          en:"Gig poster series with blackletter type and a duotone treatment."},
+    media:[] },
+  { area:"design", cat:"identidade", h:140, tools:"",
     title:{pt:"Identidade Cayo Gomes", en:"Cayo Gomes identity"},
     desc:{pt:"Logotipo glitch, cartão de apresentação digital e sistema visual próprio, com estética de interface e detalhes em vermelho.",
-          en:"Glitch logotype, digital presentation card and own visual system, with an interface look and red accents."} }
+          en:"Glitch logotype, digital presentation card and own visual system, with an interface look and red accents."},
+    media:[{ type:"image", src:"img/identidade-cayo.webp" }] }
 ];
 
 /* SERVIÇOS exibidos na seção Sobre (edite as listas pt/en) */
