@@ -110,6 +110,17 @@ a{color:inherit}
 .area .head{padding:1.2rem 1.2rem 0}   /* espaço ao redor do título da área */
 .area h2{font:400 clamp(2.6rem,6vw,4.4rem)/1 var(--big);letter-spacing:.02em}
 .area .lead{color:var(--mute);max-width:56ch;margin-top:.4rem}
+/* Separadores discretos das categorias na visualização "Todos". */
+.cat-group{min-width:0}
+.cat-separator{
+  display:flex;align-items:center;gap:.8rem;
+  margin:1.25rem 1.2rem 0;
+  color:var(--mute);font:inherit;font-size:1rem;line-height:1.3;
+}
+.cat-separator::after{
+  content:"";height:1px;flex:1;
+  background:currentColor;opacity:.7;
+}
 /* GRADE: minmax(250px,1fr) = largura mínima de cada card; gap = espaço entre eles */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;padding:1.4rem 1.2rem 1.4rem}
 .item{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
@@ -230,6 +241,7 @@ html{-webkit-text-size-adjust:100%}
   .bar{padding:.55rem .8rem;font-size:.78rem}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
+  .cat-separator{margin:1.1rem .9rem 0}
   .grid{grid-template-columns:repeat(2,1fr);gap:.7rem;padding:1rem .9rem}
   .feat .item:first-child{grid-column:span 2}
   .item h3{font-size:1rem}
@@ -417,16 +429,24 @@ function render(){
   $("#panel").setAttribute("aria-labelledby", "tab-" + a.id);
   const cats = a.cats || [];
   const list = PROJECTS.map((p,j) => [p,j]).filter(([p]) => p.area === a.id && (filter === "all" || p.cat === filter));
+  // Em "Todos", agrupa pela ordem das categorias cadastradas; dentro de cada
+  // categoria, preserva a ordem original dos projetos em PROJECTS.
+  const grupos = filter === "all" && cats.length
+    ? cats.map(c => ({ cat:c, items:list.filter(([p]) => p.cat === c.id) })).filter(g => g.items.length)
+    : [];
   const chips = cats.length
     ? `<div class="chips" role="group" aria-label="${u.filters}">` + [{id:"all",name:u.all}, ...cats.map(c => ({id:c.id,name:c.name[lang]}))]
         .map(c => `<button class="chip" type="button" data-c="${c.id}" aria-pressed="${c.id === filter}">${esc(c.name)}</button>`).join("") + `</div>`
     : "";
-  const grade = list.length
-    ? `<div class="grid${list.length > 2 ? " feat" : ""}">${list.map(([p,j]) => `
+  const cardsHTML = items => `<div class="grid${items.length > 2 ? " feat" : ""}">${items.map(([p,j]) => `
       <button class="item" type="button" data-i="${j}">
         <div class="thumb">${capaHTML(p)}</div>
         <h3>${esc(p.title[lang])}</h3>
-      </button>`).join("")}</div>`
+      </button>`).join("")}</div>`;
+  const grade = list.length
+    ? grupos.length
+      ? grupos.map(g => `<section class="cat-group"><div class="cat-separator"><span>${esc(g.cat.name[lang])}</span></div>${cardsHTML(g.items)}</section>`).join("")
+      : cardsHTML(list)
     : `<p class="vazio">${esc(u.empty)}</p>`;
   $("#panel").innerHTML = `
     <div class="bar"><span>${esc(a.name[lang]).toUpperCase()} / ${pad(i+1)}</span><i aria-hidden="true">— ✕</i></div>
