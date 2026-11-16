@@ -1,0 +1,3 @@
+# manter quebras de linha LF no repositório, independente do sistema
+# (evita "todos os arquivos mudaram" ao abrir o projeto em outra máquina)
+* text=auto eol=lf

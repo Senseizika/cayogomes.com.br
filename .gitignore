@@ -1,0 +1,13 @@
+# arquivo temporário criado por tools/paleta.js enquanto roda
+.paleta-tmp.html
+
+# snapshots manuais anteriores ao git (continuam no disco, fora do histórico)
+backup/
+
+# lixo do sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# dependências (o site não usa, mas evita surpresa se um dia usar)
+node_modules/
