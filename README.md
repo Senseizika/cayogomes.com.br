@@ -40,6 +40,7 @@ media:[
 git status                        # o que mudou
 git add -A                        # marca tudo que mudou
 git commit -m "mensagem curta"    # grava uma versão
+git push                          # envia as versões pro GitHub
 git log --oneline                 # lista as versões
 ```
 
@@ -48,6 +49,12 @@ Voltar atrás:
 ```bash
 git restore .                     # descarta o que ainda não foi commitado
 git revert HEAD                   # desfaz o último commit (cria um novo)
+```
+
+Restaurar o projeto em outra máquina (ou depois de perder o HD):
+
+```bash
+git clone https://github.com/Senseizika/cayogomes.com.br.git
 ```
 
 ## Ferramentas
