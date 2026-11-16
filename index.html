@@ -191,6 +191,8 @@ dialog[open]{animation:in .22s ease-out}
 .d-body h3{font:400 2.8rem/1 var(--big);letter-spacing:.02em}
 .d-body .meta{font:400 .9rem var(--mono);color:var(--accent);margin:.6rem 0 1rem;letter-spacing:.05em}
 .d-body p{max-width:62ch}
+/* mensagem quando a área ainda não tem projeto */
+.vazio{padding:2.4rem 1.2rem;margin:0;color:var(--mute);font:400 .95rem var(--mono);letter-spacing:.06em}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .area{margin-top:0}
@@ -289,7 +291,8 @@ html{-webkit-text-size-adjust:100%}
   </div>
 </main>
 
-<!-- conteúdo (áreas, projetos, serviços, textos) -->
+<!-- projetos (gerado pelo painel) + demais textos -->
+<script src="conteudo/projetos.js"></script>
 <script src="content.js"></script>
 <script>
 /* ============================================================
@@ -418,15 +421,18 @@ function render(){
     ? `<div class="chips" role="group" aria-label="${u.filters}">` + [{id:"all",name:u.all}, ...cats.map(c => ({id:c.id,name:c.name[lang]}))]
         .map(c => `<button class="chip" type="button" data-c="${c.id}" aria-pressed="${c.id === filter}">${esc(c.name)}</button>`).join("") + `</div>`
     : "";
+  const grade = list.length
+    ? `<div class="grid${list.length > 2 ? " feat" : ""}">${list.map(([p,j]) => `
+      <button class="item" type="button" data-i="${j}">
+        <div class="thumb">${capaHTML(p)}</div>
+        <h3>${esc(p.title[lang])}</h3>
+      </button>`).join("")}</div>`
+    : `<p class="vazio">${esc(u.empty)}</p>`;
   $("#panel").innerHTML = `
     <div class="bar"><span>${esc(a.name[lang]).toUpperCase()} / ${pad(i+1)}</span><i aria-hidden="true">— ✕</i></div>
     <div class="head"><h2>${esc(a.name[lang])}</h2><p class="lead">${esc(a.lead[lang])}</p></div>
     ${chips}
-    <div class="grid${list.length > 2 ? " feat" : ""}">${list.map(([p,j]) => `
-      <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${capaHTML(p)}</div>
-        <h3>${esc(p.title[lang])}</h3>
-      </button>`).join("")}</div>`;
+    ${grade}`;
   if (current !== null && $("#dlg").open) fill(current);
 }
 

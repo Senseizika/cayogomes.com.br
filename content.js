@@ -28,75 +28,9 @@ const AREAS = [
           en:"Characters, creatures and props with carefully crafted textures and lighting."} }
 ];
 
-/* MÍDIA — a lista do que aparece no projeto, na ordem que você quiser.
-   Cada item tem um "type":
-
-     image      src: caminho do arquivo  ->  { type:"image", src:"img/projetos/nome/01.webp" }
-     video      src: link do YouTube     ->  { type:"video", src:"https://youtu.be/XXXX" }
-     sketchfab  src: link do modelo      ->  { type:"sketchfab", src:"https://sketchfab.com/3d-models/nome-ID" }
-
-   A PRIMEIRA da lista é a capa que aparece na grade.
-   Para vídeo/Sketchfab, "poster" é opcional: se faltar, o site tenta a
-   miniatura do próprio YouTube. */
-
-/* PROJETOS. A ordem desta lista = ordem na tela.
-   area: id de uma AREA.  cat: id de uma categoria (opcional).
-   h: matiz 0-360 do fundo colorido, usado quando media está vazia.
-   tools: softwares exibidos no modal.  title/desc: textos em pt/en.
-   media: lista de mídias (ver explicação acima). Vazia = espaço reservado. */
-const PROJECTS = [
-  { area:"3d", h:20, tools:"Blender · ZBrush · Substance Painter",
-    title:{pt:"Caveira com capacete", en:"Skull with helmet"},
-    desc:{pt:"Cena com crânio e elmo corroído, focada em materiais envelhecidos, ferrugem e luz quente.",
-          en:"Scene with a skull and corroded helmet, focused on aged materials, rust and warm light."},
-    media:[] },
-  { area:"3d", h:350, tools:"ZBrush",
-    title:{pt:"Criatura", en:"Creature bust"},
-    desc:{pt:"Busto de criatura realista, com atenção à pele, às presas e à expressão.",
-          en:"Realistic creature bust, with attention to skin, fangs and expression."},
-    media:[] },
-  { area:"3d", h:200, tools:"",
-    title:{pt:"Baú do tesouro", en:"Treasure chest"},
-    desc:{pt:"Prop estilizado com madeira e metal pintados à mão.",
-          en:"Stylized prop with hand-painted wood and metal."},
-    media:[] },
-  { area:"3d", h:190, tools:"",
-    title:{pt:"Mascote", en:"Mascot"},
-    desc:{pt:"Personagem cartoon em pose de destaque sobre base.",
-          en:"Cartoon character posing on a base."},
-    media:[] },
-  { area:"3d", h:5, tools:"",
-    title:{pt:"Drone hard surface", en:"Hard surface drone"},
-    desc:{pt:"Modelagem hard surface com detalhes luminosos.",
-          en:"Hard surface model with glowing details."},
-    media:[] },
-
-  { area:"design", cat:"cartazes", h:30, tools:"Photoshop",
-    title:{pt:"Arraiá Agostino do Xerifes", en:"Xerifes Arraiá poster"},
-    desc:{pt:"Cartaz de festa junina com cenário de barraca, madeira, bandeirinhas e comida feitos em composição digital.",
-          en:"Festa junina poster built as a digital composite: wooden stall, bunting and food."},
-    media:[] },
-  { area:"design", cat:"estampas", h:25, tools:"Illustrator",
-    title:{pt:"Estampa Xerifes Moto Clube", en:"Xerifes Moto Clube print"},
-    desc:{pt:"Estampa para serigrafia no estilo gravura, com caveira de chapéu de xerife e faixas ornamentadas.",
-          en:"Engraving-style screen-print artwork with a sheriff-hat skull and ornate banners."},
-    media:[] },
-  { area:"design", cat:"estampas", h:0, tools:"Illustrator",
-    title:{pt:"21ª Moto Romaria", en:"21st Moto Romaria"},
-    desc:{pt:"Estampa em preto e branco com mãos em oração, rosas e espinhos.",
-          en:"Black and white artwork with praying hands, roses and thorns."},
-    media:[] },
-  { area:"design", cat:"cartazes", h:10, tools:"Photoshop",
-    title:{pt:"Quinta sem Lei", en:"Quinta sem Lei"},
-    desc:{pt:"Série de cartazes de shows com tipografia blackletter e tratamento duotone.",
-          en:"Gig poster series with blackletter type and a duotone treatment."},
-    media:[] },
-  { area:"design", cat:"identidade", h:140, tools:"",
-    title:{pt:"Identidade Cayo Gomes", en:"Cayo Gomes identity"},
-    desc:{pt:"Logotipo glitch, cartão de apresentação digital e sistema visual próprio, com estética de interface e detalhes em vermelho.",
-          en:"Glitch logotype, digital presentation card and own visual system, with an interface look and red accents."},
-    media:[{ type:"image", src:"img/identidade-cayo.webp" }] }
-];
+/* PROJETOS E MÍDIAS: ficam em conteudo/projetos.json e são editados pelo
+   painel (node tools/painel.js). O arquivo conteudo/projetos.js é gerado
+   automaticamente a partir dele — não edite nenhum dos dois à mão. */
 
 /* SERVIÇOS exibidos na seção Sobre (edite as listas pt/en) */
 const SERVICES = {
@@ -117,7 +51,8 @@ const UI = {
        contact_h:"Contato", contact_p:"Escreva ou chame no WhatsApp.", quote:"Orçamento sem compromisso",
        close:"FECHAR", img:"IMAGEM DO PROJETO", btn:"EN", lang:"pt-BR",
        prev:"Mídia anterior", next:"Próxima mídia", play:"Reproduzir", model3d:"Ver modelo 3D",
-       media:"Mídia", media_error:"Mídia indisponível" },
+       media:"Mídia", media_error:"Mídia indisponível",
+       empty:"Nenhum projeto publicado ainda." },
   en:{ all:"All", filters:"Filter projects", role:"DIGITAL ARTIST / GRAPHIC DESIGNER / 3D MODELER",
        pitch:"Ideas take shape. Brands gain identity.",
        about_p1:"I’m Cayo, a digital artist from Petrópolis, Rio de Janeiro. I work in 3D modeling and graphic design, and bring the same dark, handcrafted mood to both.",
@@ -125,5 +60,6 @@ const UI = {
        contact_h:"Contact", contact_p:"Send an email or message me on WhatsApp.", quote:"Free quote, no commitment",
        close:"CLOSE", img:"PROJECT IMAGE", btn:"PT", lang:"en",
        prev:"Previous media", next:"Next media", play:"Play", model3d:"View 3D model",
-       media:"Media", media_error:"Media unavailable" }
+       media:"Media", media_error:"Media unavailable",
+       empty:"No projects published yet." }
 };

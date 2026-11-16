@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel — cayogomes.com.br</title>
+<style>
+:root{--ink:#050506;--panel:#0b0c0e;--line:rgba(255,255,255,.14);--white:#f4f4f2;--mute:#8d9490;--accent:#ef2b31}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-ui,sans-serif}
+header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(5,5,6,.97);z-index:5}
+header strong{font:400 1.1rem ui-monospace,Consolas,monospace;letter-spacing:.22em}
+#sujo{font:400 .78rem ui-monospace,Consolas,monospace;color:#f0b429;border:1px solid rgba(240,180,41,.4);border-radius:4px;padding:.15rem .45rem}
+#sujo[hidden]{display:none}
+#status{font:400 .8rem ui-monospace,Consolas,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status.ok{color:#39d98a} #status.err{color:#ff5a5f}
+.acoes{margin-left:auto;display:flex;gap:.6rem;align-items:center;flex:0 0 auto}
+button{background:none;border:1px solid var(--line);color:var(--white);padding:.45rem .8rem;border-radius:6px;cursor:pointer;font:inherit}
+button:hover{border-color:var(--mute)}
+button.pri{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:600}
+button.perigo{color:#ff5a5f;border-color:rgba(255,90,95,.4)}
+button:disabled{opacity:.35;cursor:default}
+a{color:var(--mute);text-decoration:none;font-size:.85rem}
+a:hover{color:var(--white)}
+main{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 58px)}
+aside{border-right:1px solid var(--line);padding:.6rem;overflow:auto}
+ol{list-style:none;margin:0;padding:0}
+ol li{display:grid;grid-template-columns:2rem 1fr;gap:.3rem;padding:.55rem .6rem;border-radius:6px;cursor:pointer;border:1px solid transparent}
+ol li:hover{background:rgba(255,255,255,.04)}
+ol li.sel{border-color:var(--accent);background:rgba(239,43,49,.1)}
+ol li b{font:400 .8rem ui-monospace,Consolas,monospace;color:var(--mute)}
+ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol li em{grid-column:2;font:400 .7rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal}
+section{padding:1.2rem clamp(1rem,3vw,2rem);max-width:940px}
+label{display:block;margin-bottom:.8rem;font:400 .72rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+input,select,textarea{display:block;width:100%;margin-top:.25rem;background:#0f1114;border:1px solid var(--line);color:var(--white);padding:.5rem .6rem;border-radius:6px;font:400 .95rem system-ui,sans-serif}
+input:focus,select:focus,textarea:focus{outline:1px solid var(--accent)}
+textarea{resize:vertical}
+.linha{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+h3{font:400 .95rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.4rem 0 .6rem;display:flex;align-items:center;gap:.8rem}
+.midia{border:1px solid var(--line);border-radius:8px;padding:.7rem;margin-bottom:.7rem;background:var(--panel)}
+.midia .topo{display:flex;gap:.4rem;align-items:center;margin-bottom:.6rem}
+.midia .topo select{width:auto;margin:0}
+.midia .topo .empurra{margin-left:auto}
+.midia .corpo{display:grid;gap:.5rem}
+.mini{max-width:130px;border-radius:4px;border:1px solid var(--line);display:block;margin-top:.3rem}
+.arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.35rem .6rem;border-radius:6px;color:var(--mute);font-size:.8rem}
+.arquivo:hover{border-color:var(--mute);color:var(--white)}
+.arquivo input{display:none}
+.dica{color:var(--mute);font-size:.9rem}
+@media(max-width:760px){main{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);max-height:34vh}.linha{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <strong>PAINEL</strong>
+  <span id="sujo" hidden>não salvo</span>
+  <span id="status"></span>
+  <div class="acoes">
+    <a href="/site" target="_blank">ver site</a>
+    <button id="novo">+ projeto</button>
+    <button id="salvar" class="pri">salvar</button>
+  </div>
+</header>
+<main>
+  <aside><ol id="lista"></ol></aside>
+  <section id="form"><p class="dica">Crie um projeto ou escolha um à esquerda.</p></section>
+</main>
+<script>
+const token = new URLSearchParams(location.search).get("t") || "";
+let projetos = [], areas = [], sel = -1, sujo = false;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function api(rota, corpo) {
+  const r = await fetch(rota, {
+    method: corpo === undefined ? "GET" : "POST",
+    headers: { "content-type": "application/json", "x-painel-token": token },
+    body: corpo === undefined ? undefined : JSON.stringify(corpo)
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.erro || ("HTTP " + r.status));
+  return j;
+}
+
+let tempo;
+function status(msg, erro) {
+  const el = $("#status");
+  el.textContent = msg;
+  el.className = erro ? "err" : "ok";
+  clearTimeout(tempo);
+  tempo = setTimeout(() => { el.textContent = ""; }, 5000);
+}
+
+// marca que existe alteração ainda não gravada no disco
+function marcarSujo(){
+  sujo = true;
+  $("#sujo").hidden = false;
+}
+function limparSujo(){
+  sujo = false;
+  $("#sujo").hidden = true;
+}
+
+const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "projeto";
+
+const lerBase64 = f => new Promise((ok, err) => {
+  const r = new FileReader();
+  r.onload = () => ok(r.result);
+  r.onerror = err;
+  r.readAsDataURL(f);
+});
+
+function setCampo(obj, caminho, valor) {
+  const ks = caminho.split(".");
+  let o = obj;
+  for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]] = o[ks[i]] || {};
+  o[ks[ks.length - 1]] = caminho === "h" ? (Number(valor) || 0) : valor;
+}
+
+function desenhar() { desenharLista(); desenharForm(); }
+
+function desenharLista() {
+  $("#lista").innerHTML = projetos.map((p, i) => `
+    <li class="${i === sel ? "sel" : ""}" data-i="${i}">
+      <b>${String(i + 1).padStart(2, "0")}</b>
+      <span>${esc(p.title?.pt || "(sem título)")}</span>
+      <em>${esc(p.area || "")}${p.cat ? " / " + esc(p.cat) : ""}</em>
+    </li>`).join("") || '<li class="vazio dica">nenhum projeto</li>';
+}
+
+function linhaMidia(m, i, total) {
+  const tipo = m.type || "image";
+  const ehImg = tipo === "image";
+  return `<div class="midia" data-mi="${i}">
+    <div class="topo">
+      <select data-mcampo="type">
+        ${["image", "video", "sketchfab"].map(t =>
+          `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
+      </select>
+      <button class="empurra" data-subir ${i === 0 ? "disabled" : ""} title="subir">↑</button>
+      <button data-descer ${i === total - 1 ? "disabled" : ""} title="descer">↓</button>
+      <button class="perigo" data-remover title="remover">×</button>
+    </div>
+    <div class="corpo">
+      <label>${ehImg ? "arquivo da imagem" : "link"}
+        <input data-mcampo="src" value="${esc(m.src || "")}" placeholder="${ehImg
+          ? "img/projetos/nome/01.webp"
+          : tipo === "video" ? "https://youtu.be/..." : "https://sketchfab.com/3d-models/..."}">
+      </label>
+      ${ehImg ? "" : `<label>capa (opcional)
+        <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa">
+      </label>`}
+      <label class="arquivo">${ehImg ? "escolher imagem" : "escolher capa"}
+        <input type="file" accept="image/*" data-upload="${ehImg ? "src" : "poster"}">
+      </label>
+      ${(ehImg ? m.src : m.poster) ? `<img class="mini" src="/${esc(ehImg ? m.src : m.poster)}" alt="">` : ""}
+    </div>
+  </div>`;
+}
+
+function desenharForm() {
+  const p = projetos[sel];
+  if (!p) { $("#form").innerHTML = '<p class="dica">Crie um projeto ou escolha um à esquerda.</p>'; return; }
+  const cats = (areas.find(a => a.id === p.area)?.cats) || [];
+  $("#form").innerHTML = `
+    <div class="linha">
+      <label>área
+        <select data-campo="area">
+          ${areas.map(a => `<option value="${a.id}" ${a.id === p.area ? "selected" : ""}>${esc(a.name.pt)}</option>`).join("")}
+        </select>
+      </label>
+      <label>categoria
+        <select data-campo="cat">
+          <option value="">(nenhuma)</option>
+          ${cats.map(c => `<option value="${c.id}" ${c.id === p.cat ? "selected" : ""}>${esc(c.name.pt)}</option>`).join("")}
+        </select>
+      </label>
+    </div>
+    <div class="linha">
+      <label>título PT <input data-campo="title.pt" value="${esc(p.title?.pt)}"></label>
+      <label>título EN <input data-campo="title.en" value="${esc(p.title?.en)}"></label>
+    </div>
+    <label>descrição PT <textarea rows="3" data-campo="desc.pt">${esc(p.desc?.pt)}</textarea></label>
+    <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
+    <div class="linha">
+      <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
+      <label>matiz (só quando não há mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
+    </div>
+    <h3>mídias <button id="add-midia">+ mídia</button></h3>
+    <div id="midias">
+      ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
+    </div>
+    <button class="perigo" id="apagar">apagar projeto</button>`;
+}
+
+/* ---- eventos ---- */
+$("#lista").addEventListener("click", e => {
+  const li = e.target.closest("li[data-i]");
+  if (!li) return;
+  sel = +li.dataset.i;
+  desenhar();
+});
+
+$("#novo").onclick = () => {
+  projetos.unshift({ area: areas[0]?.id || "design", cat: "", h: 0, tools: "",
+    title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+  sel = 0;
+  marcarSujo();
+  desenhar();
+  document.querySelector('[data-campo="title.pt"]')?.focus();
+};
+
+$("#salvar").onclick = async () => {
+  try {
+    status("salvando…");
+    await api("/api/projetos", { projetos });
+    limparSujo();
+    status("salvo — recarregue o site para ver");
+  } catch (e) { status("erro: " + e.message, true); }
+};
+
+$("#form").addEventListener("input", e => {
+  const c = e.target.closest("[data-campo]");
+  if (c) { setCampo(projetos[sel], c.dataset.campo, c.value); desenharLista(); marcarSujo(); return; }
+  const m = e.target.closest("[data-mcampo]");
+  if (m && (m.dataset.mcampo === "src" || m.dataset.mcampo === "poster")) {
+    const mi = +m.closest("[data-mi]").dataset.mi;
+    projetos[sel].media[mi][m.dataset.mcampo] = m.value;
+    marcarSujo();
+  }
+});
+
+$("#form").addEventListener("change", async e => {
+  const tipo = e.target.closest('[data-mcampo="type"]');
+  if (tipo) {
+    const mi = +tipo.closest("[data-mi]").dataset.mi;
+    projetos[sel].media[mi].type = tipo.value;
+    marcarSujo();
+    desenharForm();
+    return;
+  }
+  const area = e.target.closest('[data-campo="area"]');
+  if (area) {
+    projetos[sel].area = area.value;
+    projetos[sel].cat = "";
+    marcarSujo();
+    desenharForm();
+    return;
+  }
+
+  const arq = e.target.closest("[data-upload]");
+  if (!arq || !arq.files[0]) return;
+  const mi = +arq.closest("[data-mi]").dataset.mi;
+  const alvo = arq.dataset.upload;
+  try {
+    status("enviando imagem…");
+    const dados = await lerBase64(arq.files[0]);
+    const r = await api("/api/imagem", { pasta: slug(projetos[sel].title?.pt), nome: arq.files[0].name, dados });
+    projetos[sel].media[mi][alvo] = r.caminho;
+    marcarSujo();
+    desenharForm();
+    status("imagem salva: " + r.caminho + " (" + Math.round(r.bytes / 1024) + " KB)");
+  } catch (err) { status("erro: " + err.message, true); }
+});
+
+$("#form").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const caixa = b.closest("[data-mi]");
+  const mi = caixa ? +caixa.dataset.mi : -1;
+  const media = projetos[sel]?.media || [];
+
+  if (b.id === "add-midia") { projetos[sel].media.push({ type: "image", src: "" }); marcarSujo(); desenharForm(); }
+  else if (b.id === "apagar") {
+    if (confirm("Apagar este projeto da lista?")) {
+      projetos.splice(sel, 1);
+      sel = Math.min(sel, projetos.length - 1);
+      marcarSujo();
+      desenhar();
+    }
+  }
+  else if (b.hasAttribute("data-subir") && mi > 0) {
+    [media[mi - 1], media[mi]] = [media[mi], media[mi - 1]];
+    marcarSujo();
+    desenharForm();
+  }
+  else if (b.hasAttribute("data-descer") && mi < media.length - 1) {
+    [media[mi + 1], media[mi]] = [media[mi], media[mi + 1]];
+    marcarSujo();
+    desenharForm();
+  }
+  else if (b.hasAttribute("data-remover")) {
+    media.splice(mi, 1);
+    marcarSujo();
+    desenharForm();
+  }
+});
+
+/* Ctrl+S salva, e fechar a aba com alteração pendente pede confirmação. */
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) {
+    e.preventDefault();
+    $("#salvar").click();
+  }
+});
+window.addEventListener("beforeunload", e => {
+  if (!sujo) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+/* ---- início ---- */
+(async () => {
+  try {
+    const r = await api("/api/estado");
+    projetos = r.projetos; areas = r.areas;
+    sel = projetos.length ? 0 : -1;
+    desenhar();
+    if (!token) status("abra pelo link com token que o terminal mostrou", true);
+  } catch (e) { status("erro ao carregar: " + e.message, true); }
+})();
+</script>
+</body>
+</html>
