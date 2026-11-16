@@ -11,3 +11,24 @@ desktop.ini
 
 # dependências (o site não usa, mas evita surpresa se um dia usar)
 node_modules/
+
+# arquivos de trabalho dos programas: pesados e sem uso no site.
+# vídeos vão para o YouTube (embed), nunca para o repositório.
+*.psd
+*.psb
+*.ai
+*.blend
+*.blend1
+*.blend2
+*.ztl
+*.zpr
+*.spp
+*.tif
+*.tiff
+*.exr
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.zip
+
