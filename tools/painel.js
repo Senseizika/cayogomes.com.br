@@ -136,14 +136,6 @@ const MIME = {
   '.ico': 'image/x-icon', '.woff2': 'font/woff2'
 };
 
-function enviar(res, abs) {
-  fs.readFile(abs, (e, buf) => {
-    if (e) return json(res, 404, { erro: 'não encontrado' });
-    res.writeHead(200, { 'content-type': MIME[path.extname(abs).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' });
-    res.end(buf);
-  });
-}
-
 function servirArquivo(res, abs) {
   const rel = path.relative(ROOT, abs);
   if (rel.startsWith('..') || path.isAbsolute(rel)) return json(res, 403, { erro: 'fora do projeto' });
@@ -176,7 +168,13 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (req.method === 'GET' && (rota === '/' || rota === '/painel.html')) {
-      return enviar(res, PAINEL_HTML);
+      const html = fs.readFileSync(PAINEL_HTML, 'utf8').replace('__PAINEL_TOKEN__', TOKEN);
+      res.writeHead(200, {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff'
+      });
+      return res.end(html);
     }
     if (req.method === 'GET' && rota === '/site') {
       return servirArquivo(res, path.join(ROOT, 'index.html'));
@@ -217,7 +215,7 @@ function subir() {
     else { console.error('ERRO: ' + e.message); process.exit(1); }
   });
   server.listen(porta, '127.0.0.1', () => {
-    const link = `http://127.0.0.1:${porta}/?t=${TOKEN}`;
+    const link = `http://127.0.0.1:${porta}/`;
     console.log('\n  PAINEL — cayogomes.com.br');
     console.log('  ' + link);
     console.log('  (Ctrl+C para parar)\n');

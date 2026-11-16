@@ -67,7 +67,8 @@ h3{font:400 .95rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <section id="form"><p class="dica">Crie um projeto ou escolha um à esquerda.</p></section>
 </main>
 <script>
-const token = new URLSearchParams(location.search).get("t") || "";
+/* token injetado pelo servidor ao servir esta página */
+const token = "__PAINEL_TOKEN__";
 let projetos = [], areas = [], sel = -1, sujo = false;
 
 const $ = s => document.querySelector(s);
@@ -214,6 +215,13 @@ $("#novo").onclick = () => {
 };
 
 $("#salvar").onclick = async () => {
+  const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
+  if (semTitulo >= 0) {
+    sel = semTitulo;
+    desenhar();
+    status("o projeto " + String(semTitulo + 1).padStart(2, "0") + " está sem título", true);
+    return;
+  }
   try {
     status("salvando…");
     await api("/api/projetos", { projetos });
@@ -319,7 +327,7 @@ window.addEventListener("beforeunload", e => {
     projetos = r.projetos; areas = r.areas;
     sel = projetos.length ? 0 : -1;
     desenhar();
-    if (!token) status("abra pelo link com token que o terminal mostrou", true);
+    if (!token || token.indexOf("__PAINEL") === 0) status("abra com node tools/painel.js (o servidor entrega o token)", true);
   } catch (e) { status("erro ao carregar: " + e.message, true); }
 })();
 </script>
