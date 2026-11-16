@@ -26,6 +26,12 @@ button:disabled{opacity:.35;cursor:default}
 a{color:var(--mute);text-decoration:none;font-size:.82rem}
 a:hover{color:var(--white)}
 
+/* ---------- alternador de modo ---------- */
+.toggle-modo{display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:6px;padding:2px}
+.toggle-modo button{border:none;border-radius:4px;padding:.22rem .6rem;font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.05em;color:var(--mute)}
+.toggle-modo button.on{background:rgba(255,255,255,.13);color:var(--white)}
+.toggle-modo button:hover{border-color:transparent;color:var(--white)}
+
 /* ---------- corpo: lista | site | formulário ---------- */
 main{flex:1;display:grid;grid-template-columns:200px 1fr;min-height:0;position:relative}
 body.editando main{grid-template-columns:200px 1fr min(420px,38vw)}
@@ -89,8 +95,18 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 #seletor{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 .dica{color:var(--mute);font-size:.88rem}
 
-/* telas médias: a gaveta passa a flutuar sobre o site
-   (abaixo de ~1400px ela não caberia ao lado sem espremer o site no layout de celular) */
+/* ---------- categorias no form de áreas ---------- */
+.cat{border:1px solid var(--line);border-radius:8px;padding:.55rem .6rem;margin-bottom:.5rem;background:#0e1013;display:grid;gap:.4rem}
+.cat-topo{display:flex;gap:.3rem;align-items:center}
+.cat-topo .num{font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute)}
+.cat-topo .empurra{margin-left:auto}
+.cat-topo button{padding:.18rem .4rem;font-size:.8rem}
+.cat-linha{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.cat-id input{font:400 .82rem ui-monospace,Consolas,monospace}
+.aviso-id{font:400 .7rem ui-monospace,Consolas,monospace;color:#f0b429;margin-top:.3rem;padding:.3rem .5rem;
+  background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:4px}
+
+/* telas médias: a gaveta passa a flutuar sobre o site */
 @media(max-width:1400px){
   body.editando main{grid-template-columns:200px 1fr}
   #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;
@@ -106,6 +122,10 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 <body>
 <header>
   <strong>PAINEL</strong>
+  <div class="toggle-modo">
+    <button class="on" data-modo="projetos">projetos</button>
+    <button data-modo="areas">áreas</button>
+  </div>
   <span id="sujo" hidden>não salvo</span>
   <span id="status"></span>
   <div class="acoes">
@@ -140,14 +160,16 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   </aside>
 </main>
 
-<!-- seletor de arquivos do painel: um só para todos os campos, criado uma vez só
-     (assim trocar o formulário no meio da escolha não perde o arquivo) -->
+<!-- seletor de arquivos do painel: um só para todos os campos -->
 <input type="file" id="seletor" multiple tabindex="-1" aria-hidden="true">
 
 <script>
 /* token injetado pelo servidor ao servir esta página */
 const token = "__PAINEL_TOKEN__";
-let projetos = [], areas = [], sel = -1, sujo = false;
+let projetos = [], areas = [], areasEditaveis = [];
+let sel = -1, selArea = -1, sujo = false, modoAtual = 'projetos';
+// guarda o id original de cada área ao abrir (para avisar se mudou)
+let idOriginalArea = '';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -172,15 +194,13 @@ function status(msg, erro) {
   tempo = setTimeout(() => { el.textContent = ""; el.className = ""; }, 5000);
 }
 
-/* marca que existe alteração ainda não gravada no disco */
 function marcarSujo(){ sujo = true; $("#sujo").hidden = false; }
 function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
 
 const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "projeto";
+  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "item";
 
-/* formatos que o navegador desenha dentro de uma tag <img>.
-   Os outros são guardados do mesmo jeito, mas não aparecem no site. */
+/* formatos que o navegador desenha dentro de uma tag <img> */
 const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
 
 const lerBase64 = f => new Promise((ok, err) => {
@@ -202,7 +222,6 @@ function setCampo(obj, caminho, valor) {
 /* ---------- site dentro do painel ---------- */
 const frame = $("#prev");
 
-// Ctrl+S dentro do site também salva.
 function ligarFrame() {
   try {
     const d = frame.contentDocument;
@@ -216,8 +235,6 @@ function ligarFrame() {
   } catch (e) {}
 }
 
-// Recarrega o site e só resolve quando ele terminou de carregar.
-// Mantém a aba, a rolagem e o projeto aberto no modal, para o preview não "pular".
 function carregarPreview() {
   let antes = null;
   try {
@@ -243,10 +260,22 @@ function carregarPreview() {
   });
 }
 
-/* ---------- desenho ---------- */
-function desenhar() { desenharLista(); desenharForm(); }
+/* ---------- modo projetos / áreas ---------- */
+function mudarModo(m) {
+  modoAtual = m;
+  document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
+  $('#novo').textContent = m === 'projetos' ? '+ projeto' : '+ área';
+  $('#ver-site').style.display = m === 'projetos' ? '' : 'none';
+  desenharLista();
+  if (m === 'projetos') {
+    if (sel >= 0) desenharForm(); else fechar();
+  } else {
+    if (selArea >= 0) desenharFormArea(); else fechar();
+  }
+}
 
-function desenharLista() {
+/* ---------- desenho ---------- */
+function desenharListaProjetos() {
   const conta = n => n ? n + (n === 1 ? " mídia" : " mídias") : "sem mídia";
   $("#lista").innerHTML = projetos.map((p, i) => `
     <li class="${i === sel ? "sel" : ""}" data-i="${i}" title="${esc(p.title?.pt || "")}">
@@ -254,6 +283,24 @@ function desenharLista() {
       <span>${esc(p.title?.pt || "(sem título)")}</span>
       <em>${esc(p.area || "")}${p.cat ? " / " + esc(p.cat) : ""} · ${conta((p.media || []).length)}</em>
     </li>`).join("") || '<li class="vazio">nenhum projeto</li>';
+}
+
+function desenharListaAreas() {
+  const conta = a => {
+    const n = (a.cats || []).length;
+    return n ? n + (n === 1 ? ' categoria' : ' categorias') : 'sem categorias';
+  };
+  $('#lista').innerHTML = areasEditaveis.map((a, i) => `
+    <li class="${i === selArea ? 'sel' : ''}" data-ai="${i}" title="${esc(a.name?.pt || '')}">
+      <b>${String(i + 1).padStart(2, '0')}</b>
+      <span>${esc(a.name?.pt || '(sem nome)')}</span>
+      <em>${esc(a.id || '—')} · ${conta(a)}</em>
+    </li>`).join('') || '<li class="vazio">nenhuma área</li>';
+}
+
+function desenharLista() {
+  if (modoAtual === 'projetos') desenharListaProjetos();
+  else desenharListaAreas();
 }
 
 function linhaMidia(m, i, total) {
@@ -287,6 +334,24 @@ function linhaMidia(m, i, total) {
             : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(preview.split("/").pop())}</span>`)
         : ""}
     </div>
+  </div>`;
+}
+
+function linhaCategoria(c, i, total) {
+  return `<div class="cat" data-ci="${i}">
+    <div class="cat-topo">
+      <span class="num">${String(i + 1).padStart(2, '0')}</span>
+      <button class="empurra" data-cat-subir ${i === 0 ? 'disabled' : ''} title="mover para cima">↑</button>
+      <button data-cat-descer ${i === total - 1 ? 'disabled' : ''} title="mover para baixo">↓</button>
+      <button class="perigo" data-cat-remover title="remover categoria">×</button>
+    </div>
+    <div class="cat-linha">
+      <label>nome PT <input data-catcampo="name.pt" value="${esc(c.name?.pt)}"></label>
+      <label>nome EN <input data-catcampo="name.en" value="${esc(c.name?.en)}"></label>
+    </div>
+    <label class="cat-id">id (slug)
+      <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente ao salvar">
+    </label>
   </div>`;
 }
 
@@ -328,15 +393,66 @@ function desenharForm() {
       ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
     </div>
     <button class="perigo" id="apagar">apagar projeto</button>`;
+  desenharListaProjetos();
+}
+
+function desenharFormArea() {
+  const a = areasEditaveis[selArea];
+  if (!a) {
+    $('#drawer-titulo').textContent = '';
+    $('#form').innerHTML = '<p class="dica">Escolha uma área à esquerda ou crie uma nova.</p>';
+    return;
+  }
+  const idMudou = idOriginalArea && a.id !== idOriginalArea;
+  const projetosAfetados = idMudou ? projetos.filter(p => p.area === idOriginalArea).length : 0;
+  $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (a.name?.pt || 'sem nome');
+  $('#form').innerHTML = `
+    <div class="linha">
+      <label>nome PT <input data-acampo="name.pt" value="${esc(a.name?.pt)}"></label>
+      <label>nome EN <input data-acampo="name.en" value="${esc(a.name?.en)}"></label>
+    </div>
+    <div class="linha">
+      <label>aba PT (curto) <input data-acampo="short.pt" value="${esc(a.short?.pt)}" placeholder="${esc(a.name?.pt)}"></label>
+      <label>aba EN (curto) <input data-acampo="short.en" value="${esc(a.short?.en)}" placeholder="${esc(a.name?.en)}"></label>
+    </div>
+    <label>id / slug
+      <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace">
+    </label>
+    ${idMudou && projetosAfetados > 0 ? `<p class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}" — atualize-os também após salvar.</p>` : ''}
+    <label>subtítulo PT
+      <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea>
+    </label>
+    <label>subtítulo EN
+      <textarea rows="2" data-acampo="lead.en">${esc(a.lead?.en)}</textarea>
+    </label>
+    <h3>categorias (filtros) <button id="add-cat">+ categoria</button></h3>
+    <div id="cats">
+      ${(a.cats || []).map((c, i) => linhaCategoria(c, i, (a.cats || []).length)).join('') || '<p class="dica">nenhuma categoria — a área aparece sem filtros</p>'}
+    </div>
+    <button class="perigo" id="apagar-area">apagar área</button>`;
+  desenharListaAreas();
+}
+
+function desenhar() {
   desenharLista();
+  if (modoAtual === 'projetos') desenharForm();
+  else desenharFormArea();
 }
 
 /* ---------- gaveta ---------- */
 function abrir(i) {
   sel = i;
   document.body.classList.add("editando");
-  desenhar();
+  desenharForm();
 }
+
+function abrirArea(i) {
+  selArea = i;
+  idOriginalArea = areasEditaveis[i]?.id || '';
+  document.body.classList.add('editando');
+  desenharFormArea();
+}
+
 function fechar() { document.body.classList.remove("editando"); }
 
 $("#fechar-drawer").onclick = fechar;
@@ -344,16 +460,29 @@ $("#fechar-drawer").onclick = fechar;
 /* ---------- ações ---------- */
 $("#lista").addEventListener("click", e => {
   const li = e.target.closest("li[data-i]");
-  if (!li) return;
-  abrir(+li.dataset.i);
+  if (li) { abrir(+li.dataset.i); return; }
+  const lia = e.target.closest("li[data-ai]");
+  if (lia) { abrirArea(+lia.dataset.ai); return; }
+});
+
+/* alternador de modo */
+document.querySelectorAll('[data-modo]').forEach(b => {
+  b.onclick = () => mudarModo(b.dataset.modo);
 });
 
 $("#novo").onclick = () => {
-  projetos.unshift({ area: areas[0]?.id || "design", cat: "", h: 0, tools: "",
-    title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
-  marcarSujo();
-  abrir(0);
-  document.querySelector('[data-campo="title.pt"]')?.focus();
+  if (modoAtual === 'projetos') {
+    projetos.unshift({ area: areas[0]?.id || "design", cat: "", h: 0, tools: "",
+      title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+    marcarSujo();
+    abrir(0);
+    document.querySelector('[data-campo="title.pt"]')?.focus();
+  } else {
+    areasEditaveis.push({ id: "", name: { pt: "", en: "" }, short: { pt: "", en: "" }, cats: [], lead: { pt: "", en: "" } });
+    marcarSujo();
+    abrirArea(areasEditaveis.length - 1);
+    document.querySelector('[data-acampo="name.pt"]')?.focus();
+  }
 };
 
 $("#recarregar").onclick = async () => {
@@ -369,6 +498,7 @@ document.querySelectorAll("[data-largura]").forEach(b => {
   };
 });
 
+/* ---------- salvar projetos ---------- */
 async function salvar() {
   const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
   if (semTitulo >= 0) {
@@ -388,7 +518,42 @@ async function salvar() {
     return false;
   }
 }
-$("#salvar").onclick = () => { salvar(); };
+
+/* ---------- salvar áreas ---------- */
+async function salvarAreas() {
+  for (let i = 0; i < areasEditaveis.length; i++) {
+    const a = areasEditaveis[i];
+    if (!String(a.name?.pt || '').trim()) {
+      abrirArea(i);
+      status('a área ' + String(i + 1).padStart(2, '0') + ' está sem nome PT', true);
+      return false;
+    }
+    // Auto-preenche id se vazio
+    if (!String(a.id || '').trim()) {
+      areasEditaveis[i].id = slug(a.name?.pt || ('area-' + (i + 1)));
+    }
+  }
+  try {
+    status('salvando áreas…');
+    await api('/api/areas', { areas: areasEditaveis });
+    // Atualiza o dropdown de áreas no form de projetos
+    const r = await api('/api/estado');
+    areas = r.areas;
+    areasEditaveis = r.areasCompletas || areasEditaveis;
+    // Atualiza o id original para o normalizado pelo servidor
+    if (selArea >= 0) idOriginalArea = areasEditaveis[selArea]?.id || '';
+    limparSujo();
+    await carregarPreview();
+    status('áreas salvas — site atualizado');
+    if (modoAtual === 'areas') desenharFormArea();
+    return true;
+  } catch (e) {
+    status('erro: ' + e.message, true);
+    return false;
+  }
+}
+
+$("#salvar").onclick = () => { modoAtual === 'projetos' ? salvar() : salvarAreas(); };
 
 /* abre no site o projeto que está sendo editado */
 $("#ver-site").onclick = async () => {
@@ -408,10 +573,11 @@ $("#ver-site").onclick = async () => {
 
 /* ---------- edição ---------- */
 $("#form").addEventListener("input", e => {
+  // Projetos: campos normais
   const c = e.target.closest("[data-campo]");
   if (c) {
     setCampo(projetos[sel], c.dataset.campo, c.value);
-    desenharLista();
+    desenharListaProjetos();
     if (c.dataset.campo === "title.pt") $("#drawer-titulo").textContent =
       String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
     marcarSujo();
@@ -422,6 +588,43 @@ $("#form").addEventListener("input", e => {
     const mi = +m.closest("[data-mi]").dataset.mi;
     projetos[sel].media[mi][m.dataset.mcampo] = m.value;
     marcarSujo();
+    return;
+  }
+  // Áreas: campos da área
+  const ca = e.target.closest('[data-acampo]');
+  if (ca) {
+    setCampo(areasEditaveis[selArea], ca.dataset.acampo, ca.value);
+    if (ca.dataset.acampo === 'name.pt') {
+      $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (ca.value || 'sem nome');
+      // Auto-preenche id se ainda estiver vazio
+      const a = areasEditaveis[selArea];
+      if (!a.id) {
+        a.id = slug(ca.value);
+        const idInput = document.querySelector('[data-acampo="id"]');
+        if (idInput) idInput.value = a.id;
+      }
+    }
+    if (ca.dataset.acampo === 'id') {
+      // Redesenha para mostrar/esconder aviso de id mudado
+      const rolagem = $('#form').scrollTop;
+      desenharFormArea();
+      $('#form').scrollTop = rolagem;
+      // Re-foca no campo id
+      const idInput = document.querySelector('[data-acampo="id"]');
+      if (idInput) { idInput.focus(); idInput.setSelectionRange(ca.value.length, ca.value.length); }
+      return;
+    }
+    marcarSujo();
+    desenharListaAreas();
+    return;
+  }
+  // Áreas: campos de categoria
+  const cc = e.target.closest('[data-catcampo]');
+  if (cc) {
+    const ci = +cc.closest('[data-ci]').dataset.ci;
+    setCampo(areasEditaveis[selArea].cats[ci], cc.dataset.catcampo, cc.value);
+    marcarSujo();
+    return;
   }
 });
 
@@ -444,13 +647,113 @@ $("#form").addEventListener("change", async e => {
   }
 });
 
+/* ---------- cliques no form ---------- */
+$("#form").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+
+  /* ---- ações de categorias (modo áreas) ---- */
+  if (b.id === 'add-cat') {
+    areasEditaveis[selArea].cats = areasEditaveis[selArea].cats || [];
+    areasEditaveis[selArea].cats.push({ id: '', name: { pt: '', en: '' } });
+    marcarSujo();
+    const rolagem = $('#form').scrollTop;
+    desenharFormArea();
+    $('#form').scrollTop = rolagem;
+    const catInputs = document.querySelectorAll('[data-catcampo="name.pt"]');
+    catInputs[catInputs.length - 1]?.focus();
+    return;
+  }
+  if (b.id === 'apagar-area') {
+    if (confirm('Apagar esta área? Projetos que a usam ficarão sem área válida.')) {
+      areasEditaveis.splice(selArea, 1);
+      selArea = Math.min(selArea, areasEditaveis.length - 1);
+      marcarSujo();
+      if (!areasEditaveis.length) fechar();
+      else { idOriginalArea = areasEditaveis[selArea]?.id || ''; desenharFormArea(); }
+      desenharListaAreas();
+    }
+    return;
+  }
+  if (b.hasAttribute('data-cat-subir')) {
+    const ci = +b.closest('[data-ci]').dataset.ci;
+    if (ci > 0) {
+      const cats = areasEditaveis[selArea].cats;
+      [cats[ci - 1], cats[ci]] = [cats[ci], cats[ci - 1]];
+      marcarSujo();
+      const rolagem = $('#form').scrollTop;
+      desenharFormArea();
+      $('#form').scrollTop = rolagem;
+    }
+    return;
+  }
+  if (b.hasAttribute('data-cat-descer')) {
+    const ci = +b.closest('[data-ci]').dataset.ci;
+    const cats = areasEditaveis[selArea].cats;
+    if (ci < cats.length - 1) {
+      [cats[ci + 1], cats[ci]] = [cats[ci], cats[ci + 1]];
+      marcarSujo();
+      const rolagem = $('#form').scrollTop;
+      desenharFormArea();
+      $('#form').scrollTop = rolagem;
+    }
+    return;
+  }
+  if (b.hasAttribute('data-cat-remover')) {
+    const ci = +b.closest('[data-ci]').dataset.ci;
+    areasEditaveis[selArea].cats.splice(ci, 1);
+    marcarSujo();
+    const rolagem = $('#form').scrollTop;
+    desenharFormArea();
+    $('#form').scrollTop = rolagem;
+    return;
+  }
+
+  /* ---- ações de mídias (modo projetos) ---- */
+  const caixa = b.closest("[data-mi]");
+  const mi = caixa ? +caixa.dataset.mi : -1;
+  const media = projetos[sel]?.media || [];
+
+  if (b.hasAttribute("data-escolher")) {
+    if (caixa) abrirSeletor(b.dataset.escolher, mi);
+  }
+  else if (b.id === "add-midia") {
+    projetos[sel].media.push({ type: "image", src: "" });
+    marcarSujo();
+    desenharForm();
+  }
+  else if (b.id === "apagar") {
+    if (confirm("Apagar este projeto da lista?")) {
+      projetos.splice(sel, 1);
+      sel = Math.min(sel, projetos.length - 1);
+      marcarSujo();
+      if (!projetos.length) fechar();
+      desenhar();
+    }
+  }
+  else if (b.hasAttribute("data-subir") && mi > 0) {
+    [media[mi - 1], media[mi]] = [media[mi], media[mi - 1]];
+    marcarSujo();
+    desenharForm();
+  }
+  else if (b.hasAttribute("data-descer") && mi < media.length - 1) {
+    [media[mi + 1], media[mi]] = [media[mi], media[mi + 1]];
+    marcarSujo();
+    desenharForm();
+  }
+  else if (b.hasAttribute("data-remover")) {
+    media.splice(mi, 1);
+    marcarSujo();
+    desenharForm();
+  }
+});
+
 /* ---------- escolher e enviar arquivos ---------- */
 const seletor = $("#seletor");
 
-// O botão só aponta o seletor para a mídia e o campo certos e abre o diálogo.
 function abrirSeletor(alvo, mi) {
-  seletor.value = "";                    // permite escolher o mesmo arquivo de novo
-  seletor.multiple = alvo === "src";     // várias imagens de uma vez; capa é uma só
+  seletor.value = "";
+  seletor.multiple = alvo === "src";
   seletor.dataset.alvo = alvo;
   seletor.dataset.mi = String(mi);
   status(alvo === "src" ? "escolha uma ou mais imagens…" : "escolha a imagem de capa…");
@@ -465,13 +768,11 @@ seletor.addEventListener("change", () => {
   if (lista.length) enviarArquivos(lista, alvo, mi);
 });
 
-// Envia em fila: o primeiro arquivo ocupa a mídia clicada, os outros entram
-// logo depois dele, na ordem em que foram escolhidos.
 async function enviarArquivos(lista, alvo, mi0) {
   const p = projetos[sel];
   if (!p || !p.media || !p.media[mi0] || !lista.length) return;
   const arquivos = [...lista];
-  if (alvo !== "src") arquivos.length = 1;   // capa é uma só
+  if (alvo !== "src") arquivos.length = 1;
 
   const pasta = slug(p.title?.pt);
   let destino = mi0, ultimo = null, foraDoSite = [];
@@ -484,7 +785,7 @@ async function enviarArquivos(lista, alvo, mi0) {
         : "enviando " + f.name + "…");
       const dados = await lerBase64(f);
       const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
-      if (projetos[sel] !== p) return;        // trocou de projeto durante o envio
+      if (projetos[sel] !== p) return;
       if (k > 0) {
         p.media.splice(destino + 1, 0, { type: "image", src: "" });
         destino += 1;
@@ -517,7 +818,7 @@ async function enviarArquivos(lista, alvo, mi0) {
     status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
 }
 
-// Soltar arquivos em cima do botão também funciona (evita o diálogo do sistema).
+// Soltar arquivos em cima do botão também funciona
 $("#form").addEventListener("dragover", e => {
   const alvo = e.target.closest("[data-escolher]");
   if (!alvo) return;
@@ -539,43 +840,6 @@ $("#form").addEventListener("drop", e => {
   if (caixa && lista.length) enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
-$("#form").addEventListener("click", e => {
-  const b = e.target.closest("button");
-  if (!b) return;
-  const caixa = b.closest("[data-mi]");
-  const mi = caixa ? +caixa.dataset.mi : -1;
-  const media = projetos[sel]?.media || [];
-
-  if (b.hasAttribute("data-escolher")) {
-    if (caixa) abrirSeletor(b.dataset.escolher, mi);
-  }
-  else if (b.id === "add-midia") { projetos[sel].media.push({ type: "image", src: "" }); marcarSujo(); desenharForm(); }
-  else if (b.id === "apagar") {
-    if (confirm("Apagar este projeto da lista?")) {
-      projetos.splice(sel, 1);
-      sel = Math.min(sel, projetos.length - 1);
-      marcarSujo();
-      if (!projetos.length) fechar();
-      desenhar();
-    }
-  }
-  else if (b.hasAttribute("data-subir") && mi > 0) {
-    [media[mi - 1], media[mi]] = [media[mi], media[mi - 1]];
-    marcarSujo();
-    desenharForm();
-  }
-  else if (b.hasAttribute("data-descer") && mi < media.length - 1) {
-    [media[mi + 1], media[mi]] = [media[mi], media[mi + 1]];
-    marcarSujo();
-    desenharForm();
-  }
-  else if (b.hasAttribute("data-remover")) {
-    media.splice(mi, 1);
-    marcarSujo();
-    desenharForm();
-  }
-});
-
 /* Ctrl+S salva, Esc fecha a gaveta, e sair com alteração pendente pede confirmação. */
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
@@ -594,7 +858,9 @@ window.addEventListener("beforeunload", e => {
 (async () => {
   try {
     const r = await api("/api/estado");
-    projetos = r.projetos; areas = r.areas;
+    projetos = r.projetos;
+    areas = r.areas;
+    areasEditaveis = r.areasCompletas || r.areas;
     desenhar();
     ligarFrame();
     if (!token || token.indexOf("__PAINEL") === 0)

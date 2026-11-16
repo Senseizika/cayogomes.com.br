@@ -27,6 +27,7 @@ const DIR_CONTEUDO = path.join(ROOT, 'conteudo');
 const ARQ_JSON = path.join(DIR_CONTEUDO, 'projetos.json');
 const ARQ_JS = path.join(DIR_CONTEUDO, 'projetos.js');
 const ARQ_CONTENT = path.join(ROOT, 'content.js');
+const ARQ_AREAS_JSON = path.join(DIR_CONTEUDO, 'areas.json');
 const DIR_IMG = path.join(ROOT, 'img', 'projetos');
 const PAINEL_HTML = path.join(__dirname, 'painel.html');
 
@@ -58,6 +59,61 @@ function lerAreas() {
   } catch (e) {
     console.error('  aviso: não consegui ler AREAS do content.js (' + e.message + ')');
     return [];
+  }
+}
+
+/* retorna a versão completa das áreas (com short, lead, cats bilíngues) para o editor do painel */
+function lerAreasCompletas() {
+  // prefere areas.json (fonte da verdade do editor)
+  try {
+    const v = JSON.parse(fs.readFileSync(ARQ_AREAS_JSON, 'utf8'));
+    if (Array.isArray(v)) return v;
+  } catch (e) {}
+  // fallback: lê direto do content.js
+  try {
+    const src = fs.readFileSync(ARQ_CONTENT, 'utf8');
+    const areas = new Function(src + '\nreturn AREAS;')();
+    return Array.isArray(areas) ? areas : [];
+  } catch (e) {
+    console.error('  aviso: não consegui ler AREAS completas (' + e.message + ')');
+    return [];
+  }
+}
+
+function normalizarAreas(lista) {
+  if (!Array.isArray(lista)) throw new Error('formato inválido: esperava lista');
+  if (lista.length > 30) throw new Error('máximo de 30 áreas');
+  const slugify = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return lista.map((a, idx) => {
+    const id = slugify(a.id) || slugify(a.name?.pt) || ('area-' + (idx + 1));
+    if (!id) throw new Error('área ' + (idx + 1) + ' sem id');
+    const cats = (Array.isArray(a.cats) ? a.cats : []).map((c, ci) => {
+      const cid = slugify(c.id) || slugify(c.name?.pt) || ('cat-' + (ci + 1));
+      return { id: cid, name: { pt: String(c.name?.pt || cid), en: String(c.name?.en || cid) } };
+    }).filter(c => c.id);
+    return {
+      id,
+      name:  { pt: String(a.name?.pt  || id),                en: String(a.name?.en  || id) },
+      short: { pt: String(a.short?.pt || a.name?.pt || id),  en: String(a.short?.en || a.name?.en || id) },
+      cats,
+      lead:  { pt: String(a.lead?.pt  || ''),                en: String(a.lead?.en  || '') }
+    };
+  });
+}
+
+function gravarAreas(lista) {
+  fs.mkdirSync(DIR_CONTEUDO, { recursive: true });
+  // salva areas.json (fonte da verdade do editor)
+  fs.writeFileSync(ARQ_AREAS_JSON, JSON.stringify(lista, null, 2) + '\n', 'utf8');
+  // substitui o bloco AREAS no content.js
+  let src = fs.readFileSync(ARQ_CONTENT, 'utf8');
+  const novasAreas = 'const AREAS = ' + JSON.stringify(lista, null, 2) + ';';
+  const novo = src.replace(/const AREAS = \[[\s\S]*?\n\];/, novasAreas);
+  if (novo !== src) {
+    fs.writeFileSync(ARQ_CONTENT, novo, 'utf8');
+  } else {
+    console.warn('  aviso: bloco AREAS não encontrado no content.js — apenas areas.json foi atualizado');
   }
 }
 
@@ -190,13 +246,20 @@ const server = http.createServer(async (req, res) => {
       if (req.headers['x-painel-token'] !== TOKEN) return json(res, 403, { erro: 'token inválido' });
 
       if (rota === '/api/estado' && req.method === 'GET') {
-        return json(res, 200, { projetos: lerProjetos(), areas: lerAreas() });
+        return json(res, 200, { projetos: lerProjetos(), areas: lerAreas(), areasCompletas: lerAreasCompletas() });
       }
       if (rota === '/api/projetos' && req.method === 'POST') {
         const dados = await corpo(req);
         const lista = normalizar(dados.projetos);
         gravar(lista);
         console.log(`  salvo: ${lista.length} projeto(s)`);
+        return json(res, 200, { ok: true, total: lista.length });
+      }
+      if (rota === '/api/areas' && req.method === 'POST') {
+        const dados = await corpo(req);
+        const lista = normalizarAreas(dados.areas);
+        gravarAreas(lista);
+        console.log(`  áreas: ${lista.length} área(s) salva(s)`);
         return json(res, 200, { ok: true, total: lista.length });
       }
       if (rota === '/api/arquivo' && req.method === 'POST') {
