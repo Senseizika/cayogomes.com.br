@@ -570,6 +570,19 @@ document.addEventListener("click", e => {
     render();
   }
 });
+/* imagem que o navegador não consegue mostrar (formato errado ou arquivo faltando)
+   vira o placeholder em vez de ícone de imagem quebrada */
+document.addEventListener("error", e => {
+  const img = e.target;
+  if (!img || img.tagName !== "IMG" || img.dataset.fb || img.dataset.falhou) return;
+  img.dataset.falhou = "1";
+  const ph = document.createElement("div");
+  ph.className = "ph";
+  ph.style.setProperty("--h", "0");
+  ph.textContent = UI[lang].img;
+  img.replaceWith(ph);
+}, true);
+
 window.addEventListener("hashchange", () => pick(location.hash.slice(1), false));
 $("#tabs").addEventListener("keydown", e => {
   const k = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;

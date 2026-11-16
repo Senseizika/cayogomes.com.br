@@ -77,6 +77,9 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .midia .topo button{padding:.2rem .45rem;font-size:.8rem}
 .midia .corpo{display:grid;gap:.45rem}
 .mini{max-width:120px;border-radius:4px;border:1px solid var(--line);display:block;margin-top:.2rem}
+.mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);
+  border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;
   border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
 .arquivo:hover{border-color:var(--mute);color:var(--white)}
@@ -169,10 +172,16 @@ function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
 const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "projeto";
 
+/* formatos que o navegador desenha dentro de uma tag <img>.
+   Os outros são guardados do mesmo jeito, mas não aparecem no site. */
+const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
+
 const lerBase64 = f => new Promise((ok, err) => {
+  if (!f) return err(new Error("nenhum arquivo selecionado"));
   const r = new FileReader();
   r.onload = () => ok(r.result);
-  r.onerror = err;
+  r.onerror = () => err(new Error("não consegui ler o arquivo " + f.name));
+  r.onabort = () => err(new Error("leitura cancelada: " + f.name));
   r.readAsDataURL(f);
 });
 
@@ -264,9 +273,13 @@ function linhaMidia(m, i, total) {
         <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa">
       </label>`}
       <label class="arquivo">${ehImg ? "escolher imagem" : "escolher capa"}
-        <input type="file" accept="image/*" data-upload="${ehImg ? "src" : "poster"}">
+        <input type="file" data-upload="${ehImg ? "src" : "poster"}">
       </label>
-      ${preview ? `<img class="mini" src="/${esc(preview)}" alt="">` : ""}
+      ${preview
+        ? (WEB_IMG.test(preview)
+            ? `<img class="mini" src="/${esc(preview)}" alt="">`
+            : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(preview.split("/").pop())}</span>`)
+        : ""}
     </div>
   </div>`;
 }
@@ -429,14 +442,22 @@ $("#form").addEventListener("change", async e => {
   const mi = +arq.closest("[data-mi]").dataset.mi;
   const alvo = arq.dataset.upload;
   try {
-    status("enviando imagem…");
+    status("enviando arquivo…");
     const dados = await lerBase64(arq.files[0]);
-    const r = await api("/api/imagem", { pasta: slug(projetos[sel].title?.pt), nome: arq.files[0].name, dados });
+    const r = await api("/api/arquivo", { pasta: slug(projetos[sel].title?.pt), nome: arq.files[0].name, dados });
     projetos[sel].media[mi][alvo] = r.caminho;
     marcarSujo();
     desenharForm();
-    status("imagem salva: " + r.caminho + " (" + Math.round(r.bytes / 1024) + " KB)");
-  } catch (err) { status("erro: " + err.message, true); }
+    const nome = r.caminho.split("/").pop();
+    const kb = r.bytes < 1024 ? r.bytes + " B" : Math.round(r.bytes / 1024) + " KB";
+    if (alvo === "src" && !WEB_IMG.test(r.caminho))
+      status("salvo " + nome + " (" + kb + ") — o site só garante webp, jpg, png, gif e avif; confira no preview", true);
+    else
+      status("arquivo salvo: " + r.caminho + " (" + kb + ")");
+  } catch (err) {
+    console.error(err);
+    status("erro: " + (err && err.message ? err.message : String(err)), true);
+  }
 });
 
 $("#form").addEventListener("click", e => {

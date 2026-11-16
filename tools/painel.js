@@ -9,11 +9,11 @@
  * O que ele faz:
  *   - lê e grava conteudo/projetos.json (a fonte da verdade)
  *   - regrava conteudo/projetos.js (o arquivo que o site carrega)
- *   - grava imagens em img/projetos/<pasta>/NN.ext
+ *   - grava qualquer arquivo enviado em img/projetos/<pasta>/NN.ext, mantendo a extensão
  *
  * Segurança: escuta só em 127.0.0.1 e as rotas /api exigem o token da
- * sessão (aparece na URL). Sem o token, qualquer site aberto no navegador
- * poderia mandar POST para o painel enquanto ele estiver rodando.
+ * sessão (embutido na página do painel). Sem o token, qualquer site aberto
+ * no navegador poderia mandar POST para o painel enquanto ele estiver rodando.
  */
 
 const fs = require('fs');
@@ -98,18 +98,20 @@ function gravar(lista) {
 }
 
 /* ---------- imagens ---------- */
-const EXT_OK = ['webp', 'jpg', 'jpeg', 'png', 'avif', 'gif'];
-
-function salvarImagem(pasta, nomeOriginal, dataUrl) {
-  const m = /^data:([\w/+.-]+);base64,([A-Za-z0-9+/=\s]+)$/.exec(String(dataUrl || ''));
+function salvarArquivo(pasta, nomeOriginal, dataUrl) {
+  // aceita data URL com ou sem tipo: o Windows não conhece muitos formatos e
+  // o navegador manda "data:;base64,..." nesses casos
+  const m = /^data:([^,]*),([\s\S]*)$/.exec(String(dataUrl || ''));
   if (!m) throw new Error('arquivo inválido');
+  if (!/;base64$/i.test(m[1])) throw new Error('envio não é base64');
 
   const buf = Buffer.from(m[2], 'base64');
   if (!buf.length) throw new Error('arquivo vazio');
-  if (buf.length > 8 * 1024 * 1024) throw new Error('imagem maior que 8 MB');
+  if (buf.length > 30 * 1024 * 1024) throw new Error('arquivo maior que 30 MB');
 
-  let ext = (path.extname(String(nomeOriginal || '')).slice(1) || '').toLowerCase();
-  if (!EXT_OK.includes(ext)) ext = 'jpg';
+  // qualquer extensão é aceita: o arquivo é guardado como veio, com o mesmo nome de extensão
+  let ext = String(path.extname(String(nomeOriginal || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!ext || ext.length > 10) ext = 'bin';
 
   const seg = String(pasta || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -133,7 +135,11 @@ const MIME = {
   '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
   '.avif': 'image/avif', '.gif': 'image/gif', '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon', '.woff2': 'font/woff2'
+  '.ico': 'image/x-icon', '.bmp': 'image/bmp', '.tif': 'image/tiff', '.tiff': 'image/tiff',
+  '.heic': 'image/heic', '.jxl': 'image/jxl', '.psd': 'image/vnd.adobe.photoshop',
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime',
+  '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json',
+  '.pdf': 'application/pdf', '.woff2': 'font/woff2'
 };
 
 function servirArquivo(res, abs) {
@@ -156,7 +162,7 @@ function json(res, codigo, obj) {
 function corpo(req) {
   return new Promise((ok, err) => {
     let d = '';
-    req.on('data', c => { d += c; if (d.length > 40e6) { req.destroy(); err(new Error('corpo grande demais')); } });
+    req.on('data', c => { d += c; if (d.length > 45e6) { req.destroy(); err(new Error('corpo grande demais')); } });
     req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { err(new Error('json inválido')); } });
     req.on('error', err);
   });
@@ -193,10 +199,10 @@ const server = http.createServer(async (req, res) => {
         console.log(`  salvo: ${lista.length} projeto(s)`);
         return json(res, 200, { ok: true, total: lista.length });
       }
-      if (rota === '/api/imagem' && req.method === 'POST') {
+      if (rota === '/api/arquivo' && req.method === 'POST') {
         const dados = await corpo(req);
-        const r = salvarImagem(dados.pasta, dados.nome, dados.dados);
-        console.log(`  imagem: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
+        const r = salvarArquivo(dados.pasta, dados.nome, dados.dados);
+        console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
       }
       return json(res, 404, { erro: 'rota não encontrada' });
