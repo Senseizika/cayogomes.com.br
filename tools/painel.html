@@ -7,48 +7,94 @@
 <style>
 :root{--ink:#050506;--panel:#0b0c0e;--line:rgba(255,255,255,.14);--white:#f4f4f2;--mute:#8d9490;--accent:#ef2b31}
 *{box-sizing:border-box}
-body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-ui,sans-serif}
-header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(5,5,6,.97);z-index:5}
-header strong{font:400 1.1rem ui-monospace,Consolas,monospace;letter-spacing:.22em}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+
+/* ---------- topo ---------- */
+header{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line);background:#07080a;flex:0 0 auto;z-index:40}
+header strong{font:400 1rem ui-monospace,Consolas,monospace;letter-spacing:.22em}
 #sujo{font:400 .78rem ui-monospace,Consolas,monospace;color:#f0b429;border:1px solid rgba(240,180,41,.4);border-radius:4px;padding:.15rem .45rem}
 #sujo[hidden]{display:none}
-#status{font:400 .8rem ui-monospace,Consolas,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status{font:400 .78rem ui-monospace,Consolas,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #status.ok{color:#39d98a} #status.err{color:#ff5a5f}
-.acoes{margin-left:auto;display:flex;gap:.6rem;align-items:center;flex:0 0 auto}
-button{background:none;border:1px solid var(--line);color:var(--white);padding:.45rem .8rem;border-radius:6px;cursor:pointer;font:inherit}
+.acoes{margin-left:auto;display:flex;gap:.5rem;align-items:center;flex:0 0 auto}
+button{background:none;border:1px solid var(--line);color:var(--white);padding:.4rem .7rem;border-radius:6px;cursor:pointer;font:inherit}
 button:hover{border-color:var(--mute)}
 button.pri{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:600}
 button.perigo{color:#ff5a5f;border-color:rgba(255,90,95,.4)}
 button:disabled{opacity:.35;cursor:default}
-a{color:var(--mute);text-decoration:none;font-size:.85rem}
+a{color:var(--mute);text-decoration:none;font-size:.82rem}
 a:hover{color:var(--white)}
-main{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 58px)}
-aside{border-right:1px solid var(--line);padding:.6rem;overflow:auto}
+
+/* ---------- corpo: lista | site | formulário ---------- */
+main{flex:1;display:grid;grid-template-columns:200px 1fr;min-height:0;position:relative}
+body.editando main{grid-template-columns:200px 1fr min(420px,38vw)}
+
+#lateral{border-right:1px solid var(--line);overflow:auto;padding:.45rem;min-height:0}
 ol{list-style:none;margin:0;padding:0}
-ol li{display:grid;grid-template-columns:2rem 1fr;gap:.3rem;padding:.55rem .6rem;border-radius:6px;cursor:pointer;border:1px solid transparent}
+ol li{display:grid;grid-template-columns:1.7rem 1fr;gap:.25rem;padding:.5rem .55rem;border-radius:6px;cursor:pointer;border:1px solid transparent}
 ol li:hover{background:rgba(255,255,255,.04)}
 ol li.sel{border-color:var(--accent);background:rgba(239,43,49,.1)}
-ol li b{font:400 .8rem ui-monospace,Consolas,monospace;color:var(--mute)}
-ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-ol li em{grid-column:2;font:400 .7rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal}
-section{padding:1.2rem clamp(1rem,3vw,2rem);max-width:940px}
-label{display:block;margin-bottom:.8rem;font:400 .72rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
-input,select,textarea{display:block;width:100%;margin-top:.25rem;background:#0f1114;border:1px solid var(--line);color:var(--white);padding:.5rem .6rem;border-radius:6px;font:400 .95rem system-ui,sans-serif}
+ol li b{font:400 .78rem ui-monospace,Consolas,monospace;color:var(--mute)}
+ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem}
+ol li em{grid-column:2;font:400 .66rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem}
+
+#palco{display:flex;flex-direction:column;min-width:0;min-height:0}
+#ferramentas{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-bottom:1px solid var(--line);
+  font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);flex:0 0 auto}
+#ferramentas button{padding:.2rem .5rem;font:400 .72rem ui-monospace,Consolas,monospace;border-radius:4px}
+#ferramentas button.on{border-color:var(--accent);color:var(--accent)}
+#ferramentas .cresc{flex:1}
+#ferramentas .dica{opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ferramentas .sep{width:1px;height:14px;background:var(--line);margin:0 .2rem}
+
+#moldura{flex:1;min-height:0;display:grid;place-items:center;padding:.7rem;background:#07080a;overflow:auto}
+#prev{width:var(--larg,100%);height:100%;border:1px solid var(--line);border-radius:10px;background:var(--ink);
+  display:block;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+
+/* ---------- gaveta do formulário ---------- */
+#drawer{display:none;flex-direction:column;border-left:1px solid var(--line);background:var(--panel);min-height:0}
+body.editando #drawer{display:flex}
+.drawer-topo{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border-bottom:1px solid var(--line);flex:0 0 auto}
+.drawer-topo span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--mute)}
+.drawer-topo button{padding:.2rem .5rem;font-size:.75rem}
+#form{flex:1;overflow:auto;padding:.9rem 1rem 2rem;min-height:0}
+
+label{display:block;margin-bottom:.7rem;font:400 .68rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+input,select,textarea{display:block;width:100%;margin-top:.22rem;background:#0f1114;border:1px solid var(--line);color:var(--white);
+  padding:.45rem .55rem;border-radius:6px;font:400 .92rem system-ui,sans-serif}
 input:focus,select:focus,textarea:focus{outline:1px solid var(--accent)}
 textarea{resize:vertical}
-.linha{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-h3{font:400 .95rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.4rem 0 .6rem;display:flex;align-items:center;gap:.8rem}
-.midia{border:1px solid var(--line);border-radius:8px;padding:.7rem;margin-bottom:.7rem;background:var(--panel)}
-.midia .topo{display:flex;gap:.4rem;align-items:center;margin-bottom:.6rem}
-.midia .topo select{width:auto;margin:0}
+.linha{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;text-transform:uppercase;color:var(--mute)}
+.midia{border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-bottom:.6rem;background:#0e1013}
+.midia .topo{display:flex;gap:.35rem;align-items:center;margin-bottom:.5rem}
+.midia .topo select{width:auto;margin:0;padding:.3rem .4rem;font-size:.8rem}
 .midia .topo .empurra{margin-left:auto}
-.midia .corpo{display:grid;gap:.5rem}
-.mini{max-width:130px;border-radius:4px;border:1px solid var(--line);display:block;margin-top:.3rem}
-.arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.35rem .6rem;border-radius:6px;color:var(--mute);font-size:.8rem}
+.midia .topo button{padding:.2rem .45rem;font-size:.8rem}
+.midia .corpo{display:grid;gap:.45rem}
+.mini{max-width:120px;border-radius:4px;border:1px solid var(--line);display:block;margin-top:.2rem}
+.arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;
+  border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
 .arquivo:hover{border-color:var(--mute);color:var(--white)}
 .arquivo input{display:none}
-.dica{color:var(--mute);font-size:.9rem}
-@media(max-width:760px){main{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);max-height:34vh}.linha{grid-template-columns:1fr}}
+.dica{color:var(--mute);font-size:.88rem}
+
+/* telas médias: a gaveta passa a flutuar sobre o site
+   (abaixo de ~1400px ela não caberia ao lado sem espremer o site no layout de celular) */
+@media(max-width:1400px){
+  body.editando main{grid-template-columns:200px 1fr}
+  #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;
+    box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
+}
+@media(max-width:760px){
+  main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  #lateral{border-right:0;border-bottom:1px solid var(--line);max-height:22vh}
+  #ferramentas .dica{display:none}
+}
 </style>
 </head>
 <body>
@@ -57,15 +103,37 @@ h3{font:400 .95rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <span id="sujo" hidden>não salvo</span>
   <span id="status"></span>
   <div class="acoes">
-    <a href="/site" target="_blank">ver site</a>
+    <a href="/site" target="_blank">abrir site ↗</a>
     <button id="novo">+ projeto</button>
     <button id="salvar" class="pri">salvar</button>
   </div>
 </header>
+
 <main>
-  <aside><ol id="lista"></ol></aside>
-  <section id="form"><p class="dica">Crie um projeto ou escolha um à esquerda.</p></section>
+  <nav id="lateral"><ol id="lista"></ol></nav>
+
+  <section id="palco">
+    <div id="ferramentas">
+      <button id="recarregar" title="recarregar o site">⟳</button>
+      <i class="sep"></i>
+      <button data-largura="100%" class="on" title="largura total">desktop</button>
+      <button data-largura="390px" title="largura de celular">celular</button>
+      <i class="cresc"></i>
+      <span class="dica">o site ao lado mostra o que já foi salvo</span>
+    </div>
+    <div id="moldura"><iframe id="prev" src="/site" title="site cayogomes.com.br"></iframe></div>
+  </section>
+
+  <aside id="drawer">
+    <div class="drawer-topo">
+      <span id="drawer-titulo"></span>
+      <button id="ver-site" title="abrir este projeto no site ao lado">ver no site</button>
+      <button id="fechar-drawer" title="fechar">×</button>
+    </div>
+    <div id="form"></div>
+  </aside>
 </main>
+
 <script>
 /* token injetado pelo servidor ao servir esta página */
 const token = "__PAINEL_TOKEN__";
@@ -91,18 +159,12 @@ function status(msg, erro) {
   el.textContent = msg;
   el.className = erro ? "err" : "ok";
   clearTimeout(tempo);
-  tempo = setTimeout(() => { el.textContent = ""; }, 5000);
+  tempo = setTimeout(() => { el.textContent = ""; el.className = ""; }, 5000);
 }
 
-// marca que existe alteração ainda não gravada no disco
-function marcarSujo(){
-  sujo = true;
-  $("#sujo").hidden = false;
-}
-function limparSujo(){
-  sujo = false;
-  $("#sujo").hidden = true;
-}
+/* marca que existe alteração ainda não gravada no disco */
+function marcarSujo(){ sujo = true; $("#sujo").hidden = false; }
+function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
 
 const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "projeto";
@@ -121,29 +183,76 @@ function setCampo(obj, caminho, valor) {
   o[ks[ks.length - 1]] = caminho === "h" ? (Number(valor) || 0) : valor;
 }
 
+/* ---------- site dentro do painel ---------- */
+const frame = $("#prev");
+
+// Ctrl+S dentro do site também salva.
+function ligarFrame() {
+  try {
+    const d = frame.contentDocument;
+    if (!d) return;
+    d.addEventListener("keydown", e => {
+      if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
+        e.preventDefault();
+        $("#salvar").click();
+      }
+    });
+  } catch (e) {}
+}
+
+// Recarrega o site e só resolve quando ele terminou de carregar.
+// Mantém a aba, a rolagem e o projeto aberto no modal, para o preview não "pular".
+function carregarPreview() {
+  let antes = null;
+  try {
+    antes = frame.contentWindow.eval(
+      `({ area: area, rolagem: scrollY,
+          projeto: (document.querySelector("#dlg") && document.querySelector("#dlg").open) ? current : -1 })`);
+  } catch (e) {}
+  return new Promise(res => {
+    frame.onload = () => {
+      frame.onload = null;
+      ligarFrame();
+      if (antes) {
+        try {
+          const w = frame.contentWindow;
+          if (antes.area) w.eval(`pick(${JSON.stringify(antes.area)}, false)`);
+          if (antes.projeto >= 0) w.eval(`current = ${antes.projeto}; fill(${antes.projeto}); document.querySelector("#dlg").showModal();`);
+          if (antes.rolagem) w.scrollTo(0, antes.rolagem);
+        } catch (e) {}
+      }
+      res();
+    };
+    frame.src = "/site?v=" + Date.now();
+  });
+}
+
+/* ---------- desenho ---------- */
 function desenhar() { desenharLista(); desenharForm(); }
 
 function desenharLista() {
+  const conta = n => n ? n + (n === 1 ? " mídia" : " mídias") : "sem mídia";
   $("#lista").innerHTML = projetos.map((p, i) => `
-    <li class="${i === sel ? "sel" : ""}" data-i="${i}">
+    <li class="${i === sel ? "sel" : ""}" data-i="${i}" title="${esc(p.title?.pt || "")}">
       <b>${String(i + 1).padStart(2, "0")}</b>
       <span>${esc(p.title?.pt || "(sem título)")}</span>
-      <em>${esc(p.area || "")}${p.cat ? " / " + esc(p.cat) : ""}</em>
-    </li>`).join("") || '<li class="vazio dica">nenhum projeto</li>';
+      <em>${esc(p.area || "")}${p.cat ? " / " + esc(p.cat) : ""} · ${conta((p.media || []).length)}</em>
+    </li>`).join("") || '<li class="vazio">nenhum projeto</li>';
 }
 
 function linhaMidia(m, i, total) {
   const tipo = m.type || "image";
   const ehImg = tipo === "image";
+  const preview = ehImg ? m.src : m.poster;
   return `<div class="midia" data-mi="${i}">
     <div class="topo">
       <select data-mcampo="type">
         ${["image", "video", "sketchfab"].map(t =>
           `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
       </select>
-      <button class="empurra" data-subir ${i === 0 ? "disabled" : ""} title="subir">↑</button>
-      <button data-descer ${i === total - 1 ? "disabled" : ""} title="descer">↓</button>
-      <button class="perigo" data-remover title="remover">×</button>
+      <button class="empurra" data-subir ${i === 0 ? "disabled" : ""} title="mover para cima">↑</button>
+      <button data-descer ${i === total - 1 ? "disabled" : ""} title="mover para baixo">↓</button>
+      <button class="perigo" data-remover title="remover mídia">×</button>
     </div>
     <div class="corpo">
       <label>${ehImg ? "arquivo da imagem" : "link"}
@@ -157,14 +266,19 @@ function linhaMidia(m, i, total) {
       <label class="arquivo">${ehImg ? "escolher imagem" : "escolher capa"}
         <input type="file" accept="image/*" data-upload="${ehImg ? "src" : "poster"}">
       </label>
-      ${(ehImg ? m.src : m.poster) ? `<img class="mini" src="/${esc(ehImg ? m.src : m.poster)}" alt="">` : ""}
+      ${preview ? `<img class="mini" src="/${esc(preview)}" alt="">` : ""}
     </div>
   </div>`;
 }
 
 function desenharForm() {
   const p = projetos[sel];
-  if (!p) { $("#form").innerHTML = '<p class="dica">Crie um projeto ou escolha um à esquerda.</p>'; return; }
+  if (!p) {
+    $("#drawer-titulo").textContent = "";
+    $("#form").innerHTML = '<p class="dica">Escolha um projeto à esquerda ou crie um novo.</p>';
+    return;
+  }
+  $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (p.title?.pt || "sem título");
   const cats = (areas.find(a => a.id === p.area)?.cats) || [];
   $("#form").innerHTML = `
     <div class="linha">
@@ -188,51 +302,102 @@ function desenharForm() {
     <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
     <div class="linha">
       <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
-      <label>matiz (só quando não há mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
+      <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
     </div>
     <h3>mídias <button id="add-midia">+ mídia</button></h3>
     <div id="midias">
       ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
     </div>
     <button class="perigo" id="apagar">apagar projeto</button>`;
+  desenharLista();
 }
 
-/* ---- eventos ---- */
+/* ---------- gaveta ---------- */
+function abrir(i) {
+  sel = i;
+  document.body.classList.add("editando");
+  desenhar();
+}
+function fechar() { document.body.classList.remove("editando"); }
+
+$("#fechar-drawer").onclick = fechar;
+
+/* ---------- ações ---------- */
 $("#lista").addEventListener("click", e => {
   const li = e.target.closest("li[data-i]");
   if (!li) return;
-  sel = +li.dataset.i;
-  desenhar();
+  abrir(+li.dataset.i);
 });
 
 $("#novo").onclick = () => {
   projetos.unshift({ area: areas[0]?.id || "design", cat: "", h: 0, tools: "",
     title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
-  sel = 0;
   marcarSujo();
-  desenhar();
+  abrir(0);
   document.querySelector('[data-campo="title.pt"]')?.focus();
 };
 
-$("#salvar").onclick = async () => {
+$("#recarregar").onclick = async () => {
+  status("recarregando o site…");
+  await carregarPreview();
+  status("site recarregado");
+};
+
+document.querySelectorAll("[data-largura]").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("[data-largura]").forEach(x => x.classList.toggle("on", x === b));
+    $("#moldura").style.setProperty("--larg", b.dataset.largura);
+  };
+});
+
+async function salvar() {
   const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
   if (semTitulo >= 0) {
-    sel = semTitulo;
-    desenhar();
+    abrir(semTitulo);
     status("o projeto " + String(semTitulo + 1).padStart(2, "0") + " está sem título", true);
-    return;
+    return false;
   }
   try {
     status("salvando…");
     await api("/api/projetos", { projetos });
     limparSujo();
-    status("salvo — recarregue o site para ver");
-  } catch (e) { status("erro: " + e.message, true); }
+    await carregarPreview();
+    status("salvo — o site ao lado já está atualizado");
+    return true;
+  } catch (e) {
+    status("erro: " + e.message, true);
+    return false;
+  }
+}
+$("#salvar").onclick = () => { salvar(); };
+
+/* abre no site o projeto que está sendo editado */
+$("#ver-site").onclick = async () => {
+  const p = projetos[sel];
+  if (!p) return;
+  if (sujo && !(await salvar())) return;
+  const i = projetos.indexOf(p);
+  try {
+    frame.contentWindow.eval(
+      `pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`
+    );
+    fechar();
+  } catch (e) {
+    status("não consegui abrir no site: " + e.message, true);
+  }
 };
 
+/* ---------- edição ---------- */
 $("#form").addEventListener("input", e => {
   const c = e.target.closest("[data-campo]");
-  if (c) { setCampo(projetos[sel], c.dataset.campo, c.value); desenharLista(); marcarSujo(); return; }
+  if (c) {
+    setCampo(projetos[sel], c.dataset.campo, c.value);
+    desenharLista();
+    if (c.dataset.campo === "title.pt") $("#drawer-titulo").textContent =
+      String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
+    marcarSujo();
+    return;
+  }
   const m = e.target.closest("[data-mcampo]");
   if (m && (m.dataset.mcampo === "src" || m.dataset.mcampo === "poster")) {
     const mi = +m.closest("[data-mi]").dataset.mi;
@@ -287,6 +452,7 @@ $("#form").addEventListener("click", e => {
       projetos.splice(sel, 1);
       sel = Math.min(sel, projetos.length - 1);
       marcarSujo();
+      if (!projetos.length) fechar();
       desenhar();
     }
   }
@@ -307,12 +473,13 @@ $("#form").addEventListener("click", e => {
   }
 });
 
-/* Ctrl+S salva, e fechar a aba com alteração pendente pede confirmação. */
+/* Ctrl+S salva, Esc fecha a gaveta, e sair com alteração pendente pede confirmação. */
 document.addEventListener("keydown", e => {
-  if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) {
+  if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
     e.preventDefault();
     $("#salvar").click();
   }
+  if (e.key === "Escape" && document.body.classList.contains("editando")) fechar();
 });
 window.addEventListener("beforeunload", e => {
   if (!sujo) return;
@@ -320,14 +487,15 @@ window.addEventListener("beforeunload", e => {
   e.returnValue = "";
 });
 
-/* ---- início ---- */
+/* ---------- início ---------- */
 (async () => {
   try {
     const r = await api("/api/estado");
     projetos = r.projetos; areas = r.areas;
-    sel = projetos.length ? 0 : -1;
     desenhar();
-    if (!token || token.indexOf("__PAINEL") === 0) status("abra com node tools/painel.js (o servidor entrega o token)", true);
+    ligarFrame();
+    if (!token || token.indexOf("__PAINEL") === 0)
+      status("abra com node tools/painel.js (o servidor entrega o token)", true);
   } catch (e) { status("erro ao carregar: " + e.message, true); }
 })();
 </script>
