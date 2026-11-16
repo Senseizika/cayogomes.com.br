@@ -29,6 +29,13 @@ const AREAS = [
     },
     "cats": [
       {
+        "id": "cartazes",
+        "name": {
+          "pt": "Cartazes e divulgação",
+          "en": "Posters and promo"
+        }
+      },
+      {
         "id": "identidade",
         "name": {
           "pt": "Identidade visual",
@@ -40,13 +47,6 @@ const AREAS = [
         "name": {
           "pt": "Estampas",
           "en": "Prints"
-        }
-      },
-      {
-        "id": "cartazes",
-        "name": {
-          "pt": "Cartazes e divulgação",
-          "en": "Posters and promo"
         }
       }
     ],

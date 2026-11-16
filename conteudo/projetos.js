@@ -114,20 +114,60 @@ const PROJECTS = [
   {
     "area": "design",
     "cat": "cartazes",
-    "h": 0,
-    "tools": "adada",
+    "h": 72,
+    "tools": "Affinity",
     "title": {
-      "pt": "dadada",
-      "en": "dadad"
+      "pt": "xerifes (cópia)",
+      "en": "Xerifes (copy)"
     },
     "desc": {
-      "pt": "adada",
-      "en": "dawdawd"
+      "pt": "dasda",
+      "en": "daf3ada"
     },
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/dadada/01.png"
+        "src": "img/projetos/xerifes/01.jpg"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "cat": "cartazes",
+    "h": 98,
+    "tools": "",
+    "title": {
+      "pt": "Moto romaria (cópia)",
+      "en": "Moto romaria (copy)"
+    },
+    "desc": {
+      "pt": "reteas",
+      "en": "tearawawt"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/moto-romaria/01.jpg"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "cat": "cartazes",
+    "h": 72,
+    "tools": "Affinity",
+    "title": {
+      "pt": "xerifes (cópia) (cópia)",
+      "en": "Xerifes (copy) (copy)"
+    },
+    "desc": {
+      "pt": "dasda",
+      "en": "daf3ada"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/xerifes/01.jpg"
       }
     ]
   },
@@ -179,20 +219,20 @@ const PROJECTS = [
   {
     "area": "design",
     "cat": "cartazes",
-    "h": 72,
-    "tools": "Affinity",
+    "h": 0,
+    "tools": "adada",
     "title": {
-      "pt": "xerifes (cópia)",
-      "en": "Xerifes (copy)"
+      "pt": "dadada",
+      "en": "dadad"
     },
     "desc": {
-      "pt": "dasda",
-      "en": "daf3ada"
+      "pt": "adada",
+      "en": "dawdawd"
     },
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/xerifes/01.jpg"
+        "src": "img/projetos/dadada/01.png"
       }
     ]
   },
@@ -237,26 +277,6 @@ const PROJECTS = [
     ]
   },
   {
-    "area": "design",
-    "cat": "identidade",
-    "h": 98,
-    "tools": "",
-    "title": {
-      "pt": "Moto romaria (cópia)",
-      "en": "Moto romaria (copy)"
-    },
-    "desc": {
-      "pt": "reteas",
-      "en": "tearawawt"
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/moto-romaria/01.jpg"
-      }
-    ]
-  },
-  {
     "area": "3d",
     "cat": "cat-1794855280365",
     "h": 98,
@@ -273,26 +293,6 @@ const PROJECTS = [
       {
         "type": "image",
         "src": "img/projetos/moto-romaria/01.jpg"
-      }
-    ]
-  },
-  {
-    "area": "design",
-    "cat": "estampas",
-    "h": 72,
-    "tools": "Affinity",
-    "title": {
-      "pt": "xerifes (cópia) (cópia)",
-      "en": "Xerifes (copy) (copy)"
-    },
-    "desc": {
-      "pt": "dasda",
-      "en": "daf3ada"
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/xerifes/01.jpg"
       }
     ]
   }
