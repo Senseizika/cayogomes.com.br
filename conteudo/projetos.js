@@ -2,6 +2,38 @@
    A fonte da verdade é conteudo/projetos.json */
 const PROJECTS = [
   {
+    "area": "design",
+    "cat": "cartazes",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "carrossel",
+      "en": "asdasd"
+    },
+    "desc": {
+      "pt": "asdasd",
+      "en": "dsadadad"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/item/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/item/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/item/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/item/04.png"
+      }
+    ]
+  },
+  {
     "area": "poema",
     "cat": "adadadad",
     "h": 0,
