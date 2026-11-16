@@ -17,15 +17,60 @@
    cats: filtros da área (o id precisa bater com PROJECTS.cat).
    name/short/lead: textos em pt/en. */
 const AREAS = [
-  { id:"design", name:{pt:"Design Gráfico", en:"Graphic Design"}, short:{pt:"Design",en:"Design"},
-    cats:[ {id:"cartazes",   name:{pt:"Cartazes e divulgação", en:"Posters and promo"}},
-           {id:"estampas",   name:{pt:"Estampas",              en:"Prints"}},
-           {id:"identidade", name:{pt:"Identidade visual",     en:"Visual identity"}} ],
-    lead:{pt:"Cartazes, estampas para serigrafia e identidade visual.",
-          en:"Posters, screen-print artwork and visual identity."} },
-  { id:"3d",     name:{pt:"Modelagem 3D",   en:"3D Art"}, short:{pt:"3D",en:"3D"},
-    lead:{pt:"Personagens, criaturas e props com texturas e iluminação trabalhadas.",
-          en:"Characters, creatures and props with carefully crafted textures and lighting."} }
+  {
+    "id": "design",
+    "name": {
+      "pt": "Design Gráfico",
+      "en": "Graphic Design"
+    },
+    "short": {
+      "pt": "Design",
+      "en": "Design"
+    },
+    "cats": [
+      {
+        "id": "cartazes",
+        "name": {
+          "pt": "Cartazes e divulgação",
+          "en": "Posters and promo"
+        }
+      },
+      {
+        "id": "estampas",
+        "name": {
+          "pt": "Estampas",
+          "en": "Prints"
+        }
+      },
+      {
+        "id": "identidade",
+        "name": {
+          "pt": "Identidade visual",
+          "en": "Visual identity"
+        }
+      }
+    ],
+    "lead": {
+      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
+      "en": "Posters, screen-print artwork and visual identity."
+    }
+  },
+  {
+    "id": "3d",
+    "name": {
+      "pt": "Modelagem 3D",
+      "en": "3D Art"
+    },
+    "short": {
+      "pt": "3D",
+      "en": "3D"
+    },
+    "cats": [],
+    "lead": {
+      "pt": "Personagens, criaturas e props com texturas e iluminação trabalhadas.",
+      "en": "Characters, creatures and props with carefully crafted textures and lighting."
+    }
+  }
 ];
 
 /* PROJETOS E MÍDIAS: ficam em conteudo/projetos.json e são editados pelo

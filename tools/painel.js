@@ -10,6 +10,7 @@
  *   - lê e grava conteudo/projetos.json (a fonte da verdade)
  *   - regrava conteudo/projetos.js (o arquivo que o site carrega)
  *   - grava qualquer arquivo enviado em img/projetos/<pasta>/NN.ext, mantendo a extensão
+ *   - commita e envia para o GitHub
  *
  * Segurança: escuta só em 127.0.0.1 e as rotas /api exigem o token da
  * sessão (embutido na página do painel). Sem o token, qualquer site aberto
@@ -268,6 +269,27 @@ const server = http.createServer(async (req, res) => {
         console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
       }
+      
+      // NOVA ROTA: COMMIT E PUSH PARA O GITHUB
+      if (rota === '/api/git/push' && req.method === 'POST') {
+        const dados = await corpo(req);
+        const msg = String(dados.mensagem || 'Atualização via painel').replace(/"/g, '\\"');
+        
+        return new Promise((resolve) => {
+          // Roda git add, commit e push na pasta raiz do projeto
+          exec(`git add . && git commit -m "${msg}" && git push`, { cwd: ROOT }, (err, stdout, stderr) => {
+            if (err) {
+              // Se não houver alterações, o Git dá um "erro", mas não é um problema real
+              if (stdout.includes('nothing to commit') || stderr.includes('nothing to commit')) {
+                return resolve(json(res, 200, { ok: true, log: 'Nenhuma alteração para enviar.' }));
+              }
+              return resolve(json(res, 400, { erro: 'Falha no Git', log: stderr || stdout || err.message }));
+            }
+            resolve(json(res, 200, { ok: true, log: stdout || 'Enviado para o GitHub com sucesso!' }));
+          });
+        });
+      }
+
       return json(res, 404, { erro: 'rota não encontrada' });
     }
 

@@ -1,3 +1,4 @@
+<!-- Nome do arquivo: tools/painel.html -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -21,6 +22,8 @@ header strong{font:400 1rem ui-monospace,Consolas,monospace;letter-spacing:.22em
 button{background:none;border:1px solid var(--line);color:var(--white);padding:.4rem .7rem;border-radius:6px;cursor:pointer;font:inherit}
 button:hover{border-color:var(--mute)}
 button.pri{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:600}
+button.git{color:#39d98a;border-color:rgba(57,217,138,.4)}
+button.git:hover{background:rgba(57,217,138,.1);border-color:#39d98a}
 button.perigo{color:#ff5a5f;border-color:rgba(255,90,95,.4)}
 button:disabled{opacity:.35;cursor:default}
 a{color:var(--mute);text-decoration:none;font-size:.82rem}
@@ -33,23 +36,73 @@ a:hover{color:var(--white)}
 .toggle-modo button:hover{border-color:transparent;color:var(--white)}
 
 /* ---------- corpo: lista | site | formulário ---------- */
-main{flex:1;display:grid;grid-template-columns:200px 1fr;min-height:0;position:relative}
-body.editando main{grid-template-columns:200px 1fr min(420px,38vw)}
+main{flex:1;display:grid;grid-template-columns:220px 1fr;min-height:0;position:relative}
+body.editando main{grid-template-columns:220px 1fr min(420px,38vw)}
 
-#lateral{border-right:1px solid var(--line);overflow:auto;padding:.45rem;min-height:0}
+#lateral{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+#filtros-lista{padding:.5rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;flex:0 0 auto}
+#filtros-lista input, #filtros-lista select { width:100%; background:#0f1114; border:1px solid var(--line); color:var(--white); padding:.3rem .4rem; border-radius:4px; font-size:.8rem; outline:none; }
+#filtros-lista input:focus, #filtros-lista select:focus { border-color:var(--accent); }
+#lateral-conteudo{overflow:auto;padding:.45rem;min-height:0;flex:1}
+
+/* Menu Cascata (Accordion) */
+details.grupo { margin-bottom: .5rem; }
+details.grupo > summary {
+  font: 600 .72rem ui-monospace,Consolas,monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: .4rem .5rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  border-radius: 4px;
+}
+details.grupo > summary:hover { background: rgba(255,255,255,.04); }
+details.grupo > summary::-webkit-details-marker { display: none; }
+details.grupo > summary::before {
+  content: "▶"; font-size: .6rem; margin-right: .4rem; transition: transform .2s; color: var(--mute);
+}
+details.grupo[open] > summary::before { transform: rotate(90deg); }
+
+details.grupo-cat { margin-left: .5rem; margin-bottom: .2rem; }
+details.grupo-cat > summary {
+  font: 400 .65rem ui-monospace,Consolas,monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--mute);
+  padding: .3rem .5rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+details.grupo-cat > summary:hover { color: var(--white); }
+details.grupo-cat > summary::-webkit-details-marker { display: none; }
+details.grupo-cat > summary::before { content: "▸"; font-size: .7rem; margin-right: .3rem; color: var(--mute); }
+details.grupo-cat[open] > summary::before { content: "▾"; }
+
 ol{list-style:none;margin:0;padding:0}
-ol li{display:grid;grid-template-columns:1.7rem 1fr;gap:.25rem;padding:.5rem .55rem;border-radius:6px;cursor:pointer;border:1px solid transparent}
+ol li{display:grid;grid-template-columns:1.7rem 1fr;gap:.25rem;padding:.4rem .55rem;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:background .2s;margin-left:.5rem}
 ol li:hover{background:rgba(255,255,255,.04)}
 ol li.sel{border-color:var(--accent);background:rgba(239,43,49,.1)}
 ol li b{font:400 .78rem ui-monospace,Consolas,monospace;color:var(--mute)}
-ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem}
-ol li em{grid-column:2;font:400 .66rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem}
+ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem;display:flex;align-items:center;gap:4px}
+ol li em{grid-column:2;font:400 .66rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text-align:center;padding:1rem;margin:0}
+
+/* Estilos para Drag & Drop na lista */
+ol li.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
+ol li.drag-over { border-top: 2px solid var(--accent); }
+
+/* Ícone de aviso */
+.aviso-icon { color: #f0b429; font-size: .85rem; cursor: help; line-height: 1; }
 
 #palco{display:flex;flex-direction:column;min-width:0;min-height:0}
-#ferramentas{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-bottom:1px solid var(--line);
-  font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);flex:0 0 auto}
+#ferramentas{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-bottom:1px solid var(--line);font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);flex:0 0 auto}
 #ferramentas button{padding:.2rem .5rem;font:400 .72rem ui-monospace,Consolas,monospace;border-radius:4px}
 #ferramentas button.on{border-color:var(--accent);color:var(--accent)}
 #ferramentas .cresc{flex:1}
@@ -57,41 +110,39 @@ ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem}
 #ferramentas .sep{width:1px;height:14px;background:var(--line);margin:0 .2rem}
 
 #moldura{flex:1;min-height:0;display:grid;place-items:center;padding:.7rem;background:#07080a;overflow:auto}
-#prev{width:var(--larg,100%);height:100%;border:1px solid var(--line);border-radius:10px;background:var(--ink);
-  display:block;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#prev{width:var(--larg,100%);height:100%;border:1px solid var(--line);border-radius:10px;background:var(--ink);display:block;box-shadow:0 18px 50px rgba(0,0,0,.55)}
 
 /* ---------- gaveta do formulário ---------- */
 #drawer{display:none;flex-direction:column;border-left:1px solid var(--line);background:var(--panel);min-height:0}
 body.editando #drawer{display:flex}
 .drawer-topo{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border-bottom:1px solid var(--line);flex:0 0 auto}
-.drawer-topo span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--mute)}
+.drawer-topo span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--mute)}
 .drawer-topo button{padding:.2rem .5rem;font-size:.75rem}
 #form{flex:1;overflow:auto;padding:.9rem 1rem 2rem;min-height:0}
 
 label{display:block;margin-bottom:.7rem;font:400 .68rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
-input,select,textarea{display:block;width:100%;margin-top:.22rem;background:#0f1114;border:1px solid var(--line);color:var(--white);
-  padding:.45rem .55rem;border-radius:6px;font:400 .92rem system-ui,sans-serif}
+input,select,textarea{display:block;width:100%;margin-top:.22rem;background:#0f1114;border:1px solid var(--line);color:var(--white);padding:.45rem .55rem;border-radius:6px;font:400 .92rem system-ui,sans-serif}
 input:focus,select:focus,textarea:focus{outline:1px solid var(--accent)}
 textarea{resize:vertical}
 .linha{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;text-transform:uppercase;color:var(--mute)}
 .midia{border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-bottom:.6rem;background:#0e1013}
-.midia .topo{display:flex;gap:.35rem;align-items:center;margin-bottom:.5rem}
+.midia .topo{display:flex;gap:.35rem;align-items:center;margin-bottom:.5rem;cursor:grab}
+.midia .topo:active{cursor:grabbing}
 .midia .topo select{width:auto;margin:0;padding:.3rem .4rem;font-size:.8rem}
 .midia .topo .empurra{margin-left:auto}
 .midia .topo button{padding:.2rem .45rem;font-size:.8rem}
 .midia .corpo{display:grid;gap:.45rem}
-.mini{max-width:120px;border-radius:4px;border:1px solid var(--line);display:block;margin-top:.2rem}
-.mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);
-  border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;
-  border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
+.mini{max-width:100%;max-height:250px;object-fit:contain;border-radius:6px;border:1px solid var(--line);display:block;margin-top:.2rem;cursor:zoom-in;background:#000}
+.mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
-/* o seletor de arquivos fica fora da tela (não display:none: alguns navegadores
-   se recusam a abrir o diálogo a partir de um input escondido) */
+
+/* Estilos para Drag & Drop nas mídias */
+.midia.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
+.midia.drag-over { border-top: 2px solid var(--accent); }
+
 #seletor{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 .dica{color:var(--mute);font-size:.88rem}
 
@@ -103,18 +154,16 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .cat-topo button{padding:.18rem .4rem;font-size:.8rem}
 .cat-linha{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
 .cat-id input{font:400 .82rem ui-monospace,Consolas,monospace}
-.aviso-id{font:400 .7rem ui-monospace,Consolas,monospace;color:#f0b429;margin-top:.3rem;padding:.3rem .5rem;
-  background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:4px}
+.aviso-id{font:400 .7rem ui-monospace,Consolas,monospace;color:#f0b429;margin-top:.3rem;padding:.4rem .5rem;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:4px;display:flex;justify-content:space-between;align-items:center;gap:1rem}
 
 /* telas médias: a gaveta passa a flutuar sobre o site */
 @media(max-width:1400px){
-  body.editando main{grid-template-columns:200px 1fr}
-  #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;
-    box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
+  body.editando main{grid-template-columns:220px 1fr}
+  #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
 }
 @media(max-width:760px){
   main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
-  #lateral{border-right:0;border-bottom:1px solid var(--line);max-height:22vh}
+  #lateral{border-right:0;border-bottom:1px solid var(--line);max-height:30vh}
   #ferramentas .dica{display:none}
 }
 </style>
@@ -130,17 +179,28 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <span id="status"></span>
   <div class="acoes">
     <a href="/site" target="_blank">abrir site ↗</a>
+    <button id="git-push" class="git" title="Salvar e enviar para o GitHub">☁️ GitHub ↑</button>
     <button id="novo">+ projeto</button>
     <button id="salvar" class="pri">salvar</button>
   </div>
 </header>
 
 <main>
-  <nav id="lateral"><ol id="lista"></ol></nav>
+  <nav id="lateral">
+    <div id="filtros-lista">
+      <input type="search" id="busca-projeto" placeholder="Buscar projeto..." autocomplete="off">
+      <select id="filtro-area">
+        <option value="">Todas as áreas</option>
+      </select>
+    </div>
+    <div id="lateral-conteudo">
+      <div id="lista"></div>
+    </div>
+  </nav>
 
   <section id="palco">
     <div id="ferramentas">
-      <button id="recarregar" title="recarregar o site">⟳</button>
+      <button id="recarregar" title="recarregar o site inteiro">⟳ recarregar site</button>
       <i class="sep"></i>
       <button data-largura="100%" class="on" title="largura total">desktop</button>
       <button data-largura="390px" title="largura de celular">celular</button>
@@ -153,6 +213,8 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <aside id="drawer">
     <div class="drawer-topo">
       <span id="drawer-titulo"></span>
+      <button id="preview-projeto" title="atualizar preview do site com este projeto">⟳</button>
+      <button id="duplicar" title="duplicar este projeto">duplicar</button>
       <button id="ver-site" title="abrir este projeto no site ao lado">ver no site</button>
       <button id="fechar-drawer" title="fechar">×</button>
     </div>
@@ -160,16 +222,18 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   </aside>
 </main>
 
-<!-- seletor de arquivos do painel: um só para todos os campos -->
 <input type="file" id="seletor" multiple tabindex="-1" aria-hidden="true">
 
 <script>
-/* token injetado pelo servidor ao servir esta página */
 const token = "__PAINEL_TOKEN__";
 let projetos = [], areas = [], areasEditaveis = [];
 let sel = -1, selArea = -1, sujo = false, modoAtual = 'projetos';
-// guarda o id original de cada área ao abrir (para avisar se mudou)
 let idOriginalArea = '';
+
+let buscaProjeto = '';
+let filtroArea = '';
+let dragProjetoIndex = -1;
+let dragMidiaIndex = -1;
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -197,10 +261,7 @@ function status(msg, erro) {
 function marcarSujo(){ sujo = true; $("#sujo").hidden = false; }
 function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
 
-const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "item";
-
-/* formatos que o navegador desenha dentro de uma tag <img> */
+const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "item";
 const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
 
 const lerBase64 = f => new Promise((ok, err) => {
@@ -221,7 +282,6 @@ function setCampo(obj, caminho, valor) {
 
 /* ---------- site dentro do painel ---------- */
 const frame = $("#prev");
-
 function ligarFrame() {
   try {
     const d = frame.contentDocument;
@@ -238,9 +298,7 @@ function ligarFrame() {
 function carregarPreview() {
   let antes = null;
   try {
-    antes = frame.contentWindow.eval(
-      `({ area: area, rolagem: scrollY,
-          projeto: (document.querySelector("#dlg") && document.querySelector("#dlg").open) ? current : -1 })`);
+    antes = frame.contentWindow.eval(`({ area: area, rolagem: scrollY, projeto: (document.querySelector("#dlg") && document.querySelector("#dlg").open) ? current : -1 })`);
   } catch (e) {}
   return new Promise(res => {
     frame.onload = () => {
@@ -260,12 +318,29 @@ function carregarPreview() {
   });
 }
 
+/* Atualiza APENAS o projeto atual no iframe, sem recarregar */
+function atualizarPreviewProjeto() {
+  const p = projetos[sel];
+  if (!p) return;
+  const i = projetos.indexOf(p);
+  try {
+    frame.contentWindow.eval(`pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`);
+    status("Preview atualizado no site!");
+  } catch (e) {
+    status("Erro ao atualizar preview: " + e.message, true);
+  }
+}
+
 /* ---------- modo projetos / áreas ---------- */
 function mudarModo(m) {
   modoAtual = m;
   document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
   $('#novo').textContent = m === 'projetos' ? '+ projeto' : '+ área';
   $('#ver-site').style.display = m === 'projetos' ? '' : 'none';
+  $('#duplicar').style.display = m === 'projetos' ? '' : 'none';
+  $('#preview-projeto').style.display = m === 'projetos' ? '' : 'none';
+  $('#filtros-lista').style.display = m === 'projetos' ? 'flex' : 'none';
+  
   desenharLista();
   if (m === 'projetos') {
     if (sel >= 0) desenharForm(); else fechar();
@@ -274,15 +349,103 @@ function mudarModo(m) {
   }
 }
 
-/* ---------- desenho ---------- */
+/* ---------- verificação de problemas no projeto ---------- */
+function temProblema(p) {
+  const avisos = [];
+  if (!String(p.title?.pt || "").trim()) avisos.push("Falta título PT");
+  if (!String(p.title?.en || "").trim()) avisos.push("Falta título EN");
+  if (!p.media || p.media.length === 0) avisos.push("Sem mídias");
+  return avisos;
+}
+
+/* ---------- desenho da lista (Menu Cascata) ---------- */
 function desenharListaProjetos() {
-  const conta = n => n ? n + (n === 1 ? " mídia" : " mídias") : "sem mídia";
-  $("#lista").innerHTML = projetos.map((p, i) => `
-    <li class="${i === sel ? "sel" : ""}" data-i="${i}" title="${esc(p.title?.pt || "")}">
-      <b>${String(i + 1).padStart(2, "0")}</b>
-      <span>${esc(p.title?.pt || "(sem título)")}</span>
-      <em>${esc(p.area || "")}${p.cat ? " / " + esc(p.cat) : ""} · ${conta((p.media || []).length)}</em>
-    </li>`).join("") || '<li class="vazio">nenhum projeto</li>';
+  const termo = buscaProjeto.toLowerCase();
+  const agrupado = {};
+
+  // 1. Organizar os projetos
+  projetos.forEach((p, i) => {
+    const areaId = p.area || 'sem-area';
+    const catId = p.cat || 'sem-cat';
+    
+    const matchBusca = !termo || 
+      (p.title?.pt || "").toLowerCase().includes(termo) || 
+      (p.title?.en || "").toLowerCase().includes(termo) ||
+      (p.tools || "").toLowerCase().includes(termo) ||
+      (p.area || "").toLowerCase().includes(termo) ||
+      (p.cat || "").toLowerCase().includes(termo);
+      
+    if (!matchBusca) return;
+    if (filtroArea && p.area !== filtroArea) return;
+
+    if (!agrupado[areaId]) agrupado[areaId] = {};
+    if (!agrupado[areaId][catId]) agrupado[areaId][catId] = [];
+    agrupado[areaId][catId].push({ p, i });
+  });
+
+  // 2. Renderizar HTML
+  let html = '';
+  
+  // Renderiza Áreas válidas
+  areas.forEach(area => {
+    const projetosDaArea = agrupado[area.id];
+    if (!projetosDaArea) return; 
+
+    html += `<details class="grupo" open>
+      <summary>${esc(area.name.pt)}</summary>
+      <div class="grupo-conteudo">`;
+
+    // Categorias definidas + "Sem categoria"
+    const cats = area.cats || [];
+    const categoriasRender = [...cats, { id: 'sem-cat', name: { pt: 'Sem categoria' } }];
+    
+    categoriasRender.forEach(cat => {
+      const lista = projetosDaArea[cat.id] || [];
+      if (lista.length === 0) return;
+
+      html += `<details class="grupo-cat" open>
+        <summary>${esc(cat.name.pt)}</summary>
+        <ol data-cat-id="${cat.id}">`;
+
+      lista.forEach(({ p, i }) => {
+        const avisos = temProblema(p);
+        const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
+        const conta = p.media?.length ? p.media.length + " mídia(s)" : "sem mídia";
+
+        html += `
+          <li class="${i === sel ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
+            <b>${String(i + 1).padStart(2, "0")}</b>
+            <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
+            <em>${conta}</em>
+          </li>`;
+      });
+      html += `</ol></details>`;
+    });
+
+    html += `</div></details>`;
+  });
+
+  // Renderiza projetos órfãos (áreas que não existem mais)
+  const areasIds = areas.map(a => a.id);
+  const orfaos = Object.values(agrupado).flatMap(catsObj => 
+    Object.values(catsObj).flat().filter(({ p }) => !areasIds.includes(p.area))
+  );
+  
+  if (orfaos.length > 0) {
+    html += `<details class="grupo erro" open style="color:#ff5a5f">
+      <summary style="color:#ff5a5f">Áreas inválidas / excluídas</summary>
+      <ol>`;
+    orfaos.forEach(({ p, i }) => {
+      html += `<li class="${i === sel ? "sel" : ""}" data-i="${i}" draggable="true">
+        <b>${String(i + 1).padStart(2, "0")}</b>
+        <span>${esc(p.title?.pt || "(sem título)")}</span>
+        <em>${esc(p.area)}</em>
+      </li>`;
+    });
+    html += `</ol></details>`;
+  }
+
+  $("#lista").innerHTML = html || '<li class="vazio">Nenhum projeto encontrado.</li>';
 }
 
 function desenharListaAreas() {
@@ -303,12 +466,13 @@ function desenharLista() {
   else desenharListaAreas();
 }
 
+/* ---------- formulários ---------- */
 function linhaMidia(m, i, total) {
   const tipo = m.type || "image";
   const ehImg = tipo === "image";
   const preview = ehImg ? m.src : m.poster;
   return `<div class="midia" data-mi="${i}">
-    <div class="topo">
+    <div class="topo" draggable="true" title="Arraste para reordenar">
       <select data-mcampo="type">
         ${["image", "video", "sketchfab"].map(t =>
           `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
@@ -330,7 +494,7 @@ function linhaMidia(m, i, total) {
         ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
       ${preview
         ? (WEB_IMG.test(preview)
-            ? `<img class="mini" src="/${esc(preview)}" alt="">`
+            ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">`
             : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(preview.split("/").pop())}</span>`)
         : ""}
     </div>
@@ -418,7 +582,7 @@ function desenharFormArea() {
     <label>id / slug
       <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace">
     </label>
-    ${idMudou && projetosAfetados > 0 ? `<p class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}" — atualize-os também após salvar.</p>` : ''}
+    ${idMudou && projetosAfetados > 0 ? `<div class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}". <button type="button" id="corrigir-slug">Corrigir agora</button></div>` : ''}
     <label>subtítulo PT
       <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea>
     </label>
@@ -439,7 +603,6 @@ function desenhar() {
   else desenharFormArea();
 }
 
-/* ---------- gaveta ---------- */
 function abrir(i) {
   sel = i;
   document.body.classList.add("editando");
@@ -457,7 +620,125 @@ function fechar() { document.body.classList.remove("editando"); }
 
 $("#fechar-drawer").onclick = fechar;
 
-/* ---------- ações ---------- */
+/* ---------- Eventos de Filtro ---------- */
+$("#busca-projeto").addEventListener("input", e => {
+  buscaProjeto = e.target.value;
+  desenharListaProjetos();
+});
+
+$("#filtro-area").addEventListener("change", e => {
+  filtroArea = e.target.value;
+  desenharListaProjetos();
+});
+
+function atualizarFiltroAreas() {
+  const selArea = $("#filtro-area");
+  const valorAtual = selArea.value;
+  selArea.innerHTML = '<option value="">Todas as áreas</option>' + 
+    areas.map(a => `<option value="${a.id}">${esc(a.name.pt)}</option>`).join("");
+  selArea.value = valorAtual;
+}
+
+/* ---------- Drag & Drop: Lista Principal ---------- */
+$("#lista").addEventListener("dragstart", e => {
+  const li = e.target.closest("li[data-i]");
+  if (!li) return;
+  dragProjetoIndex = +li.dataset.i;
+  e.dataTransfer.effectAllowed = "move";
+  li.classList.add("dragging");
+});
+
+$("#lista").addEventListener("dragend", e => {
+  document.querySelectorAll("#lista li").forEach(li => li.classList.remove("dragging", "drag-over"));
+});
+
+$("#lista").addEventListener("dragover", e => {
+  const li = e.target.closest("li[data-i]");
+  if (!li || dragProjetoIndex === -1) return;
+  
+  const sourceCat = projetos[dragProjetoIndex].cat || "";
+  const targetCat = projetos[+li.dataset.i].cat || "";
+  if (sourceCat !== targetCat) return;
+
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  document.querySelectorAll("#lista li").forEach(el => el.classList.remove("drag-over"));
+  li.classList.add("drag-over");
+});
+
+$("#lista").addEventListener("dragleave", e => {
+  const li = e.target.closest("li[data-i]");
+  if (li) li.classList.remove("drag-over");
+});
+
+$("#lista").addEventListener("drop", e => {
+  const li = e.target.closest("li[data-i]");
+  if (!li || dragProjetoIndex === -1) return;
+  e.preventDefault();
+  
+  const targetIndex = +li.dataset.i;
+  
+  if (dragProjetoIndex !== targetIndex) {
+    const item = projetos.splice(dragProjetoIndex, 1)[0];
+    projetos.splice(targetIndex, 0, item);
+    marcarSujo();
+    
+    if (sel === dragProjetoIndex) sel = targetIndex;
+    else if (sel === targetIndex) sel = dragProjetoIndex;
+    
+    desenhar();
+    abrir(sel);
+  }
+  dragProjetoIndex = -1;
+});
+
+/* ---------- Drag & Drop: Mídias ---------- */
+$("#form").addEventListener("dragstart", e => {
+  if (!e.target.classList.contains("topo")) return;
+  const box = e.target.closest(".midia");
+  if (!box) return;
+  dragMidiaIndex = +box.dataset.mi;
+  e.dataTransfer.effectAllowed = "move";
+  box.classList.add("dragging");
+});
+
+$("#form").addEventListener("dragend", e => {
+  if (e.target.classList.contains("topo")) {
+    document.querySelectorAll(".midia").forEach(m => m.classList.remove("dragging", "drag-over"));
+  }
+});
+
+$("#form").addEventListener("dragover", e => {
+  const box = e.target.closest(".midia");
+  if (!box || dragMidiaIndex === -1) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  document.querySelectorAll(".midia").forEach(m => m.classList.remove("drag-over"));
+  box.classList.add("drag-over");
+});
+
+$("#form").addEventListener("dragleave", e => {
+  const box = e.target.closest(".midia");
+  if (box) box.classList.remove("drag-over");
+});
+
+$("#form").addEventListener("drop", e => {
+  const box = e.target.closest(".midia");
+  if (!box || dragMidiaIndex === -1) return;
+  e.preventDefault();
+  const targetIndex = +box.dataset.mi;
+  const media = projetos[sel]?.media || [];
+  
+  if (dragMidiaIndex !== targetIndex) {
+    const item = media.splice(dragMidiaIndex, 1)[0];
+    media.splice(targetIndex, 0, item);
+    marcarSujo();
+    desenharForm();
+  }
+  dragMidiaIndex = -1;
+});
+
+/* ---------- Cliques na lista lateral ---------- */
 $("#lista").addEventListener("click", e => {
   const li = e.target.closest("li[data-i]");
   if (li) { abrir(+li.dataset.i); return; }
@@ -465,7 +746,6 @@ $("#lista").addEventListener("click", e => {
   if (lia) { abrirArea(+lia.dataset.ai); return; }
 });
 
-/* alternador de modo */
 document.querySelectorAll('[data-modo]').forEach(b => {
   b.onclick = () => mudarModo(b.dataset.modo);
 });
@@ -485,6 +765,23 @@ $("#novo").onclick = () => {
   }
 };
 
+/* ---------- Duplicar Projeto ---------- */
+$("#duplicar").onclick = () => {
+  const p = projetos[sel];
+  if (!p) return;
+  
+  const copia = JSON.parse(JSON.stringify(p));
+  copia.title.pt += " (cópia)";
+  copia.title.en += " (copy)";
+  
+  projetos.splice(sel + 1, 0, copia);
+  marcarSujo();
+  abrir(sel + 1);
+  status("Projeto duplicado!");
+};
+
+$("#preview-projeto").onclick = atualizarPreviewProjeto;
+
 $("#recarregar").onclick = async () => {
   status("recarregando o site…");
   await carregarPreview();
@@ -498,7 +795,7 @@ document.querySelectorAll("[data-largura]").forEach(b => {
   };
 });
 
-/* ---------- salvar projetos ---------- */
+/* ---------- Salvar ---------- */
 async function salvar() {
   const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
   if (semTitulo >= 0) {
@@ -519,7 +816,6 @@ async function salvar() {
   }
 }
 
-/* ---------- salvar áreas ---------- */
 async function salvarAreas() {
   for (let i = 0; i < areasEditaveis.length; i++) {
     const a = areasEditaveis[i];
@@ -528,7 +824,6 @@ async function salvarAreas() {
       status('a área ' + String(i + 1).padStart(2, '0') + ' está sem nome PT', true);
       return false;
     }
-    // Auto-preenche id se vazio
     if (!String(a.id || '').trim()) {
       areasEditaveis[i].id = slug(a.name?.pt || ('area-' + (i + 1)));
     }
@@ -536,14 +831,13 @@ async function salvarAreas() {
   try {
     status('salvando áreas…');
     await api('/api/areas', { areas: areasEditaveis });
-    // Atualiza o dropdown de áreas no form de projetos
     const r = await api('/api/estado');
     areas = r.areas;
     areasEditaveis = r.areasCompletas || areasEditaveis;
-    // Atualiza o id original para o normalizado pelo servidor
     if (selArea >= 0) idOriginalArea = areasEditaveis[selArea]?.id || '';
     limparSujo();
     await carregarPreview();
+    atualizarFiltroAreas();
     status('áreas salvas — site atualizado');
     if (modoAtual === 'areas') desenharFormArea();
     return true;
@@ -555,31 +849,46 @@ async function salvarAreas() {
 
 $("#salvar").onclick = () => { modoAtual === 'projetos' ? salvar() : salvarAreas(); };
 
-/* abre no site o projeto que está sendo editado */
+/* ---------- Git Push ---------- */
+$("#git-push").onclick = async () => {
+  const msg = prompt("Mensagem do commit (deixe em branco para usar o padrão):", "Atualização via painel");
+  if (msg === null) return; // Cancelou
+  
+  status("Enviando para o GitHub…");
+  try {
+    // Se houver alterações no painel, salva primeiro
+    if (sujo) {
+      await (modoAtual === 'projetos' ? salvar() : salvarAreas());
+    }
+    const r = await api("/api/git/push", { mensagem: msg || "Atualização via painel" });
+    status("Enviado para o GitHub com sucesso!");
+    console.log(r.log);
+  } catch (e) {
+    status("Erro no Git: " + e.message, true);
+    console.error(e.log);
+  }
+};
+
 $("#ver-site").onclick = async () => {
   const p = projetos[sel];
   if (!p) return;
   if (sujo && !(await salvar())) return;
   const i = projetos.indexOf(p);
   try {
-    frame.contentWindow.eval(
-      `pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`
-    );
+    frame.contentWindow.eval(`pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`);
     fechar();
   } catch (e) {
     status("não consegui abrir no site: " + e.message, true);
   }
 };
 
-/* ---------- edição ---------- */
+/* ---------- Edição ---------- */
 $("#form").addEventListener("input", e => {
-  // Projetos: campos normais
   const c = e.target.closest("[data-campo]");
   if (c) {
     setCampo(projetos[sel], c.dataset.campo, c.value);
     desenharListaProjetos();
-    if (c.dataset.campo === "title.pt") $("#drawer-titulo").textContent =
-      String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
+    if (c.dataset.campo === "title.pt") $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
     marcarSujo();
     return;
   }
@@ -590,13 +899,11 @@ $("#form").addEventListener("input", e => {
     marcarSujo();
     return;
   }
-  // Áreas: campos da área
   const ca = e.target.closest('[data-acampo]');
   if (ca) {
     setCampo(areasEditaveis[selArea], ca.dataset.acampo, ca.value);
     if (ca.dataset.acampo === 'name.pt') {
       $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (ca.value || 'sem nome');
-      // Auto-preenche id se ainda estiver vazio
       const a = areasEditaveis[selArea];
       if (!a.id) {
         a.id = slug(ca.value);
@@ -605,11 +912,9 @@ $("#form").addEventListener("input", e => {
       }
     }
     if (ca.dataset.acampo === 'id') {
-      // Redesenha para mostrar/esconder aviso de id mudado
       const rolagem = $('#form').scrollTop;
       desenharFormArea();
       $('#form').scrollTop = rolagem;
-      // Re-foca no campo id
       const idInput = document.querySelector('[data-acampo="id"]');
       if (idInput) { idInput.focus(); idInput.setSelectionRange(ca.value.length, ca.value.length); }
       return;
@@ -618,7 +923,6 @@ $("#form").addEventListener("input", e => {
     desenharListaAreas();
     return;
   }
-  // Áreas: campos de categoria
   const cc = e.target.closest('[data-catcampo]');
   if (cc) {
     const ci = +cc.closest('[data-ci]').dataset.ci;
@@ -647,12 +951,23 @@ $("#form").addEventListener("change", async e => {
   }
 });
 
-/* ---------- cliques no form ---------- */
+/* ---------- Cliques no form ---------- */
 $("#form").addEventListener("click", e => {
   const b = e.target.closest("button");
   if (!b) return;
 
-  /* ---- ações de categorias (modo áreas) ---- */
+  if (b.id === 'corrigir-slug') {
+    const novoId = areasEditaveis[selArea].id;
+    const antigoId = idOriginalArea;
+    projetos.forEach(p => { if (p.area === antigoId) p.area = novoId; });
+    idOriginalArea = novoId;
+    marcarSujo();
+    desenharFormArea();
+    desenharListaProjetos();
+    status("Projetos vinculados ao novo ID com sucesso!");
+    return;
+  }
+
   if (b.id === 'add-cat') {
     areasEditaveis[selArea].cats = areasEditaveis[selArea].cats || [];
     areasEditaveis[selArea].cats.push({ id: '', name: { pt: '', en: '' } });
@@ -709,7 +1024,6 @@ $("#form").addEventListener("click", e => {
     return;
   }
 
-  /* ---- ações de mídias (modo projetos) ---- */
   const caixa = b.closest("[data-mi]");
   const mi = caixa ? +caixa.dataset.mi : -1;
   const media = projetos[sel]?.media || [];
@@ -748,7 +1062,7 @@ $("#form").addEventListener("click", e => {
   }
 });
 
-/* ---------- escolher e enviar arquivos ---------- */
+/* ---------- Upload ---------- */
 const seletor = $("#seletor");
 
 function abrirSeletor(alvo, mi) {
@@ -801,16 +1115,14 @@ async function enviarArquivos(lista, alvo, mi0) {
       console.error(err);
       marcarSujo();
       desenharForm();
-      status("erro ao enviar " + f.name + ": " +
-        (err && err.message ? err.message : String(err)), true);
+      status("erro ao enviar " + f.name + ": " + (err && err.message ? err.message : String(err)), true);
       return;
     }
   }
 
   const kb = r => r.bytes < 1024 ? r.bytes + " B" : Math.round(r.bytes / 1024) + " KB";
   const aviso = foraDoSite.length
-    ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") +
-      " no site (use webp, jpg, png, gif ou avif)"
+    ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") + " no site (use webp, jpg, png, gif ou avif)"
     : "";
   if (arquivos.length === 1)
     status("arquivo salvo: " + ultimo.caminho + " (" + kb(ultimo) + ")" + aviso, aviso !== "");
@@ -818,7 +1130,6 @@ async function enviarArquivos(lista, alvo, mi0) {
     status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
 }
 
-// Soltar arquivos em cima do botão também funciona
 $("#form").addEventListener("dragover", e => {
   const alvo = e.target.closest("[data-escolher]");
   if (!alvo) return;
@@ -840,7 +1151,7 @@ $("#form").addEventListener("drop", e => {
   if (caixa && lista.length) enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
-/* Ctrl+S salva, Esc fecha a gaveta, e sair com alteração pendente pede confirmação. */
+/* Ctrl+S salva, Esc fecha a gaveta */
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
     e.preventDefault();
@@ -854,13 +1165,14 @@ window.addEventListener("beforeunload", e => {
   e.returnValue = "";
 });
 
-/* ---------- início ---------- */
+/* ---------- Início ---------- */
 (async () => {
   try {
     const r = await api("/api/estado");
     projetos = r.projetos;
     areas = r.areas;
     areasEditaveis = r.areasCompletas || r.areas;
+    atualizarFiltroAreas();
     desenhar();
     ligarFrame();
     if (!token || token.indexOf("__PAINEL") === 0)
