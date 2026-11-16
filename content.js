@@ -18,6 +18,44 @@
    name/short/lead: textos em pt/en. */
 const AREAS = [
   {
+    "id": "design",
+    "name": {
+      "pt": "Design Gráfico",
+      "en": "Graphic Design"
+    },
+    "short": {
+      "pt": "Design",
+      "en": "Design"
+    },
+    "cats": [
+      {
+        "id": "identidade",
+        "name": {
+          "pt": "Identidade visual",
+          "en": "Visual identity"
+        }
+      },
+      {
+        "id": "estampas",
+        "name": {
+          "pt": "Estampas",
+          "en": "Prints"
+        }
+      },
+      {
+        "id": "cartazes",
+        "name": {
+          "pt": "Cartazes e divulgação",
+          "en": "Posters and promo"
+        }
+      }
+    ],
+    "lead": {
+      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
+      "en": "Posters, screen-print artwork and visual identity."
+    }
+  },
+  {
     "id": "poema",
     "name": {
       "pt": "poema",
@@ -63,44 +101,6 @@ const AREAS = [
     "lead": {
       "pt": "Personagens, criaturas e props com texturas e iluminação trabalhadas.",
       "en": "Characters, creatures and props with carefully crafted textures and lighting."
-    }
-  },
-  {
-    "id": "design",
-    "name": {
-      "pt": "Design Gráfico",
-      "en": "Graphic Design"
-    },
-    "short": {
-      "pt": "Design",
-      "en": "Design"
-    },
-    "cats": [
-      {
-        "id": "identidade",
-        "name": {
-          "pt": "Identidade visual",
-          "en": "Visual identity"
-        }
-      },
-      {
-        "id": "estampas",
-        "name": {
-          "pt": "Estampas",
-          "en": "Prints"
-        }
-      },
-      {
-        "id": "cartazes",
-        "name": {
-          "pt": "Cartazes e divulgação",
-          "en": "Posters and promo"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
-      "en": "Posters, screen-print artwork and visual identity."
     }
   }
 ];
