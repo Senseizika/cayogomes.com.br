@@ -2,6 +2,70 @@
    A fonte da verdade é conteudo/projetos.json */
 const PROJECTS = [
   {
+    "area": "poema",
+    "cat": "adadadad",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "asfa",
+      "en": "dasd"
+    },
+    "desc": {
+      "pt": "fasd",
+      "en": "afa"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/asfa/01.png"
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "sdasd (cópia)",
+      "en": "asda (copy)"
+    },
+    "desc": {
+      "pt": "fasfaf",
+      "en": "asdasdaf"
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/sdasd/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/06.png"
+      }
+    ]
+  },
+  {
     "area": "design",
     "cat": "estampas",
     "h": 72,
@@ -18,6 +82,96 @@ const PROJECTS = [
       {
         "type": "image",
         "src": "img/projetos/xerifes/01.jpg"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "cat": "estampas",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "sdasd",
+      "en": "asda"
+    },
+    "desc": {
+      "pt": "fasfaf",
+      "en": "asdasdaf"
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/sdasd/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/06.png"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "cat": "cartazes",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "sdasd (cópia) (cópia)",
+      "en": "asda (copy) (copy)"
+    },
+    "desc": {
+      "pt": "fasfaf",
+      "en": "asdasdaf"
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/sdasd/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sdasd/06.png"
       }
     ]
   },
@@ -44,6 +198,26 @@ const PROJECTS = [
   {
     "area": "design",
     "cat": "identidade",
+    "h": 98,
+    "tools": "",
+    "title": {
+      "pt": "Moto romaria (cópia) (cópia)",
+      "en": "Moto romaria (copy) (copy)"
+    },
+    "desc": {
+      "pt": "reteas",
+      "en": "tearawawt"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/moto-romaria/01.jpg"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "cat": "identidade",
     "h": 72,
     "tools": "Affinity",
     "title": {
@@ -63,7 +237,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
-    "cat": "estampas",
+    "cat": "identidade",
     "h": 98,
     "tools": "",
     "title": {
@@ -89,26 +263,6 @@ const PROJECTS = [
     "title": {
       "pt": "Moto romaria (cópia)",
       "en": "Moto romaria (copy)"
-    },
-    "desc": {
-      "pt": "reteas",
-      "en": "tearawawt"
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/moto-romaria/01.jpg"
-      }
-    ]
-  },
-  {
-    "area": "design",
-    "cat": "cartazes",
-    "h": 98,
-    "tools": "",
-    "title": {
-      "pt": "Moto romaria (cópia) (cópia)",
-      "en": "Moto romaria (copy) (copy)"
     },
     "desc": {
       "pt": "reteas",

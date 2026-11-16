@@ -36,22 +36,42 @@ a:hover{color:var(--white)}
 .toggle-modo button:hover{border-color:transparent;color:var(--white)}
 
 /* ---------- corpo: lista | site | formulário ---------- */
-main{flex:1;display:grid;grid-template-columns:220px 1fr;min-height:0;position:relative}
-body.editando main{grid-template-columns:220px 1fr min(420px,38vw)}
+main{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0;position:relative}
+body.editando main{grid-template-columns:300px 1fr min(420px,38vw)}
 
-#lateral{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+#lateral{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#08090b}
 #filtros-lista{padding:.5rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;flex:0 0 auto}
-#filtros-lista input, #filtros-lista select { width:100%; background:#0f1114; border:1px solid var(--line); color:var(--white); padding:.3rem .4rem; border-radius:4px; font-size:.8rem; outline:none; }
-#filtros-lista input:focus, #filtros-lista select:focus { border-color:var(--accent); }
+#filtros-lista input { width:100%; background:#0f1114; border:1px solid var(--line); color:var(--white); padding:.4rem .5rem; border-radius:4px; font-size:.8rem; outline:none; }
+#filtros-lista input:focus { border-color:var(--accent); }
 #lateral-conteudo{overflow:auto;padding:.45rem;min-height:0;flex:1}
 
 /* Menu Cascata (Accordion) */
-details.grupo { margin-bottom: .5rem; }
+details.grupo { margin-bottom: .3rem; border-radius:6px; }
 details.grupo > summary {
-  font: 600 .72rem ui-monospace,Consolas,monospace;
+  font: 600 .78rem ui-monospace,Consolas,monospace;
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--accent);
+  padding: .5rem .6rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  border-radius: 4px;
+  background:rgba(255,255,255,.02);
+}
+details.grupo > summary:hover { background: rgba(255,255,255,.06); }
+details.grupo > summary::-webkit-details-marker { display: none; }
+details.grupo > summary::before { content: "▶"; font-size: .6rem; margin-right: .5rem; transition: transform .2s; color: var(--mute); }
+details.grupo[open] > summary::before { transform: rotate(90deg); }
+
+details.grupo-cat { margin-left: .5rem; margin-bottom: .1rem; }
+details.grupo-cat > summary {
+  font: 400 .7rem ui-monospace,Consolas,monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--mute);
   padding: .4rem .5rem;
   cursor: pointer;
   list-style: none;
@@ -60,43 +80,41 @@ details.grupo > summary {
   user-select: none;
   border-radius: 4px;
 }
-details.grupo > summary:hover { background: rgba(255,255,255,.04); }
-details.grupo > summary::-webkit-details-marker { display: none; }
-details.grupo > summary::before {
-  content: "▶"; font-size: .6rem; margin-right: .4rem; transition: transform .2s; color: var(--mute);
-}
-details.grupo[open] > summary::before { transform: rotate(90deg); }
-
-details.grupo-cat { margin-left: .5rem; margin-bottom: .2rem; }
-details.grupo-cat > summary {
-  font: 400 .65rem ui-monospace,Consolas,monospace;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--mute);
-  padding: .3rem .5rem;
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  user-select: none;
-}
-details.grupo-cat > summary:hover { color: var(--white); }
+details.grupo-cat > summary:hover { color: var(--white); background: rgba(255,255,255,.04); }
 details.grupo-cat > summary::-webkit-details-marker { display: none; }
-details.grupo-cat > summary::before { content: "▸"; font-size: .7rem; margin-right: .3rem; color: var(--mute); }
+details.grupo-cat > summary::before { content: "▸"; font-size: .7rem; margin-right: .4rem; color: var(--mute); }
 details.grupo-cat[open] > summary::before { content: "▾"; }
 
-ol{list-style:none;margin:0;padding:0}
-ol li{display:grid;grid-template-columns:1.7rem 1fr;gap:.25rem;padding:.4rem .55rem;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:background .2s;margin-left:.5rem}
-ol li:hover{background:rgba(255,255,255,.04)}
-ol li.sel{border-color:var(--accent);background:rgba(239,43,49,.1)}
-ol li b{font:400 .78rem ui-monospace,Consolas,monospace;color:var(--mute)}
-ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem;display:flex;align-items:center;gap:4px}
-ol li em{grid-column:2;font:400 .66rem ui-monospace,Consolas,monospace;color:var(--mute);font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text-align:center;padding:1rem;margin:0}
+/* Ícone de arrastar */
+.handle { cursor: grab; color: var(--mute); font-size: .9rem; flex-shrink: 0; width: 1.5rem; text-align: center; }
+.handle:active { cursor: grabbing; }
 
-/* Estilos para Drag & Drop na lista */
-ol li.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
-ol li.drag-over { border-top: 2px solid var(--accent); }
+/* Listas Padronizadas (Alinhamento perfeito) */
+ol{list-style:none;margin:0;padding:0;min-height:10px}
+ol li {
+  display: flex;
+  align-items: center;
+  padding: .4rem .55rem .4rem 1.8rem; /* Recuo esquerdo para alinhar o número sob o texto da categoria */
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background .2s, border-color .2s;
+}
+ol li:hover { background: rgba(255,255,255,.05); }
+ol li.sel { border-color: var(--accent); background: rgba(239,43,49,.1); }
+ol li b { font: 400 .78rem ui-monospace, Consolas, monospace; color: var(--mute); width: 2rem; flex-shrink: 0; text-align: left; }
+ol li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; display: flex; align-items: center; gap: 4px; flex-grow: 1; }
+ol li em { font: 400 .66rem ui-monospace, Consolas, monospace; color: var(--mute); font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; text-align: right; padding-left: .5rem; }
+ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text-align:center;padding:1rem;margin:0;padding-left:0}
+
+/* Ajustes específicos para as listas sem cascata */
+#lista > ol > li { padding-left: .55rem; }
+
+/* Feedback visual do Drag & Drop */
+.dragging { opacity: 0.3; }
+.drag-over-top { border-top: 2px solid var(--accent) !important; }
+.drag-over-bottom { border-bottom: 2px solid var(--accent) !important; }
+.drag-over-inside { background: rgba(239,43,49,.15) !important; border: 1px dashed var(--accent) !important; }
 
 /* Ícone de aviso */
 .aviso-icon { color: #f0b429; font-size: .85rem; cursor: help; line-height: 1; }
@@ -139,7 +157,6 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
 
-/* Estilos para Drag & Drop nas mídias */
 .midia.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
 .midia.drag-over { border-top: 2px solid var(--accent); }
 
@@ -156,14 +173,13 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .cat-id input{font:400 .82rem ui-monospace,Consolas,monospace}
 .aviso-id{font:400 .7rem ui-monospace,Consolas,monospace;color:#f0b429;margin-top:.3rem;padding:.4rem .5rem;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:4px;display:flex;justify-content:space-between;align-items:center;gap:1rem}
 
-/* telas médias: a gaveta passa a flutuar sobre o site */
 @media(max-width:1400px){
-  body.editando main{grid-template-columns:220px 1fr}
+  body.editando main{grid-template-columns:300px 1fr}
   #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
 }
 @media(max-width:760px){
   main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
-  #lateral{border-right:0;border-bottom:1px solid var(--line);max-height:30vh}
+  #lateral{border-right:0;border-bottom:1px solid var(--line);max-height:40vh}
   #ferramentas .dica{display:none}
 }
 </style>
@@ -172,8 +188,9 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 <header>
   <strong>PAINEL</strong>
   <div class="toggle-modo">
-    <button class="on" data-modo="projetos">projetos</button>
     <button data-modo="areas">áreas</button>
+    <button data-modo="categorias">categorias</button>
+    <button class="on" data-modo="projetos">projetos</button>
   </div>
   <span id="sujo" hidden>não salvo</span>
   <span id="status"></span>
@@ -189,9 +206,6 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <nav id="lateral">
     <div id="filtros-lista">
       <input type="search" id="busca-projeto" placeholder="Buscar projeto..." autocomplete="off">
-      <select id="filtro-area">
-        <option value="">Todas as áreas</option>
-      </select>
     </div>
     <div id="lateral-conteudo">
       <div id="lista"></div>
@@ -227,13 +241,16 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 <script>
 const token = "__PAINEL_TOKEN__";
 let projetos = [], areas = [], areasEditaveis = [];
-let sel = -1, selArea = -1, sujo = false, modoAtual = 'projetos';
+let sel = -1, selArea = -1, selCat = { area: -1, cat: -1 };
+let sujo = false, modoAtual = 'projetos';
 let idOriginalArea = '';
 
 let buscaProjeto = '';
-let filtroArea = '';
-let dragProjetoIndex = -1;
-let dragMidiaIndex = -1;
+let dragType = null;
+let dragData = null;
+
+// Memória para os menus abertos/fechados
+let estadoAccordion = new Set();
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -274,6 +291,7 @@ const lerBase64 = f => new Promise((ok, err) => {
 });
 
 function setCampo(obj, caminho, valor) {
+  if (!obj) return;
   const ks = caminho.split(".");
   let o = obj;
   for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]] = o[ks[i]] || {};
@@ -318,7 +336,6 @@ function carregarPreview() {
   });
 }
 
-/* Atualiza APENAS o projeto atual no iframe, sem recarregar */
 function atualizarPreviewProjeto() {
   const p = projetos[sel];
   if (!p) return;
@@ -331,25 +348,43 @@ function atualizarPreviewProjeto() {
   }
 }
 
-/* ---------- modo projetos / áreas ---------- */
+/* ---------- modo do painel ---------- */
 function mudarModo(m) {
   modoAtual = m;
   document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
-  $('#novo').textContent = m === 'projetos' ? '+ projeto' : '+ área';
-  $('#ver-site').style.display = m === 'projetos' ? '' : 'none';
-  $('#duplicar').style.display = m === 'projetos' ? '' : 'none';
-  $('#preview-projeto').style.display = m === 'projetos' ? '' : 'none';
-  $('#filtros-lista').style.display = m === 'projetos' ? 'flex' : 'none';
+  
+  if (m === 'projetos') {
+    $('#novo').textContent = '+ projeto';
+    $('#filtros-lista').style.display = 'flex';
+    $('#ver-site').style.display = '';
+    $('#duplicar').style.display = '';
+    $('#preview-projeto').style.display = '';
+  } else if (m === 'areas') {
+    $('#novo').textContent = '+ área';
+    $('#filtros-lista').style.display = 'none';
+    $('#ver-site').style.display = 'none';
+    $('#duplicar').style.display = 'none';
+    $('#preview-projeto').style.display = 'none';
+  } else if (m === 'categorias') {
+    $('#novo').textContent = '+ categoria';
+    $('#filtros-lista').style.display = 'none';
+    $('#ver-site').style.display = 'none';
+    $('#duplicar').style.display = 'none';
+    $('#preview-projeto').style.display = 'none';
+  }
   
   desenharLista();
+  
   if (m === 'projetos') {
-    if (sel >= 0) desenharForm(); else fechar();
-  } else {
-    if (selArea >= 0) desenharFormArea(); else fechar();
+    if (sel >= 0 && projetos[sel]) desenharForm(); else fechar();
+  } else if (m === 'areas') {
+    if (selArea >= 0 && areasEditaveis[selArea]) desenharFormArea(); else fechar();
+  } else if (m === 'categorias') {
+    if (selCat.area >= 0 && areasEditaveis[selCat.area]?.cats[selCat.cat]) desenharFormCat(); else fechar();
   }
 }
 
-/* ---------- verificação de problemas no projeto ---------- */
+/* ---------- verificação de problemas ---------- */
 function temProblema(p) {
   const avisos = [];
   if (!String(p.title?.pt || "").trim()) avisos.push("Falta título PT");
@@ -358,116 +393,558 @@ function temProblema(p) {
   return avisos;
 }
 
-/* ---------- desenho da lista (Menu Cascata) ---------- */
+/* ---------- gerenciamento de estado dos acordeões ---------- */
+function salvarEstadoAccordions() {
+  estadoAccordion.clear();
+  document.querySelectorAll('#lista details').forEach(d => {
+    if (d.open) {
+      if (d.dataset.catId) estadoAccordion.add('cat-' + d.dataset.areaId + '-' + d.dataset.catId);
+      else if (d.dataset.areaId) estadoAccordion.add('area-' + d.dataset.areaId);
+    }
+  });
+}
+
+/* ---------- desenho das listas laterais ---------- */
 function desenharListaProjetos() {
   const termo = buscaProjeto.toLowerCase();
-  const agrupado = {};
-
-  // 1. Organizar os projetos
-  projetos.forEach((p, i) => {
-    const areaId = p.area || 'sem-area';
-    const catId = p.cat || 'sem-cat';
-    
-    const matchBusca = !termo || 
-      (p.title?.pt || "").toLowerCase().includes(termo) || 
-      (p.title?.en || "").toLowerCase().includes(termo) ||
-      (p.tools || "").toLowerCase().includes(termo) ||
-      (p.area || "").toLowerCase().includes(termo) ||
-      (p.cat || "").toLowerCase().includes(termo);
-      
-    if (!matchBusca) return;
-    if (filtroArea && p.area !== filtroArea) return;
-
-    if (!agrupado[areaId]) agrupado[areaId] = {};
-    if (!agrupado[areaId][catId]) agrupado[areaId][catId] = [];
-    agrupado[areaId][catId].push({ p, i });
-  });
-
-  // 2. Renderizar HTML
   let html = '';
   
-  // Renderiza Áreas válidas
-  areas.forEach(area => {
-    const projetosDaArea = agrupado[area.id];
-    if (!projetosDaArea) return; 
-
-    html += `<details class="grupo" open>
-      <summary>${esc(area.name.pt)}</summary>
+  areasEditaveis.forEach(area => {
+    const projetosDaArea = projetos.filter(p => p.area === area.id);
+    const abArea = estadoAccordion.size === 0 || estadoAccordion.has('area-' + area.id) ? 'open' : '';
+    
+    html += `<details class="grupo" ${abArea} data-area-id="${area.id}">
+      <summary>
+        <span class="handle" draggable="true" title="Arraste para reordenar a área">☰</span>
+        ${esc(area.name?.pt || '(sem nome)')}
+      </summary>
       <div class="grupo-conteudo">`;
 
-    // Categorias definidas + "Sem categoria"
     const cats = area.cats || [];
     const categoriasRender = [...cats, { id: 'sem-cat', name: { pt: 'Sem categoria' } }];
     
     categoriasRender.forEach(cat => {
-      const lista = projetosDaArea[cat.id] || [];
-      if (lista.length === 0) return;
-
-      html += `<details class="grupo-cat" open>
-        <summary>${esc(cat.name.pt)}</summary>
-        <ol data-cat-id="${cat.id}">`;
-
-      lista.forEach(({ p, i }) => {
-        const avisos = temProblema(p);
-        const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
-        const conta = p.media?.length ? p.media.length + " mídia(s)" : "sem mídia";
-
-        html += `
-          <li class="${i === sel ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
-            <b>${String(i + 1).padStart(2, "0")}</b>
-            <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
-            <em>${conta}</em>
-          </li>`;
+      const lista = projetosDaArea.filter(p => (p.cat || 'sem-cat') === cat.id);
+      
+      const listaFiltrada = lista.filter(p => {
+        if (!termo) return true;
+        return (p.title?.pt || "").toLowerCase().includes(termo) || 
+               (p.title?.en || "").toLowerCase().includes(termo) ||
+               (p.tools || "").toLowerCase().includes(termo);
       });
+
+      if (termo && listaFiltrada.length === 0) return;
+
+      const abCat = estadoAccordion.size === 0 || estadoAccordion.has('cat-' + area.id + '-' + cat.id) ? 'open' : '';
+
+      html += `<details class="grupo-cat" ${abCat} data-area-id="${area.id}" data-cat-id="${cat.id}">
+        <summary>
+          <span class="handle" draggable="true" title="Arraste para reordenar a categoria">☰</span>
+          ${esc(cat.name.pt)}
+        </summary>
+        <ol data-area-id="${area.id}" data-cat-id="${cat.id}">`;
+
+      if (listaFiltrada.length === 0) {
+        html += `<li class="vazio">vazio</li>`;
+      } else {
+        listaFiltrada.forEach(p => {
+          const i = projetos.indexOf(p);
+          const avisos = temProblema(p);
+          const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
+          const conta = p.media?.length ? p.media.length + " mídia(s)" : "sem mídia";
+
+          html += `
+            <li class="${i === sel ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
+              <b>${String(i + 1).padStart(2, "0")}</b>
+              <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
+              <em>${conta}</em>
+            </li>`;
+        });
+      }
       html += `</ol></details>`;
     });
 
     html += `</div></details>`;
   });
 
-  // Renderiza projetos órfãos (áreas que não existem mais)
-  const areasIds = areas.map(a => a.id);
-  const orfaos = Object.values(agrupado).flatMap(catsObj => 
-    Object.values(catsObj).flat().filter(({ p }) => !areasIds.includes(p.area))
-  );
-  
-  if (orfaos.length > 0) {
-    html += `<details class="grupo erro" open style="color:#ff5a5f">
-      <summary style="color:#ff5a5f">Áreas inválidas / excluídas</summary>
-      <ol>`;
-    orfaos.forEach(({ p, i }) => {
-      html += `<li class="${i === sel ? "sel" : ""}" data-i="${i}" draggable="true">
-        <b>${String(i + 1).padStart(2, "0")}</b>
-        <span>${esc(p.title?.pt || "(sem título)")}</span>
-        <em>${esc(p.area)}</em>
-      </li>`;
-    });
-    html += `</ol></details>`;
-  }
-
-  $("#lista").innerHTML = html || '<li class="vazio">Nenhum projeto encontrado.</li>';
+  $("#lista").innerHTML = html;
 }
 
 function desenharListaAreas() {
-  const conta = a => {
-    const n = (a.cats || []).length;
-    return n ? n + (n === 1 ? ' categoria' : ' categorias') : 'sem categorias';
-  };
-  $('#lista').innerHTML = areasEditaveis.map((a, i) => `
+  $('#lista').innerHTML = `<ol>${areasEditaveis.map((a, i) => `
     <li class="${i === selArea ? 'sel' : ''}" data-ai="${i}" title="${esc(a.name?.pt || '')}">
+      <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, '0')}</b>
       <span>${esc(a.name?.pt || '(sem nome)')}</span>
-      <em>${esc(a.id || '—')} · ${conta(a)}</em>
-    </li>`).join('') || '<li class="vazio">nenhuma área</li>';
+      <em>${esc(a.id || '—')}</em>
+    </li>`).join('')}</ol>` || '<p class="vazio">nenhuma área</p>';
+}
+
+function desenharListaCategorias() {
+  let html = '';
+  areasEditaveis.forEach((area, ai) => {
+    const cats = area.cats || [];
+    if (cats.length === 0) return;
+
+    html += `<div class="grupo-area-label">${esc(area.name?.pt || '(sem nome)')}</div>`;
+    html += `<ol>`;
+    cats.forEach((cat, ci) => {
+      const isSel = (selCat.area === ai && selCat.cat === ci);
+      html += `<li class="${isSel ? 'sel' : ''}" data-ai="${ai}" data-ci="${ci}" title="${esc(cat.name?.pt)}">
+        <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
+        <b>${String(ci + 1).padStart(2, '0')}</b>
+        <span>${esc(cat.name?.pt || '(sem nome)')}</span>
+        <em>${esc(cat.id)}</em>
+      </li>`;
+    });
+    html += `</ol>`;
+  });
+  $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
 }
 
 function desenharLista() {
   if (modoAtual === 'projetos') desenharListaProjetos();
-  else desenharListaAreas();
+  else if (modoAtual === 'areas') desenharListaAreas();
+  else if (modoAtual === 'categorias') desenharListaCategorias();
 }
 
-/* ---------- formulários ---------- */
+/* ============================================================
+   DRAG & DROP COMPLETO
+   ============================================================ */
+
+$("#lista").addEventListener("dragstart", e => {
+  if (buscaProjeto && modoAtual === 'projetos') {
+    status("Limpe a busca para reordenar", true);
+    e.preventDefault();
+    return;
+  }
+
+  salvarEstadoAccordions(); // Salva o estado antes de começar a arrastar
+
+  const handle = e.target.closest(".handle");
+  const liProj = e.target.closest("li[data-i]");
+  const liCat = e.target.closest("li[data-ci]");
+
+  if (handle) {
+    const details = handle.closest("details");
+    if (details) {
+      if (details.classList.contains("grupo-cat")) {
+        dragType = 'cat';
+        dragData = { areaId: details.dataset.areaId, catId: details.dataset.catId };
+        details.classList.add("dragging");
+      } else if (details.classList.contains("grupo")) {
+        dragType = 'area';
+        dragData = { areaId: details.dataset.areaId };
+        details.classList.add("dragging");
+      }
+    } else {
+      const li = handle.closest("li");
+      if (li && li.dataset.ci !== undefined) {
+        dragType = 'cat-item';
+        dragData = { areaIndex: +li.dataset.ai, catIndex: +li.dataset.ci };
+        li.classList.add("dragging");
+      } else if (li && li.dataset.ai !== undefined) {
+        dragType = 'area-item';
+        dragData = { areaIndex: +li.dataset.ai };
+        li.classList.add("dragging");
+      }
+    }
+  } else if (liProj && modoAtual === 'projetos') {
+    dragType = 'proj';
+    dragData = { index: +liProj.dataset.i };
+    liProj.classList.add("dragging");
+  } else {
+    e.preventDefault();
+  }
+});
+
+$("#lista").addEventListener("dragend", e => {
+  document.querySelectorAll("#lista .dragging, #lista .drag-over-top, #lista .drag-over-bottom, #lista .drag-over-inside").forEach(el => {
+    el.classList.remove("dragging", "drag-over-top", "drag-over-bottom", "drag-over-inside");
+  });
+  dragType = null;
+  dragData = null;
+});
+
+$("#lista").addEventListener("dragover", e => {
+  if (!dragType) return;
+  e.preventDefault();
+
+  document.querySelectorAll("#lista .drag-over-top, #lista .drag-over-bottom, #lista .drag-over-inside").forEach(el => {
+    el.classList.remove("drag-over-top", "drag-over-bottom", "drag-over-inside");
+  });
+
+  const targetGroup = e.target.closest("details.grupo");
+  const targetCatGroup = e.target.closest("details.grupo-cat");
+  const targetLiProj = e.target.closest("li[data-i]");
+  const targetLiItem = e.target.closest("li[data-ai]");
+
+  if (dragType === 'area' && targetGroup && targetGroup.dataset.areaId !== dragData.areaId) {
+    const rect = targetGroup.getBoundingClientRect();
+    targetGroup.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+  }
+  else if (dragType === 'cat' && targetCatGroup && targetCatGroup.dataset.areaId === dragData.areaId && targetCatGroup.dataset.catId !== dragData.catId) {
+    const rect = targetCatGroup.getBoundingClientRect();
+    targetCatGroup.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+  }
+  else if (dragType === 'proj') {
+    if (targetLiProj && +targetLiProj.dataset.i !== dragData.index) {
+      const rect = targetLiProj.getBoundingClientRect();
+      targetLiProj.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+    } else if (targetCatGroup && !targetLiProj) {
+      targetCatGroup.classList.add("drag-over-inside");
+    }
+  }
+  else if (dragType === 'area-item' && targetLiItem && +targetLiItem.dataset.ai !== dragData.areaIndex) {
+    const rect = targetLiItem.getBoundingClientRect();
+    targetLiItem.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+  }
+  else if (dragType === 'cat-item' && targetLiItem && targetLiItem.dataset.ci !== undefined && +targetLiItem.dataset.ai === dragData.areaIndex) {
+    if (+targetLiItem.dataset.ci !== dragData.catIndex) {
+      const rect = targetLiItem.getBoundingClientRect();
+      targetLiItem.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
+    }
+  }
+});
+
+$("#lista").addEventListener("drop", e => {
+  if (!dragType) return;
+  e.preventDefault();
+
+  const type = dragType;
+  const data = dragData;
+  dragType = null;
+  dragData = null;
+
+  document.querySelectorAll("#lista .dragging, #lista .drag-over-top, #lista .drag-over-bottom, #lista .drag-over-inside").forEach(el => {
+    el.classList.remove("dragging", "drag-over-top", "drag-over-bottom", "drag-over-inside");
+  });
+
+  const targetGroup = e.target.closest("details.grupo");
+  const targetCatGroup = e.target.closest("details.grupo-cat");
+  const targetLiProj = e.target.closest("li[data-i]");
+  const targetLiItem = e.target.closest("li[data-ai]");
+
+  try {
+    /* ---- SOLTAR ÁREA (Accordion) ---- */
+    if (type === 'area' && targetGroup && targetGroup.dataset.areaId !== data.areaId) {
+      const fromIndex = areasEditaveis.findIndex(a => a.id === data.areaId);
+      let toIndex = areasEditaveis.findIndex(a => a.id === targetGroup.dataset.areaId);
+      if (fromIndex === -1 || toIndex === -1) return;
+      
+      const rect = targetGroup.getBoundingClientRect();
+      if (e.clientY >= rect.top + rect.height / 2) toIndex++;
+      
+      const item = areasEditaveis.splice(fromIndex, 1)[0];
+      areasEditaveis.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
+      
+      marcarSujo();
+      setTimeout(() => { 
+        desenharLista(); 
+        if (modoAtual === 'projetos' && sel >= 0) desenharForm();
+        status("Ordem das áreas atualizada!"); 
+      }, 10);
+    }
+
+    /* ---- SOLTAR CATEGORIA (Accordion) ---- */
+    else if (type === 'cat' && targetCatGroup && targetCatGroup.dataset.areaId === data.areaId && targetCatGroup.dataset.catId !== data.catId) {
+      const area = areasEditaveis.find(a => a.id === data.areaId);
+      if (!area || data.catId === 'sem-cat' || targetCatGroup.dataset.catId === 'sem-cat') return;
+
+      const fromIndex = area.cats.findIndex(c => c.id === data.catId);
+      let toIndex = area.cats.findIndex(c => c.id === targetCatGroup.dataset.catId);
+      if (fromIndex === -1 || toIndex === -1) return;
+
+      const rect = targetCatGroup.getBoundingClientRect();
+      if (e.clientY >= rect.top + rect.height / 2) toIndex++;
+
+      const item = area.cats.splice(fromIndex, 1)[0];
+      area.cats.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
+      
+      marcarSujo();
+      setTimeout(() => { 
+        desenharLista(); 
+        if (modoAtual === 'projetos' && sel >= 0) desenharForm();
+        status("Ordem das categorias atualizada!"); 
+      }, 10);
+    }
+
+    /* ---- SOLTAR PROJETO ---- */
+    else if (type === 'proj') {
+      if (targetLiProj) {
+        const targetIndex = +targetLiProj.dataset.i;
+        if (targetIndex !== data.index && projetos[data.index] && projetos[targetIndex]) {
+          const rect = targetLiProj.getBoundingClientRect();
+          const dropAfter = e.clientY >= rect.top + rect.height / 2;
+          const proj = projetos[data.index];
+          
+          const alvoProj = projetos[targetIndex];
+          proj.area = alvoProj.area;
+          if (alvoProj.cat) proj.cat = alvoProj.cat; else delete proj.cat;
+
+          projetos.splice(data.index, 1);
+          let insertIndex = targetIndex;
+          if (!dropAfter) insertIndex = targetIndex > data.index ? targetIndex - 1 : targetIndex;
+          else insertIndex = targetIndex > data.index ? targetIndex : targetIndex + 1;
+          
+          projetos.splice(insertIndex, 0, proj);
+          marcarSujo();
+          
+          sel = projetos.indexOf(proj); // Atualiza a seleção para o projeto movido
+          
+          setTimeout(() => {
+            desenharListaProjetos();
+            abrir(sel);
+            status("Projeto reordenado!");
+          }, 10);
+        }
+      } else if (targetCatGroup) {
+        const catId = targetCatGroup.dataset.catId;
+        const areaId = targetCatGroup.dataset.areaId;
+        const proj = projetos[data.index];
+
+        if (proj && ((proj.cat || 'sem-cat') !== catId || proj.area !== areaId)) {
+          proj.area = areaId;
+          if (catId === 'sem-cat') delete proj.cat; else proj.cat = catId;
+          projetos.splice(data.index, 1);
+          projetos.push(proj);
+          marcarSujo();
+          
+          sel = projetos.indexOf(proj);
+          
+          setTimeout(() => {
+            desenharListaProjetos();
+            abrir(sel);
+            status("Projeto movido de categoria!");
+          }, 10);
+        }
+      }
+    }
+
+    /* ---- SOLTAR ÁREA (Lista plana) ---- */
+    else if (type === 'area-item' && targetLiItem && +targetLiItem.dataset.ai !== data.areaIndex) {
+      const toIndex = +targetLiItem.dataset.ai;
+      if (!areasEditaveis[data.areaIndex]) return;
+
+      const rect = targetLiItem.getBoundingClientRect();
+      const dropAfter = e.clientY >= rect.top + rect.height / 2;
+
+      const item = areasEditaveis.splice(data.areaIndex, 1)[0];
+      let insertIndex = toIndex;
+      if (!dropAfter) insertIndex = toIndex > data.areaIndex ? toIndex - 1 : toIndex;
+      else insertIndex = toIndex > data.areaIndex ? toIndex : toIndex + 1;
+
+      areasEditaveis.splice(insertIndex, 0, item);
+      selArea = insertIndex;
+      marcarSujo();
+      
+      setTimeout(() => { desenharListaAreas(); abrirArea(selArea); status("Ordem das áreas atualizada!"); }, 10);
+    }
+
+    /* ---- SOLTAR CATEGORIA (Lista plana) ---- */
+    else if (type === 'cat-item' && targetLiItem && targetLiItem.dataset.ci !== undefined && +targetLiItem.dataset.ai === data.areaIndex) {
+      const toIndex = +targetLiItem.dataset.ci;
+      const area = areasEditaveis[data.areaIndex];
+      if (toIndex !== data.catIndex && area && area.cats && area.cats[data.catIndex]) {
+        const rect = targetLiItem.getBoundingClientRect();
+        const dropAfter = e.clientY >= rect.top + rect.height / 2;
+        
+        const item = area.cats.splice(data.catIndex, 1)[0];
+        let insertIndex = toIndex;
+        if (!dropAfter) insertIndex = toIndex > data.catIndex ? toIndex - 1 : toIndex;
+        else insertIndex = toIndex > data.catIndex ? toIndex : toIndex + 1;
+        
+        area.cats.splice(insertIndex, 0, item);
+        selCat = { area: data.areaIndex, cat: insertIndex };
+        marcarSujo();
+        
+        setTimeout(() => { desenharListaCategorias(); abrirCat(selCat.area, selCat.cat); status("Categoria reordenada!"); }, 10);
+      }
+    }
+  } catch (err) {
+    console.error("Erro no drop:", err);
+    status("Erro ao reorganizar item.", true);
+    desenharLista();
+  }
+});
+
+/* ---------- Cliques na lista lateral ---------- */
+$("#lista").addEventListener("click", e => {
+  if (e.target.closest(".handle")) {
+    e.preventDefault();
+    return;
+  }
+
+  const summaryArea = e.target.closest("details.grupo > summary");
+  const summaryCat = e.target.closest("details.grupo-cat > summary");
+
+  if (summaryArea && modoAtual === 'projetos') {
+    const areaId = summaryArea.parentElement.dataset.areaId;
+    const ai = areasEditaveis.findIndex(a => a.id === areaId);
+    if (ai !== -1) abrirArea(ai);
+    return;
+  }
+  if (summaryCat && modoAtual === 'projetos') {
+    const areaId = summaryCat.parentElement.dataset.areaId;
+    const catId = summaryCat.parentElement.dataset.catId;
+    const ai = areasEditaveis.findIndex(a => a.id === areaId);
+    if (ai !== -1) {
+      const ci = (areasEditaveis[ai].cats || []).findIndex(c => c.id === catId);
+      if (ci !== -1) abrirCat(ai, ci);
+    }
+    return;
+  }
+
+  const li = e.target.closest("li[data-i]");
+  if (li) { abrir(+li.dataset.i); return; }
+  
+  const lia = e.target.closest("li[data-ai]");
+  if (lia && lia.dataset.ci === undefined) { abrirArea(+lia.dataset.ai); return; }
+
+  const lic = e.target.closest("li[data-ci]");
+  if (lic) { abrirCat(+lic.dataset.ai, +lic.dataset.ci); return; }
+});
+
+document.querySelectorAll('[data-modo]').forEach(b => {
+  b.onclick = () => mudarModo(b.dataset.modo);
+});
+
+$("#novo").onclick = () => {
+  if (modoAtual === 'projetos') {
+    const areaId = areasEditaveis[0]?.id || "";
+    projetos.unshift({ area: areaId, cat: "", h: 0, tools: "",
+      title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+    marcarSujo();
+    sel = 0;
+    desenharListaProjetos();
+    abrir(sel);
+    document.querySelector('[data-campo="title.pt"]')?.focus();
+  } else if (modoAtual === 'areas') {
+    const tempId = "area-" + Date.now();
+    areasEditaveis.push({ id: tempId, name: { pt: "", en: "" }, short: { pt: "", en: "" }, cats: [], lead: { pt: "", en: "" } });
+    marcarSujo();
+    selArea = areasEditaveis.length - 1;
+    desenharListaAreas();
+    abrirArea(selArea);
+    document.querySelector('[data-acampo="name.pt"]')?.focus();
+  } else if (modoAtual === 'categorias') {
+    if (areasEditaveis.length === 0) return status("Crie uma área primeiro", true);
+    const area = areasEditaveis[0];
+    area.cats = area.cats || [];
+    area.cats.push({ id: "cat-" + Date.now(), name: { pt: "", en: "" } });
+    marcarSujo();
+    selCat = { area: 0, cat: area.cats.length - 1 };
+    desenharListaCategorias();
+    abrirCat(selCat.area, selCat.cat);
+    document.querySelector('[data-catcampo="name.pt"]')?.focus();
+  }
+};
+
+/* ---------- Salvar ---------- */
+async function salvar() {
+  const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
+  if (semTitulo >= 0) {
+    abrir(semTitulo);
+    status("o projeto " + String(semTitulo + 1).padStart(2, "0") + " está sem título", true);
+    return false;
+  }
+  try {
+    status("salvando…");
+
+    areasEditaveis.forEach(a => {
+      if (!a.id) a.id = slug(a.name?.pt) || "area-" + Date.now();
+      (a.cats || []).forEach(c => { if (!c.id) c.id = slug(c.name?.pt) || "cat-" + Date.now(); });
+    });
+
+    projetos.forEach(p => {
+      if (!p.area || !areasEditaveis.some(a => a.id === p.area)) {
+        p.area = areasEditaveis[0]?.id || "";
+      }
+    });
+
+    await api("/api/projetos", { projetos });
+    await api("/api/areas", { areas: areasEditaveis });
+    
+    const r = await api('/api/estado');
+    areas = r.areas;
+    areasEditaveis = r.areasCompletas || areasEditaveis;
+
+    limparSujo();
+    await carregarPreview();
+    desenharLista();
+    status("salvo — o site atualizado");
+    return true;
+  } catch (e) {
+    status("erro: " + e.message, true);
+    return false;
+  }
+}
+
+$("#salvar").onclick = salvar;
+
+/* ---------- Git Push ---------- */
+$("#git-push").onclick = async () => {
+  const msg = prompt("Mensagem do commit:", "Atualização via painel");
+  if (msg === null) return;
+  status("Enviando para o GitHub…");
+  try {
+    if (sujo) await salvar();
+    const r = await api("/api/git/push", { mensagem: msg || "Atualização via painel" });
+    status("Enviado com sucesso!");
+    console.log(r.log);
+  } catch (e) {
+    status("Erro no Git: " + e.message, true);
+  }
+};
+
+$("#recarregar").onclick = async () => {
+  status("recarregando…");
+  await carregarPreview();
+  status("site recarregado");
+};
+
+document.querySelectorAll("[data-largura]").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("[data-largura]").forEach(x => x.classList.toggle("on", x === b));
+    $("#moldura").style.setProperty("--larg", b.dataset.largura);
+  };
+});
+
+$("#ver-site").onclick = async () => {
+  const p = projetos[sel];
+  if (!p) return;
+  if (sujo && !(await salvar())) return;
+  const i = projetos.indexOf(p);
+  try {
+    frame.contentWindow.eval(`pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`);
+    fechar();
+  } catch (e) {
+    status("não consegui abrir no site: " + e.message, true);
+  }
+};
+
+$("#duplicar").onclick = () => {
+  const p = projetos[sel];
+  if (!p) return;
+  const copia = JSON.parse(JSON.stringify(p));
+  copia.title.pt += " (cópia)";
+  copia.title.en += " (copy)";
+  projetos.splice(sel + 1, 0, copia);
+  marcarSujo();
+  sel = sel + 1;
+  desenharListaProjetos();
+  abrir(sel);
+  status("Projeto duplicado!");
+};
+
+$("#preview-projeto").onclick = atualizarPreviewProjeto;
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+
 function linhaMidia(m, i, total) {
+  if (!m) return '';
   const tipo = m.type || "image";
   const ehImg = tipo === "image";
   const preview = ehImg ? m.src : m.poster;
@@ -495,10 +972,120 @@ function linhaMidia(m, i, total) {
       ${preview
         ? (WEB_IMG.test(preview)
             ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">`
-            : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(preview.split("/").pop())}</span>`)
+            : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`)
         : ""}
     </div>
   </div>`;
+}
+
+function desenharForm() {
+  const p = projetos[sel];
+  if (!p) { $("#form").innerHTML = ''; return; }
+  
+  $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (p.title?.pt || "sem título");
+  
+  const areaAtual = areasEditaveis.find(a => a.id === p.area);
+  const cats = areaAtual?.cats || [];
+
+  try {
+    $("#form").innerHTML = `
+      <div class="linha">
+        <label>área
+          <select data-campo="area">
+            ${areasEditaveis.map(a => `<option value="${a.id || ''}" ${a.id === p.area ? "selected" : ""}>${esc(a.name?.pt || '(sem nome)')}</option>`).join("")}
+          </select>
+        </label>
+        <label>categoria
+          <select data-campo="cat">
+            <option value="">(nenhuma)</option>
+            ${cats.map(c => `<option value="${c.id || ''}" ${c.id === p.cat ? "selected" : ""}>${esc(c.name?.pt || '(sem nome)')}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+      <div class="linha">
+        <label>título PT <input data-campo="title.pt" value="${esc(p.title?.pt)}"></label>
+        <label>título EN <input data-campo="title.en" value="${esc(p.title?.en)}"></label>
+      </div>
+      <label>descrição PT <textarea rows="3" data-campo="desc.pt">${esc(p.desc?.pt)}</textarea></label>
+      <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
+      <div class="linha">
+        <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
+        <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
+      </div>
+      <h3>mídias <button id="add-midia">+ mídia</button></h3>
+      <div id="midias">
+        ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
+      </div>
+      <button class="perigo" id="apagar">apagar projeto</button>`;
+  } catch (err) {
+    console.error("Erro ao renderizar projeto:", err);
+    $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar o projeto. Verifique os dados.</p>`;
+  }
+}
+
+function desenharFormArea() {
+  const a = areasEditaveis[selArea];
+  if (!a) { $('#form').innerHTML = ''; return; }
+  const idMudou = idOriginalArea && a.id !== idOriginalArea;
+  const projetosAfetados = idMudou ? projetos.filter(p => p.area === idOriginalArea).length : 0;
+  $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (a.name?.pt || 'sem nome');
+  
+  try {
+    $('#form').innerHTML = `
+      <div class="linha">
+        <label>nome PT <input data-acampo="name.pt" value="${esc(a.name?.pt)}"></label>
+        <label>nome EN <input data-acampo="name.en" value="${esc(a.name?.en)}"></label>
+      </div>
+      <div class="linha">
+        <label>aba PT (curto) <input data-acampo="short.pt" value="${esc(a.short?.pt)}" placeholder="${esc(a.name?.pt)}"></label>
+        <label>aba EN (curto) <input data-acampo="short.en" value="${esc(a.short?.en)}" placeholder="${esc(a.name?.en)}"></label>
+      </div>
+      <label>id / slug
+        <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace">
+      </label>
+      ${idMudou && projetosAfetados > 0 ? `<div class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}". <button type="button" id="corrigir-slug">Corrigir agora</button></div>` : ''}
+      <label>subtítulo PT
+        <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea>
+      </label>
+      <label>subtítulo EN
+        <textarea rows="2" data-acampo="lead.en">${esc(a.lead?.en)}</textarea>
+      </label>
+      <h3>categorias (filtros) <button id="add-cat">+ categoria</button></h3>
+      <div id="cats">
+        ${(a.cats || []).map((c, i) => linhaCategoria(c, i, (a.cats || []).length)).join('') || '<p class="dica">nenhuma categoria</p>'}
+      </div>
+      <button class="perigo" id="apagar-area">apagar área</button>`;
+  } catch (err) {
+    console.error("Erro ao renderizar área:", err);
+    $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar a área.</p>`;
+  }
+}
+
+function desenharFormCat() {
+  const a = areasEditaveis[selCat.area];
+  if (!a || !a.cats || !a.cats[selCat.cat]) { $('#form').innerHTML = ''; return; }
+  const c = a.cats[selCat.cat];
+  
+  $('#drawer-titulo').textContent = 'Cat · ' + (c.name?.pt || 'sem nome');
+  try {
+    $('#form').innerHTML = `
+      <label>Área Mãe
+        <select data-cat-area>
+          ${areasEditaveis.map((ar, ai) => `<option value="${ai}" ${ai === selCat.area ? 'selected' : ''}>${esc(ar.name?.pt || '(sem nome)')}</option>`).join('')}
+        </select>
+      </label>
+      <div class="linha">
+        <label>nome PT <input data-catcampo="name.pt" value="${esc(c.name?.pt)}"></label>
+        <label>nome EN <input data-catcampo="name.en" value="${esc(c.name?.en)}"></label>
+      </div>
+      <label class="cat-id">id (slug)
+        <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente">
+      </label>
+      <button class="perigo" id="apagar-cat">apagar categoria</button>`;
+  } catch (err) {
+    console.error("Erro ao renderizar categoria:", err);
+    $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar a categoria.</p>`;
+  }
 }
 
 function linhaCategoria(c, i, total) {
@@ -519,90 +1106,6 @@ function linhaCategoria(c, i, total) {
   </div>`;
 }
 
-function desenharForm() {
-  const p = projetos[sel];
-  if (!p) {
-    $("#drawer-titulo").textContent = "";
-    $("#form").innerHTML = '<p class="dica">Escolha um projeto à esquerda ou crie um novo.</p>';
-    return;
-  }
-  $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (p.title?.pt || "sem título");
-  const cats = (areas.find(a => a.id === p.area)?.cats) || [];
-  $("#form").innerHTML = `
-    <div class="linha">
-      <label>área
-        <select data-campo="area">
-          ${areas.map(a => `<option value="${a.id}" ${a.id === p.area ? "selected" : ""}>${esc(a.name.pt)}</option>`).join("")}
-        </select>
-      </label>
-      <label>categoria
-        <select data-campo="cat">
-          <option value="">(nenhuma)</option>
-          ${cats.map(c => `<option value="${c.id}" ${c.id === p.cat ? "selected" : ""}>${esc(c.name.pt)}</option>`).join("")}
-        </select>
-      </label>
-    </div>
-    <div class="linha">
-      <label>título PT <input data-campo="title.pt" value="${esc(p.title?.pt)}"></label>
-      <label>título EN <input data-campo="title.en" value="${esc(p.title?.en)}"></label>
-    </div>
-    <label>descrição PT <textarea rows="3" data-campo="desc.pt">${esc(p.desc?.pt)}</textarea></label>
-    <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
-    <div class="linha">
-      <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
-      <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
-    </div>
-    <h3>mídias <button id="add-midia">+ mídia</button></h3>
-    <div id="midias">
-      ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
-    </div>
-    <button class="perigo" id="apagar">apagar projeto</button>`;
-  desenharListaProjetos();
-}
-
-function desenharFormArea() {
-  const a = areasEditaveis[selArea];
-  if (!a) {
-    $('#drawer-titulo').textContent = '';
-    $('#form').innerHTML = '<p class="dica">Escolha uma área à esquerda ou crie uma nova.</p>';
-    return;
-  }
-  const idMudou = idOriginalArea && a.id !== idOriginalArea;
-  const projetosAfetados = idMudou ? projetos.filter(p => p.area === idOriginalArea).length : 0;
-  $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (a.name?.pt || 'sem nome');
-  $('#form').innerHTML = `
-    <div class="linha">
-      <label>nome PT <input data-acampo="name.pt" value="${esc(a.name?.pt)}"></label>
-      <label>nome EN <input data-acampo="name.en" value="${esc(a.name?.en)}"></label>
-    </div>
-    <div class="linha">
-      <label>aba PT (curto) <input data-acampo="short.pt" value="${esc(a.short?.pt)}" placeholder="${esc(a.name?.pt)}"></label>
-      <label>aba EN (curto) <input data-acampo="short.en" value="${esc(a.short?.en)}" placeholder="${esc(a.name?.en)}"></label>
-    </div>
-    <label>id / slug
-      <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace">
-    </label>
-    ${idMudou && projetosAfetados > 0 ? `<div class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}". <button type="button" id="corrigir-slug">Corrigir agora</button></div>` : ''}
-    <label>subtítulo PT
-      <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea>
-    </label>
-    <label>subtítulo EN
-      <textarea rows="2" data-acampo="lead.en">${esc(a.lead?.en)}</textarea>
-    </label>
-    <h3>categorias (filtros) <button id="add-cat">+ categoria</button></h3>
-    <div id="cats">
-      ${(a.cats || []).map((c, i) => linhaCategoria(c, i, (a.cats || []).length)).join('') || '<p class="dica">nenhuma categoria — a área aparece sem filtros</p>'}
-    </div>
-    <button class="perigo" id="apagar-area">apagar área</button>`;
-  desenharListaAreas();
-}
-
-function desenhar() {
-  desenharLista();
-  if (modoAtual === 'projetos') desenharForm();
-  else desenharFormArea();
-}
-
 function abrir(i) {
   sel = i;
   document.body.classList.add("editando");
@@ -616,282 +1119,39 @@ function abrirArea(i) {
   desenharFormArea();
 }
 
-function fechar() { document.body.classList.remove("editando"); }
+function abrirCat(ai, ci) {
+  selCat = { area: +ai, cat: +ci };
+  document.body.classList.add('editando');
+  desenharFormCat();
+}
 
+function fechar() { document.body.classList.remove("editando"); }
 $("#fechar-drawer").onclick = fechar;
 
-/* ---------- Eventos de Filtro ---------- */
+/* ---------- Inputs e Mudanças ---------- */
 $("#busca-projeto").addEventListener("input", e => {
   buscaProjeto = e.target.value;
-  desenharListaProjetos();
+  if (modoAtual === 'projetos') desenharListaProjetos();
 });
 
-$("#filtro-area").addEventListener("change", e => {
-  filtroArea = e.target.value;
-  desenharListaProjetos();
-});
-
-function atualizarFiltroAreas() {
-  const selArea = $("#filtro-area");
-  const valorAtual = selArea.value;
-  selArea.innerHTML = '<option value="">Todas as áreas</option>' + 
-    areas.map(a => `<option value="${a.id}">${esc(a.name.pt)}</option>`).join("");
-  selArea.value = valorAtual;
-}
-
-/* ---------- Drag & Drop: Lista Principal ---------- */
-$("#lista").addEventListener("dragstart", e => {
-  const li = e.target.closest("li[data-i]");
-  if (!li) return;
-  dragProjetoIndex = +li.dataset.i;
-  e.dataTransfer.effectAllowed = "move";
-  li.classList.add("dragging");
-});
-
-$("#lista").addEventListener("dragend", e => {
-  document.querySelectorAll("#lista li").forEach(li => li.classList.remove("dragging", "drag-over"));
-});
-
-$("#lista").addEventListener("dragover", e => {
-  const li = e.target.closest("li[data-i]");
-  if (!li || dragProjetoIndex === -1) return;
-  
-  const sourceCat = projetos[dragProjetoIndex].cat || "";
-  const targetCat = projetos[+li.dataset.i].cat || "";
-  if (sourceCat !== targetCat) return;
-
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "move";
-  document.querySelectorAll("#lista li").forEach(el => el.classList.remove("drag-over"));
-  li.classList.add("drag-over");
-});
-
-$("#lista").addEventListener("dragleave", e => {
-  const li = e.target.closest("li[data-i]");
-  if (li) li.classList.remove("drag-over");
-});
-
-$("#lista").addEventListener("drop", e => {
-  const li = e.target.closest("li[data-i]");
-  if (!li || dragProjetoIndex === -1) return;
-  e.preventDefault();
-  
-  const targetIndex = +li.dataset.i;
-  
-  if (dragProjetoIndex !== targetIndex) {
-    const item = projetos.splice(dragProjetoIndex, 1)[0];
-    projetos.splice(targetIndex, 0, item);
-    marcarSujo();
-    
-    if (sel === dragProjetoIndex) sel = targetIndex;
-    else if (sel === targetIndex) sel = dragProjetoIndex;
-    
-    desenhar();
-    abrir(sel);
-  }
-  dragProjetoIndex = -1;
-});
-
-/* ---------- Drag & Drop: Mídias ---------- */
-$("#form").addEventListener("dragstart", e => {
-  if (!e.target.classList.contains("topo")) return;
-  const box = e.target.closest(".midia");
-  if (!box) return;
-  dragMidiaIndex = +box.dataset.mi;
-  e.dataTransfer.effectAllowed = "move";
-  box.classList.add("dragging");
-});
-
-$("#form").addEventListener("dragend", e => {
-  if (e.target.classList.contains("topo")) {
-    document.querySelectorAll(".midia").forEach(m => m.classList.remove("dragging", "drag-over"));
-  }
-});
-
-$("#form").addEventListener("dragover", e => {
-  const box = e.target.closest(".midia");
-  if (!box || dragMidiaIndex === -1) return;
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "move";
-  document.querySelectorAll(".midia").forEach(m => m.classList.remove("drag-over"));
-  box.classList.add("drag-over");
-});
-
-$("#form").addEventListener("dragleave", e => {
-  const box = e.target.closest(".midia");
-  if (box) box.classList.remove("drag-over");
-});
-
-$("#form").addEventListener("drop", e => {
-  const box = e.target.closest(".midia");
-  if (!box || dragMidiaIndex === -1) return;
-  e.preventDefault();
-  const targetIndex = +box.dataset.mi;
-  const media = projetos[sel]?.media || [];
-  
-  if (dragMidiaIndex !== targetIndex) {
-    const item = media.splice(dragMidiaIndex, 1)[0];
-    media.splice(targetIndex, 0, item);
-    marcarSujo();
-    desenharForm();
-  }
-  dragMidiaIndex = -1;
-});
-
-/* ---------- Cliques na lista lateral ---------- */
-$("#lista").addEventListener("click", e => {
-  const li = e.target.closest("li[data-i]");
-  if (li) { abrir(+li.dataset.i); return; }
-  const lia = e.target.closest("li[data-ai]");
-  if (lia) { abrirArea(+lia.dataset.ai); return; }
-});
-
-document.querySelectorAll('[data-modo]').forEach(b => {
-  b.onclick = () => mudarModo(b.dataset.modo);
-});
-
-$("#novo").onclick = () => {
-  if (modoAtual === 'projetos') {
-    projetos.unshift({ area: areas[0]?.id || "design", cat: "", h: 0, tools: "",
-      title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
-    marcarSujo();
-    abrir(0);
-    document.querySelector('[data-campo="title.pt"]')?.focus();
-  } else {
-    areasEditaveis.push({ id: "", name: { pt: "", en: "" }, short: { pt: "", en: "" }, cats: [], lead: { pt: "", en: "" } });
-    marcarSujo();
-    abrirArea(areasEditaveis.length - 1);
-    document.querySelector('[data-acampo="name.pt"]')?.focus();
-  }
-};
-
-/* ---------- Duplicar Projeto ---------- */
-$("#duplicar").onclick = () => {
-  const p = projetos[sel];
-  if (!p) return;
-  
-  const copia = JSON.parse(JSON.stringify(p));
-  copia.title.pt += " (cópia)";
-  copia.title.en += " (copy)";
-  
-  projetos.splice(sel + 1, 0, copia);
-  marcarSujo();
-  abrir(sel + 1);
-  status("Projeto duplicado!");
-};
-
-$("#preview-projeto").onclick = atualizarPreviewProjeto;
-
-$("#recarregar").onclick = async () => {
-  status("recarregando o site…");
-  await carregarPreview();
-  status("site recarregado");
-};
-
-document.querySelectorAll("[data-largura]").forEach(b => {
-  b.onclick = () => {
-    document.querySelectorAll("[data-largura]").forEach(x => x.classList.toggle("on", x === b));
-    $("#moldura").style.setProperty("--larg", b.dataset.largura);
-  };
-});
-
-/* ---------- Salvar ---------- */
-async function salvar() {
-  const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
-  if (semTitulo >= 0) {
-    abrir(semTitulo);
-    status("o projeto " + String(semTitulo + 1).padStart(2, "0") + " está sem título", true);
-    return false;
-  }
-  try {
-    status("salvando…");
-    await api("/api/projetos", { projetos });
-    limparSujo();
-    await carregarPreview();
-    status("salvo — o site ao lado já está atualizado");
-    return true;
-  } catch (e) {
-    status("erro: " + e.message, true);
-    return false;
-  }
-}
-
-async function salvarAreas() {
-  for (let i = 0; i < areasEditaveis.length; i++) {
-    const a = areasEditaveis[i];
-    if (!String(a.name?.pt || '').trim()) {
-      abrirArea(i);
-      status('a área ' + String(i + 1).padStart(2, '0') + ' está sem nome PT', true);
-      return false;
-    }
-    if (!String(a.id || '').trim()) {
-      areasEditaveis[i].id = slug(a.name?.pt || ('area-' + (i + 1)));
-    }
-  }
-  try {
-    status('salvando áreas…');
-    await api('/api/areas', { areas: areasEditaveis });
-    const r = await api('/api/estado');
-    areas = r.areas;
-    areasEditaveis = r.areasCompletas || areasEditaveis;
-    if (selArea >= 0) idOriginalArea = areasEditaveis[selArea]?.id || '';
-    limparSujo();
-    await carregarPreview();
-    atualizarFiltroAreas();
-    status('áreas salvas — site atualizado');
-    if (modoAtual === 'areas') desenharFormArea();
-    return true;
-  } catch (e) {
-    status('erro: ' + e.message, true);
-    return false;
-  }
-}
-
-$("#salvar").onclick = () => { modoAtual === 'projetos' ? salvar() : salvarAreas(); };
-
-/* ---------- Git Push ---------- */
-$("#git-push").onclick = async () => {
-  const msg = prompt("Mensagem do commit (deixe em branco para usar o padrão):", "Atualização via painel");
-  if (msg === null) return; // Cancelou
-  
-  status("Enviando para o GitHub…");
-  try {
-    // Se houver alterações no painel, salva primeiro
-    if (sujo) {
-      await (modoAtual === 'projetos' ? salvar() : salvarAreas());
-    }
-    const r = await api("/api/git/push", { mensagem: msg || "Atualização via painel" });
-    status("Enviado para o GitHub com sucesso!");
-    console.log(r.log);
-  } catch (e) {
-    status("Erro no Git: " + e.message, true);
-    console.error(e.log);
-  }
-};
-
-$("#ver-site").onclick = async () => {
-  const p = projetos[sel];
-  if (!p) return;
-  if (sujo && !(await salvar())) return;
-  const i = projetos.indexOf(p);
-  try {
-    frame.contentWindow.eval(`pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`);
-    fechar();
-  } catch (e) {
-    status("não consegui abrir no site: " + e.message, true);
-  }
-};
-
-/* ---------- Edição ---------- */
 $("#form").addEventListener("input", e => {
   const c = e.target.closest("[data-campo]");
   if (c) {
     setCampo(projetos[sel], c.dataset.campo, c.value);
-    desenharListaProjetos();
-    if (c.dataset.campo === "title.pt") $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
+    
+    if (c.dataset.campo === "title.pt") {
+      $("#drawer-titulo").textContent = String(sel + 1).padStart(2, "0") + " · " + (c.value || "sem título");
+      const li = document.querySelector(`li[data-i="${sel}"] span`);
+      if (li) {
+        const avisos = temProblema(projetos[sel]);
+        const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
+        li.innerHTML = `${esc(c.value || "(sem título)")} ${avisoHTML}`;
+      }
+    }
     marcarSujo();
     return;
   }
+  
   const m = e.target.closest("[data-mcampo]");
   if (m && (m.dataset.mcampo === "src" || m.dataset.mcampo === "poster")) {
     const mi = +m.closest("[data-mi]").dataset.mi;
@@ -905,10 +1165,15 @@ $("#form").addEventListener("input", e => {
     if (ca.dataset.acampo === 'name.pt') {
       $('#drawer-titulo').textContent = String(selArea + 1).padStart(2, '0') + ' · ' + (ca.value || 'sem nome');
       const a = areasEditaveis[selArea];
-      if (!a.id) {
-        a.id = slug(ca.value);
-        const idInput = document.querySelector('[data-acampo="id"]');
-        if (idInput) idInput.value = a.id;
+      if (a.id.startsWith('area-')) {
+        const novoSlug = slug(ca.value);
+        if (novoSlug && novoSlug !== 'item') {
+          const antigoId = a.id;
+          a.id = novoSlug;
+          projetos.forEach(p => { if (p.area === antigoId) p.area = novoSlug; });
+          const idInput = document.querySelector('[data-acampo="id"]');
+          if (idInput) idInput.value = a.id;
+        }
       }
     }
     if (ca.dataset.acampo === 'id') {
@@ -920,13 +1185,19 @@ $("#form").addEventListener("input", e => {
       return;
     }
     marcarSujo();
-    desenharListaAreas();
     return;
   }
   const cc = e.target.closest('[data-catcampo]');
   if (cc) {
-    const ci = +cc.closest('[data-ci]').dataset.ci;
-    setCampo(areasEditaveis[selArea].cats[ci], cc.dataset.catcampo, cc.value);
+    if (modoAtual === 'categorias') {
+      setCampo(areasEditaveis[selCat.area].cats[selCat.cat], cc.dataset.catcampo, cc.value);
+      if (cc.dataset.catcampo === 'name.pt') {
+        $('#drawer-titulo').textContent = 'Cat · ' + (cc.value || 'sem nome');
+      }
+    } else {
+      const ci = +cc.closest('[data-ci]').dataset.ci;
+      setCampo(areasEditaveis[selArea].cats[ci], cc.dataset.catcampo, cc.value);
+    }
     marcarSujo();
     return;
   }
@@ -949,6 +1220,20 @@ $("#form").addEventListener("change", async e => {
     desenharForm();
     return;
   }
+  const catArea = e.target.closest('[data-cat-area]');
+  if (catArea) {
+    const newAi = +catArea.value;
+    if (newAi !== selCat.area) {
+      const catObj = areasEditaveis[selCat.area].cats.splice(selCat.cat, 1)[0];
+      areasEditaveis[newAi].cats = areasEditaveis[newAi].cats || [];
+      areasEditaveis[newAi].cats.push(catObj);
+      selCat = { area: newAi, cat: areasEditaveis[newAi].cats.length - 1 };
+      marcarSujo();
+      desenharFormCat();
+      status("Categoria movida de área!");
+    }
+    return;
+  }
 });
 
 /* ---------- Cliques no form ---------- */
@@ -968,9 +1253,20 @@ $("#form").addEventListener("click", e => {
     return;
   }
 
+  if (b.id === 'apagar-cat') {
+    if (confirm('Apagar esta categoria? Os projetos ficarão "Sem categoria".')) {
+      areasEditaveis[selCat.area].cats.splice(selCat.cat, 1);
+      marcarSujo();
+      fechar();
+      desenharListaCategorias();
+      status("Categoria apagada!");
+    }
+    return;
+  }
+
   if (b.id === 'add-cat') {
     areasEditaveis[selArea].cats = areasEditaveis[selArea].cats || [];
-    areasEditaveis[selArea].cats.push({ id: '', name: { pt: '', en: '' } });
+    areasEditaveis[selArea].cats.push({ id: "cat-" + Date.now(), name: { pt: '', en: '' } });
     marcarSujo();
     const rolagem = $('#form').scrollTop;
     desenharFormArea();
@@ -979,6 +1275,7 @@ $("#form").addEventListener("click", e => {
     catInputs[catInputs.length - 1]?.focus();
     return;
   }
+  
   if (b.id === 'apagar-area') {
     if (confirm('Apagar esta área? Projetos que a usam ficarão sem área válida.')) {
       areasEditaveis.splice(selArea, 1);
@@ -986,41 +1283,8 @@ $("#form").addEventListener("click", e => {
       marcarSujo();
       if (!areasEditaveis.length) fechar();
       else { idOriginalArea = areasEditaveis[selArea]?.id || ''; desenharFormArea(); }
-      desenharListaAreas();
+      desenharLista();
     }
-    return;
-  }
-  if (b.hasAttribute('data-cat-subir')) {
-    const ci = +b.closest('[data-ci]').dataset.ci;
-    if (ci > 0) {
-      const cats = areasEditaveis[selArea].cats;
-      [cats[ci - 1], cats[ci]] = [cats[ci], cats[ci - 1]];
-      marcarSujo();
-      const rolagem = $('#form').scrollTop;
-      desenharFormArea();
-      $('#form').scrollTop = rolagem;
-    }
-    return;
-  }
-  if (b.hasAttribute('data-cat-descer')) {
-    const ci = +b.closest('[data-ci]').dataset.ci;
-    const cats = areasEditaveis[selArea].cats;
-    if (ci < cats.length - 1) {
-      [cats[ci + 1], cats[ci]] = [cats[ci], cats[ci + 1]];
-      marcarSujo();
-      const rolagem = $('#form').scrollTop;
-      desenharFormArea();
-      $('#form').scrollTop = rolagem;
-    }
-    return;
-  }
-  if (b.hasAttribute('data-cat-remover')) {
-    const ci = +b.closest('[data-ci]').dataset.ci;
-    areasEditaveis[selArea].cats.splice(ci, 1);
-    marcarSujo();
-    const rolagem = $('#form').scrollTop;
-    desenharFormArea();
-    $('#form').scrollTop = rolagem;
     return;
   }
 
@@ -1042,7 +1306,7 @@ $("#form").addEventListener("click", e => {
       sel = Math.min(sel, projetos.length - 1);
       marcarSujo();
       if (!projetos.length) fechar();
-      desenhar();
+      desenharLista();
     }
   }
   else if (b.hasAttribute("data-subir") && mi > 0) {
@@ -1084,11 +1348,14 @@ seletor.addEventListener("change", () => {
 
 async function enviarArquivos(lista, alvo, mi0) {
   const p = projetos[sel];
-  if (!p || !p.media || !p.media[mi0] || !lista.length) return;
+  if (!p || !p.media || !lista.length) return;
+  
+  if (!p.media[mi0]) p.media[mi0] = { type: "image", src: "" };
+
   const arquivos = [...lista];
   if (alvo !== "src") arquivos.length = 1;
 
-  const pasta = slug(p.title?.pt);
+  const pasta = slug(p.title?.pt || "item");
   let destino = mi0, ultimo = null, foraDoSite = [];
 
   for (let k = 0; k < arquivos.length; k++) {
@@ -1172,7 +1439,6 @@ window.addEventListener("beforeunload", e => {
     projetos = r.projetos;
     areas = r.areas;
     areasEditaveis = r.areasCompletas || r.areas;
-    atualizarFiltroAreas();
     desenhar();
     ligarFrame();
     if (!token || token.indexOf("__PAINEL") === 0)

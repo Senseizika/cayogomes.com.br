@@ -18,41 +18,27 @@
    name/short/lead: textos em pt/en. */
 const AREAS = [
   {
-    "id": "design",
+    "id": "poema",
     "name": {
-      "pt": "Design Gráfico",
-      "en": "Graphic Design"
+      "pt": "poema",
+      "en": "poetry"
     },
     "short": {
-      "pt": "Design",
-      "en": "Design"
+      "pt": "asd",
+      "en": "asda"
     },
     "cats": [
       {
-        "id": "cartazes",
+        "id": "adadadad",
         "name": {
-          "pt": "Cartazes e divulgação",
-          "en": "Posters and promo"
-        }
-      },
-      {
-        "id": "estampas",
-        "name": {
-          "pt": "Estampas",
-          "en": "Prints"
-        }
-      },
-      {
-        "id": "identidade",
-        "name": {
-          "pt": "Identidade visual",
-          "en": "Visual identity"
+          "pt": "asd",
+          "en": "adads"
         }
       }
     ],
     "lead": {
-      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
-      "en": "Posters, screen-print artwork and visual identity."
+      "pt": "daasdasda",
+      "en": "dasdasdad"
     }
   },
   {
@@ -65,10 +51,56 @@ const AREAS = [
       "pt": "3D",
       "en": "3D"
     },
-    "cats": [],
+    "cats": [
+      {
+        "id": "cat-1794855280365",
+        "name": {
+          "pt": "wdwd",
+          "en": "dwdasda"
+        }
+      }
+    ],
     "lead": {
       "pt": "Personagens, criaturas e props com texturas e iluminação trabalhadas.",
       "en": "Characters, creatures and props with carefully crafted textures and lighting."
+    }
+  },
+  {
+    "id": "design",
+    "name": {
+      "pt": "Design Gráfico",
+      "en": "Graphic Design"
+    },
+    "short": {
+      "pt": "Design",
+      "en": "Design"
+    },
+    "cats": [
+      {
+        "id": "identidade",
+        "name": {
+          "pt": "Identidade visual",
+          "en": "Visual identity"
+        }
+      },
+      {
+        "id": "estampas",
+        "name": {
+          "pt": "Estampas",
+          "en": "Prints"
+        }
+      },
+      {
+        "id": "cartazes",
+        "name": {
+          "pt": "Cartazes e divulgação",
+          "en": "Posters and promo"
+        }
+      }
+    ],
+    "lead": {
+      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
+      "en": "Posters, screen-print artwork and visual identity."
     }
   }
 ];
