@@ -18,51 +18,6 @@
    name/short/lead: textos em pt/en. */
 const AREAS = [
   {
-    "id": "design",
-    "name": {
-      "pt": "Design Gráfico",
-      "en": "Graphic Design"
-    },
-    "short": {
-      "pt": "Design",
-      "en": "Design"
-    },
-    "cats": [
-      {
-        "id": "cartazes",
-        "name": {
-          "pt": "Cartazes e divulgação",
-          "en": "Posters and promo"
-        }
-      },
-      {
-        "id": "identidade",
-        "name": {
-          "pt": "Identidade visual",
-          "en": "Visual identity"
-        }
-      },
-      {
-        "id": "estampas",
-        "name": {
-          "pt": "Estampas",
-          "en": "Prints"
-        }
-      },
-      {
-        "id": "cat-1794883368431",
-        "name": {
-          "pt": "4twt",
-          "en": "rw3rwrw3"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
-      "en": "Posters, screen-print artwork and visual identity."
-    }
-  },
-  {
     "id": "3d",
     "name": {
       "pt": "Modelagem 3D",
@@ -84,6 +39,51 @@ const AREAS = [
     "lead": {
       "pt": "Personagens, criaturas e props com texturas e iluminação trabalhadas.",
       "en": "Characters, creatures and props with carefully crafted textures and lighting."
+    }
+  },
+  {
+    "id": "design",
+    "name": {
+      "pt": "Design Gráfico",
+      "en": "Graphic Design"
+    },
+    "short": {
+      "pt": "Design",
+      "en": "Design"
+    },
+    "cats": [
+      {
+        "id": "identidade",
+        "name": {
+          "pt": "Identidade visual",
+          "en": "Visual identity"
+        }
+      },
+      {
+        "id": "cartazes",
+        "name": {
+          "pt": "Cartazes e divulgação",
+          "en": "Posters and promo"
+        }
+      },
+      {
+        "id": "estampas",
+        "name": {
+          "pt": "Estampas",
+          "en": "Prints"
+        }
+      },
+      {
+        "id": "cat-1794883368431",
+        "name": {
+          "pt": "4twt",
+          "en": "rw3rwrw3"
+        }
+      }
+    ],
+    "lead": {
+      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
+      "en": "Posters, screen-print artwork and visual identity."
     }
   }
 ];
