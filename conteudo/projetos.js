@@ -3,7 +3,7 @@
 const PROJECTS = [
   {
     "area": "design",
-    "galeria": "slide",
+    "galeria": "carrossel",
     "cat": "cartazes",
     "h": 0,
     "tools": "",
