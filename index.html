@@ -313,7 +313,16 @@ html{-webkit-text-size-adjust:100%}
 @media(max-width:640px){
   .win,.tabbar,dialog{backdrop-filter:none}
   .wrap{width:calc(100% - 1.5rem)}
-  .sub{font-size:.78rem}
+  /* topo compacto: a logo define a altura, sem faixas vazias */
+  .hero{min-height:0;display:flex;flex-direction:column;padding:clamp(.6rem,2vw,.9rem) 0 clamp(.9rem,3vw,1.2rem)}
+  .hero .wrap{order:1}
+  .hero-overlay{position:static;order:2;inset:auto;margin-top:clamp(.4rem,1.6vw,.8rem)}
+  .hero-overlay img{max-width:92%;max-height:34vh;transform:none}
+  /* linha de função + EN: o botão fica preso no canto superior direito */
+  .sub{flex-wrap:nowrap;align-items:flex-start;gap:.6rem;font-size:.72rem;letter-spacing:.03em}
+  .sub > span[data-i18n]{flex:1;min-width:0;line-height:1.35}
+  .sub .right{gap:0;flex:0 0 auto}
+  .sub .right > span{display:none}   /* CG / 001 só no desktop */
   .tabs{gap:.4rem}
   .tab{padding:.8rem .2rem;letter-spacing:.04em}
   .bar{padding:.55rem .8rem;font-size:.78rem}
@@ -561,6 +570,7 @@ function ajustarJanela(track, lista){
   if (!palco) return;
   if (!track.classList.contains("carrossel")) {
     palco.style.setProperty("--janela", "100%");
+    palco.style.height = "";
     delete track.dataset.janela;
     return;
   }
@@ -573,16 +583,27 @@ function ajustarJanela(track, lista){
   } else {
     ratio = 16 / 9;
   }
-  const altura = palco.clientHeight;
-  if (!altura) {
+  // Mede a altura disponível sem o height inline (senão a 2ª passagem mediria
+  // a janela já encolhida e ela iria diminuindo a cada chamada).
+  const anterior = palco.style.height;
+  palco.style.height = "";
+  const alturaMax = palco.clientHeight;
+  const larguraMax = palco.clientWidth;
+  palco.style.height = anterior;
+  if (!alturaMax || !larguraMax) {
     requestAnimationFrame(() => {
       const t = $("#d-track");
       if (t) { ajustarJanela(t, lista); ajustarLarguras(t); posicionarTrack(t); }
     });
     return;
   }
-  const largura = Math.round(Math.min(palco.clientWidth, altura * ratio));
+  // Janela = maior retângulo com a proporção da arte que cabe no palco, sem
+  // sobrar faixa preta em cima/embaixo (no celular o palco costuma ser mais
+  // alto que a arte, então ele também encolhe).
+  const largura = Math.round(Math.min(larguraMax, alturaMax * ratio));
+  const altura = Math.round(Math.min(alturaMax, largura / ratio));
   palco.style.setProperty("--janela", largura + "px");
+  palco.style.height = altura + "px";
   track.dataset.janela = String(largura);
 }
 
@@ -902,7 +923,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
 /* parallax: as duas camadas estão no mesmo bloco, então se movem exatamente juntas */
 (function(){
   const fundo = $(".fundo");
-  if (!fundo || matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(max-width: 640px)").matches) return;
+  if (!fundo || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   fundo.style.willChange = "transform";
   let ticking = false;
   addEventListener("scroll", () => {
