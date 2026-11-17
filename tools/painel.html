@@ -153,7 +153,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .carrossel-opcao b{display:block;font:500 .84rem system-ui,sans-serif;margin-bottom:.15rem}
 .carrossel-opcao small{display:block;font:400 .75rem system-ui,sans-serif;color:var(--mute)}
 .carrossel-opcao:has(input:checked){border-color:var(--accent);background:rgba(239,43,49,.08)}
-.tag-carrossel{font:400 .6rem ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid currentColor;border-radius:3px;padding:0 .25rem;flex-shrink:0}
+.tag-carrossel{font:500 .62rem ui-monospace,Consolas,monospace;line-height:1;color:var(--accent);border:1px solid currentColor;border-radius:50%;width:1.15rem;height:1.15rem;display:grid;place-items:center;flex-shrink:0}
 
 .midia.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
 .midia.drag-over { border-top: 2px solid var(--accent); }
@@ -481,7 +481,7 @@ function renderizarLinhasProjetos(lista) {
     return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, "0")}</b>
-      ${p.galeria === 'carrossel' ? '<span class="tag-carrossel" title="galeria em carrossel contínuo">carrossel</span>' : ''}
+      ${p.galeria === 'carrossel' ? '<span class="tag-carrossel" title="galeria em carrossel contínuo (Instagram)">C</span>' : ''}
       <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
       <em>${conta}</em>
     </li>`;

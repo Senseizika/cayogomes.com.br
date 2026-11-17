@@ -172,12 +172,15 @@ dialog[open]{animation:in .22s ease-out}
   min-height: 320px;
   overflow: hidden;
   touch-action: pan-y; 
+  --janela: 100%; /* largura da área visível (no carrossel = proporção da imagem) */
 }
 
 .d-stage-view{
-  width: 100%;
+  width: var(--janela);
+  margin: 0 auto;
   height: 100%;
   display: flex;
+  overflow: hidden;
 }
 
 .d-track{
@@ -221,6 +224,13 @@ dialog[open]{animation:in .22s ease-out}
   display: block;
 }
 
+.d-track.carrossel .d-slide img{
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
 /* vídeo/3D: no modo slide já ocupam a tela toda; no carrossel a largura é
    definida pelo JS (ajustarLarguras) para o deslocamento ficar exato */
 .d-track.carrossel .d-slide.is-video {
@@ -238,7 +248,7 @@ dialog[open]{animation:in .22s ease-out}
 .d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:44px;height:44px;display:grid;place-items:center;
   border:1px solid var(--line);border-radius:50%;background:rgba(5,5,6,.72);color:var(--white);font:400 1.5rem/1 var(--mono);cursor:pointer}
 .d-nav:hover{border-color:var(--accent);color:var(--accent)}
-.d-prev{left:.6rem} .d-next{right:.6rem}
+.d-prev{left:calc(50% - var(--janela) / 2 + .6rem)} .d-next{right:calc(50% - var(--janela) / 2 + .6rem)}
 .d-nav[hidden],.d-thumbs[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
 /* bolinhas do carrossel (como no Instagram) */
 .d-dots{position:absolute;left:50%;bottom:.7rem;transform:translateX(-50%);z-index:2;display:flex;gap:.4rem;
@@ -246,7 +256,7 @@ dialog[open]{animation:in .22s ease-out}
 .d-dots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer}
 .d-dots button[aria-current="true"]{background:var(--accent);transform:scale(1.3)}
 /* contador 1 / 4 */
-.d-count{position:absolute;right:.7rem;bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
+.d-count{position:absolute;right:calc(50% - var(--janela) / 2 + .7rem);bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
 .d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line)}
@@ -544,24 +554,60 @@ function deslocamento(track, i){
   return x;
 }
 
+// Janela do carrossel: tem a mesma proporção da imagem original (como no
+// Instagram), então cada arte aparece inteira e as vizinhas ficam fora.
+function ajustarJanela(track, lista){
+  const palco = track.closest(".d-stage");
+  if (!palco) return;
+  if (!track.classList.contains("carrossel")) {
+    palco.style.setProperty("--janela", "100%");
+    delete track.dataset.janela;
+    return;
+  }
+  const midias = lista || (PROJECTS[current] && PROJECTS[current].media) || [];
+  const primeira = midias[0];
+  const img = track.children[0] && track.children[0].querySelector("img");
+  let ratio = 0.8; // 4:5, proporção padrão do Instagram
+  if (!primeira || primeira.type === "image") {
+    if (img && img.naturalWidth && img.naturalHeight) ratio = img.naturalWidth / img.naturalHeight;
+  } else {
+    ratio = 16 / 9;
+  }
+  const altura = palco.clientHeight;
+  if (!altura) {
+    requestAnimationFrame(() => {
+      const t = $("#d-track");
+      if (t) { ajustarJanela(t, lista); ajustarLarguras(t); posicionarTrack(t); }
+    });
+    return;
+  }
+  const largura = Math.round(Math.min(palco.clientWidth, altura * ratio));
+  palco.style.setProperty("--janela", largura + "px");
+  track.dataset.janela = String(largura);
+}
+
+function larguraDaJanela(track){
+  const palco = track.closest(".d-stage");
+  return Math.round(Number(track.dataset.janela) || (palco && palco.clientWidth) || 0);
+}
+
 // No carrossel cada slide tem a largura natural da imagem. Vídeo e 3D não têm
-// largura natural, então recebem a largura do palco (senão o deslocamento erra).
+// largura natural, então recebem a largura da janela (senão o deslocamento erra).
 function ajustarLarguras(track){
   if (!track.classList.contains("carrossel")) return;
-  const palco = track.closest(".d-stage");
-  const largura = Math.round((palco && palco.clientWidth) || 0);
+  const largura = larguraDaJanela(track);
   // diálogo ainda fechado (largura 0): refaz no próximo quadro, quando ele abrir
   if (!largura) {
     requestAnimationFrame(() => {
       const t = $("#d-track");
-      if (t) { ajustarLarguras(t); posicionarTrack(t); }
+      if (t) { ajustarJanela(t); ajustarLarguras(t); posicionarTrack(t); }
     });
     return;
   }
   [...track.children].forEach(slide => {
-    const fixo = slide.classList.contains("is-video");
-    slide.style.flex  = fixo ? "0 0 " + largura + "px" : "";
-    slide.style.width = fixo ? largura + "px" : "";
+    // cada arte ocupa exatamente a janela; a proporção é preservada pelo object-fit
+    slide.style.flex  = "0 0 " + largura + "px";
+    slide.style.width = largura + "px";
   });
 }
 
@@ -591,6 +637,7 @@ function pintarMidia(){
     </div>`;
     track = $("#d-track");
 
+    ajustarJanela(track, lista);
     ajustarLarguras(track);
     // Posiciona instantaneamente sem animação no primeiro carregamento
     track.style.transition = 'none';
@@ -599,9 +646,23 @@ function pintarMidia(){
     track.style.transition = ''; // Restaura a animação
   } else {
     // Se só mudou de posição, anima suavemente
+    ajustarJanela(track, lista);
     ajustarLarguras(track);
     posicionarTrack(track);
   }
+
+  // Imagem grande pode terminar de carregar depois: refaz a janela e a posição
+  [...track.querySelectorAll("img")].forEach(img => {
+    if (img.dataset.janelaOk) return;
+    img.dataset.janelaOk = "1";
+    img.addEventListener("load", () => {
+      const t = $("#d-track");
+      if (!t) return;
+      ajustarJanela(t, lista);
+      ajustarLarguras(t);
+      posicionarTrack(t);
+    });
+  });
   
   // Limpa iframes de vídeos que não estão ativos para não ficarem rodando
   [...track.children].forEach((slide, i) => {
@@ -753,6 +814,7 @@ function ligarGaleria(){
   addEventListener("resize", () => {
     const t = $("#d-track");
     if (!t) return;
+    ajustarJanela(t);
     ajustarLarguras(t);
     posicionarTrack(t);
   });
