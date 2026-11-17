@@ -18,30 +18,6 @@
    name/short/lead: textos em pt/en. */
 const AREAS = [
   {
-    "id": "3d",
-    "name": {
-      "pt": "Modelagem 3D",
-      "en": "3D Art"
-    },
-    "short": {
-      "pt": "3D",
-      "en": "3D"
-    },
-    "cats": [
-      {
-        "id": "cat-1794855280365",
-        "name": {
-          "pt": "wdwd",
-          "en": "dwdasda"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "Personagens, criaturas e props com texturas e iluminação trabalhadas.",
-      "en": "Characters, creatures and props with carefully crafted textures and lighting."
-    }
-  },
-  {
     "id": "design",
     "name": {
       "pt": "Design Gráfico",
@@ -51,39 +27,26 @@ const AREAS = [
       "pt": "Design",
       "en": "Design"
     },
-    "cats": [
-      {
-        "id": "identidade",
-        "name": {
-          "pt": "Identidade visual",
-          "en": "Visual identity"
-        }
-      },
-      {
-        "id": "cartazes",
-        "name": {
-          "pt": "Cartazes e divulgação",
-          "en": "Posters and promo"
-        }
-      },
-      {
-        "id": "estampas",
-        "name": {
-          "pt": "Estampas",
-          "en": "Prints"
-        }
-      },
-      {
-        "id": "cat-1794883368431",
-        "name": {
-          "pt": "4twt",
-          "en": "rw3rwrw3"
-        }
-      }
-    ],
+    "cats": [],
     "lead": {
-      "pt": "Cartazes, estampas para serigrafia e identidade visual.",
-      "en": "Posters, screen-print artwork and visual identity."
+      "pt": "Arte feita por um humano, nada é artificial.\nCartazes, panfletos, estampas para serigrafia e posts para redes sociais, com identidade visual do físico ao digital.",
+      "en": "Art made by a human, never a machine.\nPosters, flyers, screen prints, social posts, and visual identity, from the page to the screen."
+    }
+  },
+  {
+    "id": "3d",
+    "name": {
+      "pt": "Arte 3D",
+      "en": "3D Art"
+    },
+    "short": {
+      "pt": "3D",
+      "en": "3D"
+    },
+    "cats": [],
+    "lead": {
+      "pt": "Arte 3D feita por um artista, seja estilizada ou realista.\nPersonagens, criaturas e props esculpidos à mão, prontos para jogos ou para impressão.",
+      "en": "3D art made by an artist, whether stylized or realist.\nCharacters, creatures, and props sculpted by hand, ready for games or print on demand."
     }
   }
 ];
