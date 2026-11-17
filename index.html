@@ -201,6 +201,8 @@ dialog[open]{animation:in .22s ease-out}
   align-items: center;
   justify-content: center;
 }
+/* cada slide é o bloco de referência do vídeo/capa (no carrossel, a janela) */
+.d-slide{position:relative}
 
 /* Modo Carrossel: imagens coladas, o track cresce */
 .d-track.carrossel {
@@ -216,6 +218,7 @@ dialog[open]{animation:in .22s ease-out}
 
 .d-slide img{
   max-height: 100%;
+  max-width: 100%;   /* sem isto, arte larga estoura o slide e a seguinte aparece junto */
   width: auto;
   height: auto;
   object-fit: contain;
