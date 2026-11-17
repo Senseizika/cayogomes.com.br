@@ -89,12 +89,13 @@ function gravarAreas(lista) {
   fs.writeFileSync(ARQ_AREAS_JSON, JSON.stringify(lista, null, 2) + '\n', 'utf8');
   let src = fs.readFileSync(ARQ_CONTENT, 'utf8');
   const novasAreas = 'const AREAS = ' + JSON.stringify(lista, null, 2) + ';';
-  const novo = src.replace(/const AREAS = \[[\s\S]*?\n\];/, novasAreas);
-  if (novo !== src) {
-    fs.writeFileSync(ARQ_CONTENT, novo, 'utf8');
-  } else {
+  const re = /const AREAS = \[[\s\S]*?\n\];/;
+  if (!re.test(src)) {
     console.warn('  aviso: bloco AREAS não encontrado no content.js — apenas areas.json foi atualizado');
+    return;
   }
+  const novo = src.replace(re, novasAreas);
+  if (novo !== src) fs.writeFileSync(ARQ_CONTENT, novo, 'utf8');
 }
 
 function normalizar(lista) {

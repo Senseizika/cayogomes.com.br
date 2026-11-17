@@ -264,7 +264,7 @@ function atualizarSelecaoVisual() {
     const details = document.querySelector(`#lista details[data-area-id="${areaSelecionada.id}"]`);
     if (details) details.classList.add('selecionado');
     const idx = areasEditaveis.indexOf(areaSelecionada);
-    const li = document.querySelector(`#lista li[data-ai="${idx}"]`);
+    const li = document.querySelector(`#lista li[data-ai="${idx}"]:not([data-ci])`);
     if (li) li.classList.add('sel');
   }
   if (categoriaSelecionada) {
@@ -546,7 +546,7 @@ function desenharListaAreas() {
   $('#lista').innerHTML = areasEditaveis.map((a, i) => {
     const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + a.id) ? 'open' : '';
     const selecionado = a === areaSelecionada ? ' selecionado' : '';
-    return `<details class="grupo${selecionado}" ${aberto} data-area-id="${esc(a.id)}">
+    return `<details class="grupo${selecionado}" ${aberto} draggable="true" data-area-id="${esc(a.id)}" data-ai="${i}">
       <summary>
         <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
         ${esc(a.name?.pt || '(sem nome)')}
@@ -564,18 +564,25 @@ function desenharListaCategorias() {
     const cats = area.cats || [];
     if (cats.length === 0) return;
 
-    html += `<div class="grupo-area-label">${esc(area.name?.pt || '(sem nome)')}</div>`;
-    html += `<ol class="lista-categorias">`;
+    // Mesma estrutura visual das outras abas: grupo com summary + ol de linhas.
+    const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + area.id) ? 'open' : '';
+    const selecionado = area === areaSelecionada ? ' selecionado' : '';
+    html += `<details class="grupo${selecionado}" ${aberto} draggable="true" data-area-id="${esc(area.id)}" data-ai="${ai}">
+      <summary>
+        <span class="handle" draggable="true" title="Arraste para reordenar a área">☰</span>
+        ${esc(area.name?.pt || '(sem nome)')}
+      </summary>
+      <div class="grupo-conteudo"><ol data-area-id="${esc(area.id)}">`;
     cats.forEach((cat, ci) => {
       const isSel = (cat === categoriaSelecionada);
-      html += `<li class="${isSel ? 'sel' : ''}" data-ai="${ai}" data-ci="${ci}" title="${esc(cat.name?.pt)}">
+      html += `<li class="${isSel ? 'sel' : ''}" data-ai="${ai}" data-ci="${ci}" draggable="true" title="${esc(cat.name?.pt)}">
         <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
         <b>${String(ci + 1).padStart(2, '0')}</b>
         <span>${esc(cat.name?.pt || '(sem nome)')}</span>
         <em>${esc(cat.id)}</em>
       </li>`;
     });
-    html += `</ol>`;
+    html += `</ol></div></details>`;
   });
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
 }
@@ -595,42 +602,29 @@ $("#lista").addEventListener("dragstart", e => {
 
   salvarEstadoAccordions();
 
-  const handle = e.target.closest(".handle");
-  const liProj = e.target.closest("li[data-i]");
-  const liCat = e.target.closest("li[data-ci]");
+  // A linha inteira é arrastável (não só o "☰"), então o tipo é deduzido
+  // pelo elemento em que o arraste começou.
+  const li = e.target.closest("li[data-ci], li[data-ai], li[data-i]");
+  const catGroup = e.target.closest("details.grupo-cat");
+  const areaGroup = e.target.closest("details.grupo");
 
-  if (handle) {
-    const li = handle.closest("li");
-    const details = handle.closest("details");
-    
-    if (details && details.classList.contains("grupo-cat")) {
-      if (details.dataset.catId === 'sem-cat') return;
-      dragType = 'cat';
-      dragData = { areaId: details.dataset.areaId, catId: details.dataset.catId };
-      details.classList.add("dragging");
-    } else if (details && details.classList.contains("grupo")) {
-      dragType = 'area';
-      dragData = { areaId: details.dataset.areaId };
-      details.classList.add("dragging");
-    } else if (li) {
-      if (li.dataset.ci !== undefined) {
-        dragType = 'cat-item';
-        dragData = { areaIndex: +li.dataset.ai, catIndex: +li.dataset.ci };
-        li.classList.add("dragging");
-      } else if (li.dataset.ai !== undefined) {
-        dragType = 'area-item';
-        dragData = { areaIndex: +li.dataset.ai };
-        li.classList.add("dragging");
-      } else if (li.dataset.i !== undefined) {
-        dragType = 'proj';
-        dragData = { index: +li.dataset.i };
-        li.classList.add("dragging");
-      }
-    }
-  } else if (liProj && modoAtual === 'projetos') {
-    dragType = 'proj';
-    dragData = { index: +liProj.dataset.i };
-    liProj.classList.add("dragging");
+  const iniciar = (tipo, dados, el) => {
+    dragType = tipo;
+    dragData = dados;
+    if (el) el.classList.add("dragging");
+  };
+
+  if (li && li.dataset.ci !== undefined) {
+    iniciar('cat-item', { areaIndex: +li.dataset.ai, catIndex: +li.dataset.ci }, li);
+  } else if (li && li.dataset.ai !== undefined) {
+    iniciar('area-item', { areaIndex: +li.dataset.ai }, li);
+  } else if (li && li.dataset.i !== undefined && modoAtual === 'projetos') {
+    iniciar('proj', { index: +li.dataset.i }, li);
+  } else if (catGroup && modoAtual === 'projetos') {
+    if (catGroup.dataset.catId === 'sem-cat') { e.preventDefault(); return; }
+    iniciar('cat', { areaId: catGroup.dataset.areaId, catId: catGroup.dataset.catId }, catGroup);
+  } else if (areaGroup) {
+    iniciar('area', { areaId: areaGroup.dataset.areaId }, areaGroup);
   } else {
     e.preventDefault();
   }
@@ -657,13 +651,15 @@ $("#lista").addEventListener("dragover", e => {
   const targetSemCatList = e.target.closest("ol.sem-cat-list");
   const targetLiProj = e.target.closest("li[data-i]");
   const targetLiItem = e.target.closest("li[data-ai]");
+  // para grupos abertos, a metade certa é a do cabeçalho (summary), não a do bloco inteiro
+  const rectDoGrupo = el => (el.querySelector(":scope > summary") || el).getBoundingClientRect();
 
   if (dragType === 'area' && targetGroup && targetGroup.dataset.areaId !== dragData.areaId) {
-    const rect = targetGroup.getBoundingClientRect();
+    const rect = rectDoGrupo(targetGroup);
     targetGroup.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
   }
   else if (dragType === 'cat' && targetCatGroup && targetCatGroup.dataset.areaId === dragData.areaId && targetCatGroup.dataset.catId !== dragData.catId) {
-    const rect = targetCatGroup.getBoundingClientRect();
+    const rect = rectDoGrupo(targetCatGroup);
     targetCatGroup.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
   }
   else if (dragType === 'proj') {
@@ -704,18 +700,19 @@ $("#lista").addEventListener("drop", e => {
   const targetSemCatList = e.target.closest("ol.sem-cat-list");
   const targetLiProj = e.target.closest("li[data-i]");
   const targetLiItem = e.target.closest("li[data-ai]");
+  const rectDoGrupo = el => (el.querySelector(":scope > summary") || el).getBoundingClientRect();
 
   try {
     if (type === 'area' && targetGroup && targetGroup.dataset.areaId !== data.areaId) {
       const fromIndex = areasEditaveis.findIndex(a => a.id === data.areaId);
       let toIndex = areasEditaveis.findIndex(a => a.id === targetGroup.dataset.areaId);
       if (fromIndex === -1 || toIndex === -1) return;
-      const rect = targetGroup.getBoundingClientRect();
+      const rect = rectDoGrupo(targetGroup);
       if (e.clientY >= rect.top + rect.height / 2) toIndex++;
       const item = areasEditaveis.splice(fromIndex, 1)[0];
       areasEditaveis.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
       marcarSujo();
-      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das áreas atualizada!"); }, 10);
+      setTimeout(() => { abrirFormulario(); status("Ordem das áreas atualizada!"); }, 10);
     }
     else if (type === 'cat' && targetCatGroup && targetCatGroup.dataset.areaId === data.areaId && targetCatGroup.dataset.catId !== data.catId) {
       const area = areasEditaveis.find(a => a.id === data.areaId);
@@ -723,12 +720,12 @@ $("#lista").addEventListener("drop", e => {
       const fromIndex = area.cats.findIndex(c => c.id === data.catId);
       let toIndex = area.cats.findIndex(c => c.id === targetCatGroup.dataset.catId);
       if (fromIndex === -1 || toIndex === -1) return;
-      const rect = targetCatGroup.getBoundingClientRect();
+      const rect = rectDoGrupo(targetCatGroup);
       if (e.clientY >= rect.top + rect.height / 2) toIndex++;
       const item = area.cats.splice(fromIndex, 1)[0];
       area.cats.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
       marcarSujo();
-      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das categorias atualizada!"); }, 10);
+      setTimeout(() => { abrirFormulario(); status("Ordem das categorias atualizada!"); }, 10);
     }
     else if (type === 'proj') {
       if (targetLiProj) {
@@ -747,7 +744,7 @@ $("#lista").addEventListener("drop", e => {
           projetos.splice(insertIndex, 0, proj);
           marcarSujo();
           projetoSelecionado = proj;
-          setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Projeto reordenado!"); }, 10);
+          setTimeout(() => { abrirFormulario(); status("Projeto reordenado!"); }, 10);
         }
       } else if (targetCatGroup || targetSemCatList) {
         const targetCategory = targetCatGroup || targetSemCatList;
@@ -761,7 +758,7 @@ $("#lista").addEventListener("drop", e => {
           projetos.push(proj);
           marcarSujo();
           projetoSelecionado = proj;
-          setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Projeto movido de categoria!"); }, 10);
+          setTimeout(() => { abrirFormulario(); status("Projeto movido de categoria!"); }, 10);
         }
       }
     }
@@ -777,7 +774,7 @@ $("#lista").addEventListener("drop", e => {
       areasEditaveis.splice(insertIndex, 0, item);
       areaSelecionada = item;
       marcarSujo();
-      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das áreas atualizada!"); }, 10);
+      setTimeout(() => { abrirFormulario(); status("Ordem das áreas atualizada!"); }, 10);
     }
     else if (type === 'cat-item' && targetLiItem && targetLiItem.dataset.ci !== undefined && +targetLiItem.dataset.ai === data.areaIndex) {
       const toIndex = +targetLiItem.dataset.ci;
@@ -792,7 +789,7 @@ $("#lista").addEventListener("drop", e => {
         area.cats.splice(insertIndex, 0, item);
         categoriaSelecionada = item;
         marcarSujo();
-        setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Categoria reordenada!"); }, 10);
+        setTimeout(() => { abrirFormulario(); status("Categoria reordenada!"); }, 10);
       }
     }
   } catch (err) {
