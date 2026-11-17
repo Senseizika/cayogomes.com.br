@@ -160,6 +160,88 @@
     ]
   },
   {
+    "area": "3d",
+    "galeria": "carrossel",
+    "cat": "cat-1794926813556",
+    "h": 0,
+    "tools": "Zbrush, Substance Painter, Substance Designer, Toolbag",
+    "title": {
+      "pt": "Checkpoint (cópia)",
+      "en": "Checkpoint (copy)"
+    },
+    "desc": {
+      "pt": "Checkpoint",
+      "en": "Checkpoint"
+    },
+    "media": [
+      {
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
+        "poster": "img/projetos/checkpoint/16.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/06.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/08.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/09.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/10.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/11.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/12.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/13.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/14.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/15.png"
+      }
+    ]
+  },
+  {
     "area": "c",
     "galeria": "slide",
     "cat": "cat-1794922461329",
