@@ -30,35 +30,18 @@
           "pt": "Estampas",
           "en": "Prints"
         }
+      },
+      {
+        "id": "cat-1794883368431",
+        "name": {
+          "pt": "4twt",
+          "en": "rw3rwrw3"
+        }
       }
     ],
     "lead": {
       "pt": "Cartazes, estampas para serigrafia e identidade visual.",
       "en": "Posters, screen-print artwork and visual identity."
-    }
-  },
-  {
-    "id": "poema",
-    "name": {
-      "pt": "poema",
-      "en": "poetry"
-    },
-    "short": {
-      "pt": "asd",
-      "en": "asda"
-    },
-    "cats": [
-      {
-        "id": "adadadad",
-        "name": {
-          "pt": "asd",
-          "en": "adads"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "daasdasda",
-      "en": "dasdasdad"
     }
   },
   {

@@ -3,6 +3,7 @@
 const PROJECTS = [
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 0,
     "tools": "",
@@ -34,7 +35,8 @@ const PROJECTS = [
     ]
   },
   {
-    "area": "poema",
+    "area": "design",
+    "galeria": "slide",
     "cat": "adadadad",
     "h": 0,
     "tools": "",
@@ -79,7 +81,8 @@ const PROJECTS = [
     ]
   },
   {
-    "area": "poema",
+    "area": "design",
+    "galeria": "slide",
     "cat": "adadadad",
     "h": 0,
     "tools": "",
@@ -100,6 +103,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "estampas",
     "h": 0,
     "tools": "",
@@ -145,6 +149,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 72,
     "tools": "Affinity",
@@ -165,6 +170,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 98,
     "tools": "",
@@ -185,6 +191,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 72,
     "tools": "Affinity",
@@ -205,6 +212,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 0,
     "tools": "",
@@ -250,6 +258,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "cartazes",
     "h": 0,
     "tools": "adada",
@@ -270,6 +279,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "identidade",
     "h": 72,
     "tools": "Affinity",
@@ -290,6 +300,7 @@ const PROJECTS = [
   },
   {
     "area": "design",
+    "galeria": "slide",
     "cat": "identidade",
     "h": 98,
     "tools": "",
@@ -310,6 +321,7 @@ const PROJECTS = [
   },
   {
     "area": "3d",
+    "galeria": "slide",
     "cat": "cat-1794855280365",
     "h": 98,
     "tools": "",
