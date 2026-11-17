@@ -177,11 +177,6 @@ const PROJECTS = [
     },
     "media": [
       {
-        "type": "sketchfab",
-        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
-        "poster": "img/projetos/checkpoint/16.png"
-      },
-      {
         "type": "image",
         "src": "img/projetos/checkpoint/01.png"
       },
