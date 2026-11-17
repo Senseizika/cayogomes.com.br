@@ -74,7 +74,8 @@ a{color:inherit}
 
 /* topo */
 #lang{font:500 .85rem var(--mono);letter-spacing:.1em;background:none;color:var(--white);border:1px solid var(--accent);padding:.3rem .75rem;border-radius:6px;cursor:pointer}
-#lang:hover{background:var(--accent);color:var(--ink)} /* texto escuro: o destaque é claro */
+/* o preenchimento do hover só em aparelhos com mouse: no toque ele ficaria aceso */
+@media(hover:hover){#lang:hover{background:var(--accent);color:var(--ink)}} /* texto escuro: o destaque é claro */
 
 /* hero = "capa" do topo (logo + linha de função + botão de idioma) */
 .hero{position:relative;overflow:hidden;min-height:var(--hero-h);padding:clamp(1.5rem,4vw,3rem) 0 clamp(2rem,5vw,4rem);}
