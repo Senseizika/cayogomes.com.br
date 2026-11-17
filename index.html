@@ -239,7 +239,12 @@ dialog[open]{animation:in .22s ease-out}
   border:1px solid var(--line);border-radius:50%;background:rgba(5,5,6,.72);color:var(--white);font:400 1.5rem/1 var(--mono);cursor:pointer}
 .d-nav:hover{border-color:var(--accent);color:var(--accent)}
 .d-prev{left:.6rem} .d-next{right:.6rem}
-.d-nav[hidden],.d-thumbs[hidden],.d-count[hidden]{display:none}
+.d-nav[hidden],.d-thumbs[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
+/* bolinhas do carrossel (como no Instagram) */
+.d-dots{position:absolute;left:50%;bottom:.7rem;transform:translateX(-50%);z-index:2;display:flex;gap:.4rem;
+  background:rgba(5,5,6,.62);padding:.3rem .5rem;border-radius:999px}
+.d-dots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer}
+.d-dots button[aria-current="true"]{background:var(--accent);transform:scale(1.3)}
 /* contador 1 / 4 */
 .d-count{position:absolute;right:.7rem;bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
@@ -431,7 +436,7 @@ const posterYT  = id => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 const posterYT2 = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="bar"><span id="d-bar"></span><button id="close" type="button"></button></div>
-<div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span></div>
+<div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
 <div class="d-thumbs" id="d-thumbs" hidden></div>
 <div class="d-body"><h3 id="d-title"></h3><p class="meta" id="d-meta"></p><p id="d-desc"></p></div></dialog>`;
 let area = null;
@@ -617,8 +622,14 @@ function pintarMidia(){
   $("#d-next").hidden = !varias;
   $("#d-count").hidden = !varias;
   $("#d-count").textContent = varias ? (mid+1) + " / " + lista.length : "";
-  $("#d-thumbs").hidden = !varias;
-  $("#d-thumbs").innerHTML = varias ? lista.map(thumbHTML).join("") : "";
+  const ehCarrossel = modo === "carrossel";
+  $("#d-thumbs").hidden = !varias || ehCarrossel;
+  $("#d-thumbs").innerHTML = varias && !ehCarrossel ? lista.map(thumbHTML).join("") : "";
+  const dots = $("#d-dots");
+  dots.hidden = !(varias && ehCarrossel);
+  dots.innerHTML = varias && ehCarrossel
+    ? lista.map((_, i) => `<button type="button" data-dot="${i}" aria-current="${i === mid}" aria-label="${i+1} / ${lista.length}"></button>`).join("")
+    : "";
 }
 
 // Troca a mídia (n = +1 ou -1)
@@ -672,7 +683,7 @@ function ligarGaleria(){
   let track = null, largura = 0, startTranslate = 0;
 
   palco.addEventListener("pointerdown", e => {
-    if (e.target.closest(".d-nav") || e.target.closest(".d-thumbs")) return;
+    if (e.target.closest(".d-nav") || e.target.closest(".d-thumbs") || e.target.closest(".d-dots")) return;
     
     track = $("#d-track");
     if (!track) return;
@@ -757,6 +768,8 @@ document.addEventListener("click", e => {
   if (b) { current = +b.dataset.i; fill(current); $("#dlg").showModal(); return; }
   const th = e.target.closest("[data-thumb]");
   if (th) { mid = +th.dataset.thumb; pintarMidia(); return; }
+  const dt = e.target.closest("[data-dot]");
+  if (dt) { mid = +dt.dataset.dot; pintarMidia(); return; }
   const nv = e.target.closest("[data-step]");
   if (nv) { irMedia(+nv.dataset.step); return; }
   const pl = e.target.closest("[data-play]");

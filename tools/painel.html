@@ -148,6 +148,13 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
 
+.carrossel-opcao{display:flex;gap:.6rem;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;margin-bottom:.7rem;background:#0e1013;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--white)}
+.carrossel-opcao input{width:auto;margin:.15rem 0 0;accent-color:var(--accent)}
+.carrossel-opcao b{display:block;font:500 .84rem system-ui,sans-serif;margin-bottom:.15rem}
+.carrossel-opcao small{display:block;font:400 .75rem system-ui,sans-serif;color:var(--mute)}
+.carrossel-opcao:has(input:checked){border-color:var(--accent);background:rgba(239,43,49,.08)}
+.tag-carrossel{font:400 .6rem ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid currentColor;border-radius:3px;padding:0 .25rem;flex-shrink:0}
+
 .midia.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
 .midia.drag-over { border-top: 2px solid var(--accent); }
 
@@ -188,6 +195,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
     <a href="/site" target="_blank">abrir site ↗</a>
     <button id="git-push" class="git" title="Salvar e enviar para o GitHub">☁️ GitHub ↑</button>
     <button id="novo">+ projeto</button>
+    <button id="novo-carrossel" title="novo projeto com as imagens em sequência contínua">+ carrossel</button>
     <button id="salvar" class="pri">salvar</button>
   </div>
 </header>
@@ -402,6 +410,8 @@ function atualizarPreviewProjeto() {
 function mudarModo(m) {
   modoAtual = m;
   document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
+  const btnCarrossel = $('#novo-carrossel');
+  if (btnCarrossel) btnCarrossel.style.display = m === 'projetos' ? '' : 'none';
   
   if (m === 'projetos') {
     $('#novo').textContent = '+ projeto';
@@ -471,6 +481,7 @@ function renderizarLinhasProjetos(lista) {
     return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, "0")}</b>
+      ${p.galeria === 'carrossel' ? '<span class="tag-carrossel" title="galeria em carrossel contínuo">carrossel</span>' : ''}
       <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
       <em>${conta}</em>
     </li>`;
@@ -841,17 +852,22 @@ $("#lista").addEventListener("click", e => {
 
 document.querySelectorAll('[data-modo]').forEach(b => { b.onclick = () => mudarModo(b.dataset.modo); });
 
+function novoProjeto(galeria) {
+  const areaId = areasEditaveis[0]?.id || "";
+  projetos.unshift({ area: areaId, cat: "", galeria: galeria || "slide", h: 0, tools: "",
+    title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+  marcarSujo();
+  projetoSelecionado = projetos[0];
+  desenharListaProjetos();
+  abrir(projetoSelecionado);
+  document.querySelector('[data-campo="title.pt"]')?.focus();
+}
+
+$("#novo-carrossel").onclick = () => novoProjeto('carrossel');
+
 $("#novo").onclick = () => {
   if (modoAtual === 'projetos') {
-    const areaId = areasEditaveis[0]?.id || "";
-    /* NOVO CAMPO galeria: "slide" */
-    projetos.unshift({ area: areaId, cat: "", galeria: "slide", h: 0, tools: "",
-      title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
-    marcarSujo();
-    projetoSelecionado = projetos[0];
-    desenharListaProjetos();
-    abrir(projetoSelecionado);
-    document.querySelector('[data-campo="title.pt"]')?.focus();
+    novoProjeto('slide');
   } else if (modoAtual === 'areas') {
     const tempId = "area-" + Date.now();
     areasEditaveis.push({ id: tempId, name: { pt: "", en: "" }, short: { pt: "", en: "" }, cats: [], lead: { pt: "", en: "" } });
@@ -1023,15 +1039,13 @@ function desenharForm() {
       <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
       
       <!-- NOVO CAMPO AQUI -->
-      <div class="linha">
-        <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
-        <label>estilo da galeria
-          <select data-campo="galeria">
-            <option value="slide" ${p.galeria === 'slide' || !p.galeria ? "selected" : ""}>Slide (centralizado)</option>
-            <option value="carrossel" ${p.galeria === 'carrossel' ? "selected" : ""}>Carrossel (colado/contínuo)</option>
-          </select>
-        </label>
-      </div>
+      <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
+
+      <label class="carrossel-opcao">
+        <input type="checkbox" data-campo="carrossel" ${p.galeria === 'carrossel' ? 'checked' : ''}>
+        <span><b>Carrossel do Instagram</b>
+          <small>as imagens aparecem coladas, em sequência contínua, como no Instagram — envie na ordem</small></span>
+      </label>
       
       <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
       
@@ -1130,6 +1144,11 @@ $("#busca-projeto").addEventListener("input", e => { buscaProjeto = e.target.val
 $("#form").addEventListener("input", e => {
   const c = e.target.closest("[data-campo]");
   if (c) {
+    if (c.dataset.campo === "carrossel") {
+      projetoAtual().galeria = c.checked ? "carrossel" : "slide";
+      marcarSujo();
+      return;
+    }
     setCampo(projetoAtual(), c.dataset.campo, c.value);
     if (c.dataset.campo === "title.pt") {
       $("#drawer-titulo").textContent = String(indiceProjeto(projetoAtual()) + 1).padStart(2, "0") + " · " + (c.value || "sem título");
@@ -1208,12 +1227,6 @@ $("#form").addEventListener("change", async e => {
     projetoAtual().cat = "";
     marcarSujo();
     desenharForm();
-    return;
-  }
-  const galeria = e.target.closest('[data-campo="galeria"]');
-  if (galeria) {
-    projetoAtual().galeria = galeria.value;
-    marcarSujo();
     return;
   }
   const categoria = e.target.closest('[data-campo="cat"]');
