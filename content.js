@@ -43,7 +43,15 @@ const AREAS = [
       "pt": "3D",
       "en": "3D"
     },
-    "cats": [],
+    "cats": [
+      {
+        "id": "cat-1794926813556",
+        "name": {
+          "pt": "Arte",
+          "en": "Art"
+        }
+      }
+    ],
     "lead": {
       "pt": "Arte 3D feita por um artista, seja estilizada ou realista.\nPersonagens, criaturas e props esculpidos à mão, prontos para jogos ou para impressão.",
       "en": "3D art made by an artist, whether stylized or realist.\nCharacters, creatures, and props sculpted by hand, ready for games or print on demand."

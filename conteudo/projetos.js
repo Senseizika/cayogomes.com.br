@@ -2,6 +2,166 @@
    A fonte da verdade é conteudo/projetos.json */
 const PROJECTS = [
   {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "cat-1794926813556",
+    "h": 0,
+    "tools": "Zbrush, Substance Painter, Substance Designer, Toolbag",
+    "title": {
+      "pt": "Pyromancer",
+      "en": "Pyromancer"
+    },
+    "desc": {
+      "pt": "Pyromancer",
+      "en": "Pyromancer"
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/pyromancer/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/06.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/08.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/09.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/10.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/11.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/12.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/13.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/14.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/pyromancer/15.png"
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "cat-1794926813556",
+    "h": 0,
+    "tools": "Zbrush, Substance Painter, Substance Designer, Toolbag",
+    "title": {
+      "pt": "Checkpoint",
+      "en": "Checkpoint"
+    },
+    "desc": {
+      "pt": "Checkpoint",
+      "en": "Checkpoint"
+    },
+    "media": [
+      {
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
+        "poster": "img/projetos/checkpoint/16.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/01.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/02.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/03.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/04.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/05.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/06.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/07.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/08.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/09.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/10.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/11.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/12.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/13.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/14.png"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint/15.png"
+      }
+    ]
+  },
+  {
     "area": "c",
     "galeria": "slide",
     "cat": "cat-1794922461329",
