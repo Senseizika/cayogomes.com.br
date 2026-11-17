@@ -1,4 +1,4 @@
-<!-- Nome do arquivo: tools/painel.html -->
+<!-- tools/painel.html -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -11,7 +11,6 @@
 html,body{height:100%}
 body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
 
-/* ---------- topo ---------- */
 header{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line);background:#07080a;flex:0 0 auto;z-index:40}
 header strong{font:400 1rem ui-monospace,Consolas,monospace;letter-spacing:.22em}
 #sujo{font:400 .78rem ui-monospace,Consolas,monospace;color:#f0b429;border:1px solid rgba(240,180,41,.4);border-radius:4px;padding:.15rem .45rem}
@@ -29,13 +28,11 @@ button:disabled{opacity:.35;cursor:default}
 a{color:var(--mute);text-decoration:none;font-size:.82rem}
 a:hover{color:var(--white)}
 
-/* ---------- alternador de modo ---------- */
 .toggle-modo{display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:6px;padding:2px}
 .toggle-modo button{border:none;border-radius:4px;padding:.22rem .6rem;font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.05em;color:var(--mute)}
 .toggle-modo button.on{background:rgba(255,255,255,.13);color:var(--white)}
 .toggle-modo button:hover{border-color:transparent;color:var(--white)}
 
-/* ---------- corpo: lista | site | formulário ---------- */
 main{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0;position:relative}
 body.editando main{grid-template-columns:300px 1fr min(420px,38vw)}
 
@@ -45,7 +42,6 @@ body.editando main{grid-template-columns:300px 1fr min(420px,38vw)}
 #filtros-lista input:focus { border-color:var(--accent); }
 #lateral-conteudo{overflow:auto;padding:.45rem;min-height:0;flex:1}
 
-/* Menu Cascata (Accordion) */
 details.grupo { margin-bottom: .3rem; border-radius:6px; }
 details.grupo > summary {
   font: 600 .78rem ui-monospace,Consolas,monospace;
@@ -86,16 +82,15 @@ details.grupo-cat > summary::-webkit-details-marker { display: none; }
 details.grupo-cat > summary::before { content: "▸"; font-size: .7rem; margin-right: .4rem; color: var(--mute); }
 details.grupo-cat[open] > summary::before { content: "▾"; }
 
-/* Ícone de arrastar */
 .handle { cursor: grab; color: var(--mute); font-size: .9rem; flex-shrink: 0; width: 1.5rem; text-align: center; }
 .handle:active { cursor: grabbing; }
 
-/* Listas Padronizadas (Alinhamento perfeito) */
 ol{list-style:none;margin:0;padding:0;min-height:10px}
 ol li {
   display: flex;
   align-items: center;
-  padding: .4rem .55rem .4rem 1.8rem; /* Recuo esquerdo para alinhar o número sob o texto da categoria */
+  gap: .5rem;
+  padding: .4rem .55rem;
   border-radius: 6px;
   cursor: pointer;
   border: 1px solid transparent;
@@ -103,23 +98,17 @@ ol li {
 }
 ol li:hover { background: rgba(255,255,255,.05); }
 ol li.sel { border-color: var(--accent); background: rgba(239,43,49,.1); }
-ol li b { font: 400 .78rem ui-monospace, Consolas, monospace; color: var(--mute); width: 2rem; flex-shrink: 0; text-align: left; }
-ol li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; display: flex; align-items: center; gap: 4px; flex-grow: 1; }
+ol li b { font: 400 .78rem ui-monospace, Consolas, monospace; color: var(--mute); width: 1.5rem; flex-shrink: 0; text-align: left; }
+ol li span:not(.handle) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; display: flex; align-items: center; gap: 4px; flex-grow: 1; }
 ol li .handle { flex: 0 0 1.5rem; }
-ol li em { font: 400 .66rem ui-monospace, Consolas, monospace; color: var(--mute); font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; text-align: right; padding-left: .5rem; }
-ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text-align:center;padding:1rem;margin:0;padding-left:0}
-.lista-categorias li { padding-left: .55rem; }
+ol li em { font: 400 .66rem ui-monospace, Consolas, monospace; color: var(--mute); font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; text-align: right; }
+ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text-align:center;padding:1rem;margin:0;}
 
-/* Ajustes específicos para as listas sem cascata */
-#lista > ol > li { padding-left: .55rem; }
-
-/* Feedback visual do Drag & Drop */
 .dragging { opacity: 0.3; }
 .drag-over-top { border-top: 2px solid var(--accent) !important; }
 .drag-over-bottom { border-bottom: 2px solid var(--accent) !important; }
 .drag-over-inside { background: rgba(239,43,49,.15) !important; border: 1px dashed var(--accent) !important; }
 
-/* Ícone de aviso */
 .aviso-icon { color: #f0b429; font-size: .85rem; cursor: help; line-height: 1; }
 
 #palco{display:flex;flex-direction:column;min-width:0;min-height:0}
@@ -133,7 +122,6 @@ ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text
 #moldura{flex:1;min-height:0;display:grid;place-items:center;padding:.7rem;background:#07080a;overflow:auto}
 #prev{width:var(--larg,100%);height:100%;border:1px solid var(--line);border-radius:10px;background:var(--ink);display:block;box-shadow:0 18px 50px rgba(0,0,0,.55)}
 
-/* ---------- gaveta do formulário ---------- */
 #drawer{display:none;flex-direction:column;border-left:1px solid var(--line);background:var(--panel);min-height:0}
 body.editando #drawer{display:flex}
 .drawer-topo{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border-bottom:1px solid var(--line);flex:0 0 auto}
@@ -166,7 +154,6 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 #seletor{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 .dica{color:var(--mute);font-size:.88rem}
 
-/* ---------- categorias no form de áreas ---------- */
 .cat{border:1px solid var(--line);border-radius:8px;padding:.55rem .6rem;margin-bottom:.5rem;background:#0e1013;display:grid;gap:.4rem}
 .cat-topo{display:flex;gap:.3rem;align-items:center}
 .cat-topo .num{font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute)}
@@ -252,12 +239,11 @@ let buscaProjeto = '';
 let dragType = null;
 let dragData = null;
 
-// Memória para os menus abertos/fechados
 let estadoAccordion = new Set();
 let estadoAccordionInicializado = false;
 
 const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const indiceProjeto = p => projetos.indexOf(p);
 const indiceArea = a => areasEditaveis.indexOf(a);
 const areaDaCategoria = c => areasEditaveis.find(a => (a.cats || []).includes(c)) || null;
@@ -265,9 +251,56 @@ const indiceCategoria = c => { const a = areaDaCategoria(c); return a ? (a.cats 
 function projetoAtual() { return projetoSelecionado && projetos.includes(projetoSelecionado) ? projetoSelecionado : null; }
 function areaAtual() { return areaSelecionada && areasEditaveis.includes(areaSelecionada) ? areaSelecionada : null; }
 function categoriaAtual() { const a = areaDaCategoria(categoriaSelecionada); return categoriaSelecionada && a && (a.cats || []).includes(categoriaSelecionada) ? categoriaSelecionada : null; }
-function abrirFormulario() {
-  // A seleção é a única fonte de verdade: redesenha a lista e o drawer juntos.
+
+function atualizarSelecaoVisual() {
+  document.querySelectorAll('#lista .sel, #lista .selecionado').forEach(el => el.classList.remove('sel', 'selecionado'));
+  
+  if (projetoSelecionado) {
+    const idx = projetos.indexOf(projetoSelecionado);
+    const li = document.querySelector(`#lista li[data-i="${idx}"]`);
+    if (li) li.classList.add('sel');
+  }
+  if (areaSelecionada) {
+    const details = document.querySelector(`#lista details[data-area-id="${areaSelecionada.id}"]`);
+    if (details) details.classList.add('selecionado');
+    const idx = areasEditaveis.indexOf(areaSelecionada);
+    const li = document.querySelector(`#lista li[data-ai="${idx}"]`);
+    if (li) li.classList.add('sel');
+  }
+  if (categoriaSelecionada) {
+    const a = areaDaCategoria(categoriaSelecionada);
+    if (a) {
+      const ai = areasEditaveis.indexOf(a);
+      const ci = a.cats.indexOf(categoriaSelecionada);
+      const li = document.querySelector(`#lista li[data-ai="${ai}"][data-ci="${ci}"]`);
+      if (li) li.classList.add('sel');
+    }
+  }
+}
+
+function fecharDrawer() {
+  document.body.classList.remove("editando");
+  projetoSelecionado = null;
+  areaSelecionada = null;
+  categoriaSelecionada = null;
+  atualizarSelecaoVisual();
+}
+
+function atualizarTudo() {
   desenharLista();
+  atualizarSelecaoVisual();
+  if (document.body.classList.contains('editando')) {
+    if (modoAtual === 'projetos' && projetoAtual()) desenharForm();
+    else if (modoAtual === 'areas' && areaAtual()) desenharFormArea();
+    else if (modoAtual === 'categorias' && categoriaAtual()) desenharFormCat();
+  }
+}
+
+/* Redesenha lista + drawer a partir da seleção atual. Usado depois de salvar,
+   reordenar, mover e apagar. Sem seleção válida, fecha a gaveta. */
+function abrirFormulario() {
+  desenharLista();
+  atualizarSelecaoVisual();
   if (modoAtual === 'projetos' && projetoAtual()) desenharForm();
   else if (modoAtual === 'areas' && areaAtual()) desenharFormArea();
   else if (modoAtual === 'categorias' && categoriaAtual()) desenharFormCat();
@@ -317,7 +350,6 @@ function setCampo(obj, caminho, valor) {
   o[ks[ks.length - 1]] = caminho === "h" ? (Number(valor) || 0) : valor;
 }
 
-/* ---------- site dentro do painel ---------- */
 const frame = $("#prev");
 function ligarFrame() {
   try {
@@ -367,7 +399,6 @@ function atualizarPreviewProjeto() {
   }
 }
 
-/* ---------- modo do painel ---------- */
 function mudarModo(m) {
   modoAtual = m;
   document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
@@ -394,16 +425,24 @@ function mudarModo(m) {
   
   desenharLista();
   
-  if (m === 'projetos') {
-    if (projetoAtual()) desenharForm(); else fechar();
-  } else if (m === 'areas') {
-    if (areaAtual()) desenharFormArea(); else fechar();
-  } else if (m === 'categorias') {
-    if (categoriaAtual()) desenharFormCat(); else fechar();
+  if (m === 'projetos' && projetoSelecionado) {
+    document.body.classList.add("editando");
+    atualizarSelecaoVisual();
+    desenharForm();
+  } else if (m === 'areas' && areaSelecionada) {
+    document.body.classList.add("editando");
+    atualizarSelecaoVisual();
+    desenharFormArea();
+  } else if (m === 'categorias' && categoriaSelecionada) {
+    document.body.classList.add("editando");
+    atualizarSelecaoVisual();
+    desenharFormCat();
+  } else {
+    document.body.classList.remove("editando");
+    atualizarSelecaoVisual();
   }
 }
 
-/* ---------- verificação de problemas ---------- */
 function temProblema(p) {
   const avisos = [];
   if (!String(p.title?.pt || "").trim()) avisos.push("Falta título PT");
@@ -412,7 +451,6 @@ function temProblema(p) {
   return avisos;
 }
 
-/* ---------- gerenciamento de estado dos acordeões ---------- */
 function salvarEstadoAccordions() {
   estadoAccordionInicializado = true;
   estadoAccordion.clear();
@@ -424,7 +462,6 @@ function salvarEstadoAccordions() {
   });
 }
 
-/* ---------- desenho das listas laterais ---------- */
 function renderizarLinhasProjetos(lista) {
   return lista.map(p => {
     const i = projetos.indexOf(p);
@@ -432,6 +469,7 @@ function renderizarLinhasProjetos(lista) {
     const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
     const conta = p.media?.length ? p.media.length + " mídia(s)" : "sem mídia";
     return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
+      <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, "0")}</b>
       <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
       <em>${conta}</em>
@@ -487,8 +525,15 @@ function desenharListaProjetos() {
         (p.title?.en || "").toLowerCase().includes(termo) ||
         (p.tools || "").toLowerCase().includes(termo);
     });
+    
     if (semCategoriaFiltrada.length) {
-      html += `<ol class="sem-cat-list" data-area-id="${area.id}" data-cat-id="sem-cat">${renderizarLinhasProjetos(semCategoriaFiltrada)}</ol>`;
+      const abCat = !estadoAccordionInicializado || estadoAccordion.has('cat-' + area.id + '-sem-cat') ? 'open' : '';
+      html += `<details class="grupo-cat" ${abCat} data-area-id="${area.id}" data-cat-id="sem-cat">
+        <summary>
+          Sem categoria
+        </summary>
+        <ol class="sem-cat-list" data-area-id="${area.id}" data-cat-id="sem-cat">${renderizarLinhasProjetos(semCategoriaFiltrada)}</ol>
+      </details>`;
     }
 
     html += `</div></details>`;
@@ -519,10 +564,8 @@ function desenharListaCategorias() {
     const cats = area.cats || [];
     if (cats.length === 0) return;
 
-    const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + area.id) ? 'open' : '';
-    html += `<details class="grupo" ${aberto} data-area-id="${esc(area.id)}">
-      <summary>${esc(area.name?.pt || '(sem nome)')}</summary>
-      <ol class="lista-categorias">`;
+    html += `<div class="grupo-area-label">${esc(area.name?.pt || '(sem nome)')}</div>`;
+    html += `<ol class="lista-categorias">`;
     cats.forEach((cat, ci) => {
       const isSel = (cat === categoriaSelecionada);
       html += `<li class="${isSel ? 'sel' : ''}" data-ai="${ai}" data-ci="${ci}" title="${esc(cat.name?.pt)}">
@@ -532,7 +575,7 @@ function desenharListaCategorias() {
         <em>${esc(cat.id)}</em>
       </li>`;
     });
-    html += `</ol></details>`;
+    html += `</ol>`;
   });
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
 }
@@ -543,10 +586,6 @@ function desenharLista() {
   else if (modoAtual === 'categorias') desenharListaCategorias();
 }
 
-/* ============================================================
-   DRAG & DROP COMPLETO
-   ============================================================ */
-
 $("#lista").addEventListener("dragstart", e => {
   if (buscaProjeto && modoAtual === 'projetos') {
     status("Limpe a busca para reordenar", true);
@@ -554,32 +593,39 @@ $("#lista").addEventListener("dragstart", e => {
     return;
   }
 
-  salvarEstadoAccordions(); // Salva o estado antes de começar a arrastar
+  salvarEstadoAccordions();
 
   const handle = e.target.closest(".handle");
   const liProj = e.target.closest("li[data-i]");
   const liCat = e.target.closest("li[data-ci]");
 
   if (handle) {
-    // Handles dentro de uma linha continuam sendo itens; handles do summary são grupos.
     const li = handle.closest("li");
     const details = handle.closest("details");
-    if (li && li.dataset.ci !== undefined) {
-      dragType = 'cat-item';
-      dragData = { areaIndex: +li.dataset.ai, catIndex: +li.dataset.ci };
-      li.classList.add("dragging");
-    } else if (li && li.dataset.ai !== undefined) {
-      dragType = 'area-item';
-      dragData = { areaIndex: +li.dataset.ai };
-      li.classList.add("dragging");
-    } else if (details?.classList.contains("grupo-cat")) {
+    
+    if (details && details.classList.contains("grupo-cat")) {
+      if (details.dataset.catId === 'sem-cat') return;
       dragType = 'cat';
       dragData = { areaId: details.dataset.areaId, catId: details.dataset.catId };
       details.classList.add("dragging");
-    } else if (details?.classList.contains("grupo")) {
+    } else if (details && details.classList.contains("grupo")) {
       dragType = 'area';
       dragData = { areaId: details.dataset.areaId };
       details.classList.add("dragging");
+    } else if (li) {
+      if (li.dataset.ci !== undefined) {
+        dragType = 'cat-item';
+        dragData = { areaIndex: +li.dataset.ai, catIndex: +li.dataset.ci };
+        li.classList.add("dragging");
+      } else if (li.dataset.ai !== undefined) {
+        dragType = 'area-item';
+        dragData = { areaIndex: +li.dataset.ai };
+        li.classList.add("dragging");
+      } else if (li.dataset.i !== undefined) {
+        dragType = 'proj';
+        dragData = { index: +li.dataset.i };
+        li.classList.add("dragging");
+      }
     }
   } else if (liProj && modoAtual === 'projetos') {
     dragType = 'proj';
@@ -660,50 +706,30 @@ $("#lista").addEventListener("drop", e => {
   const targetLiItem = e.target.closest("li[data-ai]");
 
   try {
-    /* ---- SOLTAR ÁREA (Accordion) ---- */
     if (type === 'area' && targetGroup && targetGroup.dataset.areaId !== data.areaId) {
       const fromIndex = areasEditaveis.findIndex(a => a.id === data.areaId);
       let toIndex = areasEditaveis.findIndex(a => a.id === targetGroup.dataset.areaId);
       if (fromIndex === -1 || toIndex === -1) return;
-      
       const rect = targetGroup.getBoundingClientRect();
       if (e.clientY >= rect.top + rect.height / 2) toIndex++;
-      
       const item = areasEditaveis.splice(fromIndex, 1)[0];
       areasEditaveis.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
-      
       marcarSujo();
-      setTimeout(() => { 
-        desenharLista(); 
-        if (modoAtual === 'projetos' && projetoAtual()) desenharForm();
-        status("Ordem das áreas atualizada!"); 
-      }, 10);
+      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das áreas atualizada!"); }, 10);
     }
-
-    /* ---- SOLTAR CATEGORIA (Accordion) ---- */
     else if (type === 'cat' && targetCatGroup && targetCatGroup.dataset.areaId === data.areaId && targetCatGroup.dataset.catId !== data.catId) {
       const area = areasEditaveis.find(a => a.id === data.areaId);
       if (!area || data.catId === 'sem-cat' || targetCatGroup.dataset.catId === 'sem-cat') return;
-
       const fromIndex = area.cats.findIndex(c => c.id === data.catId);
       let toIndex = area.cats.findIndex(c => c.id === targetCatGroup.dataset.catId);
       if (fromIndex === -1 || toIndex === -1) return;
-
       const rect = targetCatGroup.getBoundingClientRect();
       if (e.clientY >= rect.top + rect.height / 2) toIndex++;
-
       const item = area.cats.splice(fromIndex, 1)[0];
       area.cats.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, item);
-      
       marcarSujo();
-      setTimeout(() => { 
-        desenharLista(); 
-        if (modoAtual === 'projetos' && projetoAtual()) desenharForm();
-        status("Ordem das categorias atualizada!"); 
-      }, 10);
+      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das categorias atualizada!"); }, 10);
     }
-
-    /* ---- SOLTAR PROJETO ---- */
     else if (type === 'proj') {
       if (targetLiProj) {
         const targetIndex = +targetLiProj.dataset.i;
@@ -711,89 +737,62 @@ $("#lista").addEventListener("drop", e => {
           const rect = targetLiProj.getBoundingClientRect();
           const dropAfter = e.clientY >= rect.top + rect.height / 2;
           const proj = projetos[data.index];
-          
           const alvoProj = projetos[targetIndex];
           proj.area = alvoProj.area;
           if (alvoProj.cat) proj.cat = alvoProj.cat; else delete proj.cat;
-
           projetos.splice(data.index, 1);
           let insertIndex = targetIndex;
           if (!dropAfter) insertIndex = targetIndex > data.index ? targetIndex - 1 : targetIndex;
           else insertIndex = targetIndex > data.index ? targetIndex : targetIndex + 1;
-          
           projetos.splice(insertIndex, 0, proj);
           marcarSujo();
-          
           projetoSelecionado = proj;
-          
-          setTimeout(() => {
-            desenharLista();
-            abrirFormulario();
-            status("Projeto reordenado!");
-          }, 10);
+          setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Projeto reordenado!"); }, 10);
         }
       } else if (targetCatGroup || targetSemCatList) {
         const targetCategory = targetCatGroup || targetSemCatList;
         const catId = targetCategory.dataset.catId;
         const areaId = targetCategory.dataset.areaId;
         const proj = projetos[data.index];
-
         if (proj && ((proj.cat || 'sem-cat') !== catId || proj.area !== areaId)) {
           proj.area = areaId;
           if (catId === 'sem-cat') delete proj.cat; else proj.cat = catId;
           projetos.splice(data.index, 1);
           projetos.push(proj);
           marcarSujo();
-          
           projetoSelecionado = proj;
-          
-          setTimeout(() => {
-            desenharLista();
-            abrirFormulario();
-            status("Projeto movido de categoria!");
-          }, 10);
+          setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Projeto movido de categoria!"); }, 10);
         }
       }
     }
-
-    /* ---- SOLTAR ÁREA (Lista plana) ---- */
     else if (type === 'area-item' && targetLiItem && +targetLiItem.dataset.ai !== data.areaIndex) {
       const toIndex = +targetLiItem.dataset.ai;
       if (!areasEditaveis[data.areaIndex]) return;
-
       const rect = targetLiItem.getBoundingClientRect();
       const dropAfter = e.clientY >= rect.top + rect.height / 2;
-
       const item = areasEditaveis.splice(data.areaIndex, 1)[0];
       let insertIndex = toIndex;
       if (!dropAfter) insertIndex = toIndex > data.areaIndex ? toIndex - 1 : toIndex;
       else insertIndex = toIndex > data.areaIndex ? toIndex : toIndex + 1;
-
       areasEditaveis.splice(insertIndex, 0, item);
       areaSelecionada = item;
       marcarSujo();
-      
-      setTimeout(() => { desenharLista(); abrirFormulario(); status("Ordem das áreas atualizada!"); }, 10);
+      setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Ordem das áreas atualizada!"); }, 10);
     }
-
-    /* ---- SOLTAR CATEGORIA (Lista plana) ---- */
     else if (type === 'cat-item' && targetLiItem && targetLiItem.dataset.ci !== undefined && +targetLiItem.dataset.ai === data.areaIndex) {
       const toIndex = +targetLiItem.dataset.ci;
       const area = areasEditaveis[data.areaIndex];
       if (toIndex !== data.catIndex && area && area.cats && area.cats[data.catIndex]) {
         const rect = targetLiItem.getBoundingClientRect();
         const dropAfter = e.clientY >= rect.top + rect.height / 2;
-        
         const item = area.cats.splice(data.catIndex, 1)[0];
         let insertIndex = toIndex;
         if (!dropAfter) insertIndex = toIndex > data.catIndex ? toIndex - 1 : toIndex;
         else insertIndex = toIndex > data.catIndex ? toIndex : toIndex + 1;
-        
         area.cats.splice(insertIndex, 0, item);
         categoriaSelecionada = item;
         marcarSujo();
-        
-        setTimeout(() => { desenharLista(); abrirFormulario(); status("Categoria reordenada!"); }, 10);
+        setTimeout(() => { desenharLista(); if (modoAtual === 'projetos' && projetoAtual()) desenharForm(); status("Categoria reordenada!"); }, 10);
       }
     }
   } catch (err) {
@@ -803,12 +802,8 @@ $("#lista").addEventListener("drop", e => {
   }
 });
 
-/* ---------- Cliques na lista lateral ---------- */
 $("#lista").addEventListener("click", e => {
-  if (e.target.closest(".handle")) {
-    e.preventDefault();
-    return;
-  }
+  if (e.target.closest(".handle")) { e.preventDefault(); return; }
 
   const summaryArea = e.target.closest("details.grupo > summary");
   const summaryCat = e.target.closest("details.grupo-cat > summary");
@@ -821,7 +816,7 @@ $("#lista").addEventListener("click", e => {
       summaryArea.parentElement.open = !summaryArea.parentElement.open;
       salvarEstadoAccordions();
       if (modoAtual === 'projetos' || modoAtual === 'areas') abrirArea(area);
-      else abrirFormulario();
+      else if (modoAtual === 'projetos') abrirArea(area);
     }
     return;
   }
@@ -841,22 +836,19 @@ $("#lista").addEventListener("click", e => {
 
   const li = e.target.closest("li[data-i]");
   if (li) { abrir(projetos[+li.dataset.i]); return; }
-  
   const lia = e.target.closest("li[data-ai]");
   if (lia && lia.dataset.ci === undefined) { abrirArea(areasEditaveis[+lia.dataset.ai]); return; }
-
   const lic = e.target.closest("li[data-ci]");
   if (lic) { const a = areasEditaveis[+lic.dataset.ai]; if (a) abrirCat(a, a.cats?.[+lic.dataset.ci]); return; }
 });
 
-document.querySelectorAll('[data-modo]').forEach(b => {
-  b.onclick = () => mudarModo(b.dataset.modo);
-});
+document.querySelectorAll('[data-modo]').forEach(b => { b.onclick = () => mudarModo(b.dataset.modo); });
 
 $("#novo").onclick = () => {
   if (modoAtual === 'projetos') {
     const areaId = areasEditaveis[0]?.id || "";
-    projetos.unshift({ area: areaId, cat: "", h: 0, tools: "",
+    /* NOVO CAMPO galeria: "slide" */
+    projetos.unshift({ area: areaId, cat: "", galeria: "slide", h: 0, tools: "",
       title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
     marcarSujo();
     projetoSelecionado = projetos[0];
@@ -884,7 +876,6 @@ $("#novo").onclick = () => {
   }
 };
 
-/* ---------- Salvar ---------- */
 async function salvar() {
   const semTitulo = projetos.findIndex(p => !String(p.title?.pt || "").trim());
   if (semTitulo >= 0) {
@@ -894,16 +885,12 @@ async function salvar() {
   }
   try {
     status("salvando…");
-
     areasEditaveis.forEach(a => {
       if (!a.id) a.id = slug(a.name?.pt) || "area-" + Date.now();
       (a.cats || []).forEach(c => { if (!c.id) c.id = slug(c.name?.pt) || "cat-" + Date.now(); });
     });
-
     projetos.forEach(p => {
-      if (!p.area || !areasEditaveis.some(a => a.id === p.area)) {
-        p.area = areasEditaveis[0]?.id || "";
-      }
+      if (!p.area || !areasEditaveis.some(a => a.id === p.area)) p.area = areasEditaveis[0]?.id || "";
     });
 
     const areaSelecionadaId = areaSelecionada?.id;
@@ -933,7 +920,6 @@ async function salvar() {
 
 $("#salvar").onclick = salvar;
 
-/* ---------- Git Push ---------- */
 $("#git-push").onclick = async () => {
   const msg = prompt("Mensagem do commit:", "Atualização via painel");
   if (msg === null) return;
@@ -943,16 +929,10 @@ $("#git-push").onclick = async () => {
     const r = await api("/api/git/push", { mensagem: msg || "Atualização via painel" });
     status("Enviado com sucesso!");
     console.log(r.log);
-  } catch (e) {
-    status("Erro no Git: " + e.message, true);
-  }
+  } catch (e) { status("Erro no Git: " + e.message, true); }
 };
 
-$("#recarregar").onclick = async () => {
-  status("recarregando…");
-  await carregarPreview();
-  status("site recarregado");
-};
+$("#recarregar").onclick = async () => { status("recarregando…"); await carregarPreview(); status("site recarregado"); };
 
 document.querySelectorAll("[data-largura]").forEach(b => {
   b.onclick = () => {
@@ -969,9 +949,7 @@ $("#ver-site").onclick = async () => {
   try {
     frame.contentWindow.eval(`pick(${JSON.stringify(p.area)}, true); current = ${i}; fill(${i}); document.querySelector("#dlg").showModal();`);
     fechar();
-  } catch (e) {
-    status("não consegui abrir no site: " + e.message, true);
-  }
+  } catch (e) { status("não consegui abrir no site: " + e.message, true); }
 };
 
 $("#duplicar").onclick = () => {
@@ -991,10 +969,6 @@ $("#duplicar").onclick = () => {
 
 $("#preview-projeto").onclick = atualizarPreviewProjeto;
 
-/* ============================================================
-   FORMULÁRIOS
-   ============================================================ */
-
 function linhaMidia(m, i, total) {
   if (!m) return '';
   const tipo = m.type || "image";
@@ -1003,8 +977,7 @@ function linhaMidia(m, i, total) {
   return `<div class="midia" data-mi="${i}">
     <div class="topo" draggable="true" title="Arraste para reordenar">
       <select data-mcampo="type">
-        ${["image", "video", "sketchfab"].map(t =>
-          `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
+        ${["image", "video", "sketchfab"].map(t => `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
       </select>
       <button class="empurra" data-subir ${i === 0 ? "disabled" : ""} title="mover para cima">↑</button>
       <button data-descer ${i === total - 1 ? "disabled" : ""} title="mover para baixo">↓</button>
@@ -1012,20 +985,11 @@ function linhaMidia(m, i, total) {
     </div>
     <div class="corpo">
       <label>${ehImg ? "arquivo da imagem" : "link"}
-        <input data-mcampo="src" value="${esc(m.src || "")}" placeholder="${ehImg
-          ? "img/projetos/nome/01.webp"
-          : tipo === "video" ? "https://youtu.be/..." : "https://sketchfab.com/3d-models/..."}">
+        <input data-mcampo="src" value="${esc(m.src || "")}" placeholder="${ehImg ? "img/projetos/nome/01.webp" : tipo === "video" ? "https://youtu.be/..." : "https://sketchfab.com/3d-models/..."}">
       </label>
-      ${ehImg ? "" : `<label>capa (opcional)
-        <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa">
-      </label>`}
-      <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${
-        ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
-      ${preview
-        ? (WEB_IMG.test(preview)
-            ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">`
-            : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`)
-        : ""}
+      ${ehImg ? "" : `<label>capa (opcional) <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa"></label>`}
+      <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
+      ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
     </div>
   </div>`;
 }
@@ -1060,10 +1024,20 @@ function desenharForm() {
       </div>
       <label>descrição PT <textarea rows="3" data-campo="desc.pt">${esc(p.desc?.pt)}</textarea></label>
       <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
+      
+      <!-- NOVO CAMPO AQUI -->
       <div class="linha">
         <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
-        <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
+        <label>estilo da galeria
+          <select data-campo="galeria">
+            <option value="slide" ${p.galeria === 'slide' || !p.galeria ? "selected" : ""}>Slide (centralizado)</option>
+            <option value="carrossel" ${p.galeria === 'carrossel' ? "selected" : ""}>Carrossel (colado/contínuo)</option>
+          </select>
+        </label>
       </div>
+      
+      <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
+      
       <h3>mídias <button id="add-midia">+ mídia</button></h3>
       <div id="midias">
         ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
@@ -1092,16 +1066,10 @@ function desenharFormArea() {
         <label>aba PT (curto) <input data-acampo="short.pt" value="${esc(a.short?.pt)}" placeholder="${esc(a.name?.pt)}"></label>
         <label>aba EN (curto) <input data-acampo="short.en" value="${esc(a.short?.en)}" placeholder="${esc(a.name?.en)}"></label>
       </div>
-      <label>id / slug
-        <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace">
-      </label>
+      <label>id / slug <input data-acampo="id" value="${esc(a.id)}" placeholder="ex: design" style="font-family:ui-monospace,Consolas,monospace"></label>
       ${idMudou && projetosAfetados > 0 ? `<div class="aviso-id">⚠ ${projetosAfetados} projeto(s) usam o id "${esc(idOriginalArea)}". <button type="button" id="corrigir-slug">Corrigir agora</button></div>` : ''}
-      <label>subtítulo PT
-        <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea>
-      </label>
-      <label>subtítulo EN
-        <textarea rows="2" data-acampo="lead.en">${esc(a.lead?.en)}</textarea>
-      </label>
+      <label>subtítulo PT <textarea rows="2" data-acampo="lead.pt">${esc(a.lead?.pt)}</textarea></label>
+      <label>subtítulo EN <textarea rows="2" data-acampo="lead.en">${esc(a.lead?.en)}</textarea></label>
       <h3>categorias (filtros) <button id="add-cat">+ categoria</button></h3>
       <div id="cats">
         ${(a.cats || []).map((c, i) => linhaCategoria(c, i, (a.cats || []).length)).join('') || '<p class="dica">nenhuma categoria</p>'}
@@ -1130,9 +1098,7 @@ function desenharFormCat() {
         <label>nome PT <input data-catcampo="name.pt" value="${esc(c.name?.pt)}"></label>
         <label>nome EN <input data-catcampo="name.en" value="${esc(c.name?.en)}"></label>
       </div>
-      <label class="cat-id">id (slug)
-        <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente">
-      </label>
+      <label class="cat-id">id (slug) <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente"></label>
       <button class="perigo" id="apagar-cat">apagar categoria</button>`;
   } catch (err) {
     console.error("Erro ao renderizar categoria:", err);
@@ -1152,45 +1118,22 @@ function linhaCategoria(c, i, total) {
       <label>nome PT <input data-catcampo="name.pt" value="${esc(c.name?.pt)}"></label>
       <label>nome EN <input data-catcampo="name.en" value="${esc(c.name?.en)}"></label>
     </div>
-    <label class="cat-id">id (slug)
-      <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente ao salvar">
-    </label>
+    <label class="cat-id">id (slug) <input data-catcampo="id" value="${esc(c.id)}" placeholder="gerado automaticamente ao salvar"></label>
   </div>`;
 }
 
-function abrir(p) {
-  projetoSelecionado = p && projetos.includes(p) ? p : null;
-  document.body.classList.add("editando");
-  abrirFormulario();
-}
-
-function abrirArea(a) {
-  areaSelecionada = a && areasEditaveis.includes(a) ? a : null;
-  idOriginalArea = areaSelecionada?.id || '';
-  document.body.classList.add('editando');
-  abrirFormulario();
-}
-
-function abrirCat(a, c) {
-  categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null;
-  document.body.classList.add('editando');
-  abrirFormulario();
-}
-
+function abrir(p) { projetoSelecionado = p && projetos.includes(p) ? p : null; document.body.classList.add("editando"); atualizarTudo(); }
+function abrirArea(a) { areaSelecionada = a && areasEditaveis.includes(a) ? a : null; idOriginalArea = areaSelecionada?.id || ''; document.body.classList.add('editando'); atualizarTudo(); }
+function abrirCat(a, c) { categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null; document.body.classList.add('editando'); atualizarTudo(); }
 function fechar() { document.body.classList.remove("editando"); }
 $("#fechar-drawer").onclick = fechar;
 
-/* ---------- Inputs e Mudanças ---------- */
-$("#busca-projeto").addEventListener("input", e => {
-  buscaProjeto = e.target.value;
-  if (modoAtual === 'projetos') desenharListaProjetos();
-});
+$("#busca-projeto").addEventListener("input", e => { buscaProjeto = e.target.value; if (modoAtual === 'projetos') desenharListaProjetos(); });
 
 $("#form").addEventListener("input", e => {
   const c = e.target.closest("[data-campo]");
   if (c) {
     setCampo(projetoAtual(), c.dataset.campo, c.value);
-    
     if (c.dataset.campo === "title.pt") {
       $("#drawer-titulo").textContent = String(indiceProjeto(projetoAtual()) + 1).padStart(2, "0") + " · " + (c.value || "sem título");
       const li = document.querySelector(`li[data-i="${indiceProjeto(projetoAtual())}"] span`);
@@ -1243,9 +1186,7 @@ $("#form").addEventListener("input", e => {
   if (cc) {
     if (modoAtual === 'categorias') {
       setCampo(categoriaAtual(), cc.dataset.catcampo, cc.value);
-      if (cc.dataset.catcampo === 'name.pt') {
-        $('#drawer-titulo').textContent = 'Cat · ' + (cc.value || 'sem nome');
-      }
+      if (cc.dataset.catcampo === 'name.pt') $('#drawer-titulo').textContent = 'Cat · ' + (cc.value || 'sem nome');
     } else {
       const ci = +cc.closest('[data-ci]').dataset.ci;
       setCampo(areaAtual().cats[ci], cc.dataset.catcampo, cc.value);
@@ -1272,6 +1213,12 @@ $("#form").addEventListener("change", async e => {
     desenharForm();
     return;
   }
+  const galeria = e.target.closest('[data-campo="galeria"]');
+  if (galeria) {
+    projetoAtual().galeria = galeria.value;
+    marcarSujo();
+    return;
+  }
   const categoria = e.target.closest('[data-campo="cat"]');
   if (categoria) {
     projetoAtual().cat = categoria.value;
@@ -1296,7 +1243,6 @@ $("#form").addEventListener("change", async e => {
   }
 });
 
-/* ---------- Cliques no form ---------- */
 $("#form").addEventListener("click", e => {
   const b = e.target.closest("button");
   if (!b) return;
@@ -1374,7 +1320,7 @@ $("#form").addEventListener("click", e => {
       marcarSujo();
       if (!projetoSelecionado) fechar();
       desenharLista();
-      abrirFormulario();
+      atualizarTudo();
     }
   }
   else if (b.hasAttribute("data-subir") && mi > 0) {
@@ -1394,9 +1340,7 @@ $("#form").addEventListener("click", e => {
   }
 });
 
-/* ---------- Upload ---------- */
 const seletor = $("#seletor");
-
 function abrirSeletor(alvo, mi) {
   seletor.value = "";
   seletor.multiple = alvo === "src";
@@ -1417,7 +1361,6 @@ seletor.addEventListener("change", () => {
 async function enviarArquivos(lista, alvo, mi0) {
   const p = projetoAtual();
   if (!p || !p.media || !lista.length) return;
-  
   if (!p.media[mi0]) p.media[mi0] = { type: "image", src: "" };
 
   const arquivos = [...lista];
@@ -1429,16 +1372,11 @@ async function enviarArquivos(lista, alvo, mi0) {
   for (let k = 0; k < arquivos.length; k++) {
     const f = arquivos[k];
     try {
-      status(arquivos.length > 1
-        ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name
-        : "enviando " + f.name + "…");
+      status(arquivos.length > 1 ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name : "enviando " + f.name + "…");
       const dados = await lerBase64(f);
       const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
       if (projetoAtual() !== p) return;
-      if (k > 0) {
-        p.media.splice(destino + 1, 0, { type: "image", src: "" });
-        destino += 1;
-      }
+      if (k > 0) { p.media.splice(destino + 1, 0, { type: "image", src: "" }); destino += 1; }
       p.media[destino][alvo] = r.caminho;
       ultimo = r;
       if (alvo === "src" && !WEB_IMG.test(r.caminho)) foraDoSite.push(r.caminho.split("/").pop());
@@ -1456,13 +1394,9 @@ async function enviarArquivos(lista, alvo, mi0) {
   }
 
   const kb = r => r.bytes < 1024 ? r.bytes + " B" : Math.round(r.bytes / 1024) + " KB";
-  const aviso = foraDoSite.length
-    ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") + " no site (use webp, jpg, png, gif ou avif)"
-    : "";
-  if (arquivos.length === 1)
-    status("arquivo salvo: " + ultimo.caminho + " (" + kb(ultimo) + ")" + aviso, aviso !== "");
-  else
-    status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
+  const aviso = foraDoSite.length ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") + " no site (use webp, jpg, png, gif ou avif)" : "";
+  if (arquivos.length === 1) status("arquivo salvo: " + ultimo.caminho + " (" + kb(ultimo) + ")" + aviso, aviso !== "");
+  else status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
 }
 
 $("#form").addEventListener("dragover", e => {
@@ -1486,7 +1420,6 @@ $("#form").addEventListener("drop", e => {
   if (caixa && lista.length) enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
-/* Ctrl+S salva, Esc fecha a gaveta */
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
     e.preventDefault();
@@ -1500,7 +1433,6 @@ window.addEventListener("beforeunload", e => {
   e.returnValue = "";
 });
 
-/* ---------- Início ---------- */
 (async () => {
   try {
     const r = await api("/api/estado");

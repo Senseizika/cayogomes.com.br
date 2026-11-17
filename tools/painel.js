@@ -1,20 +1,6 @@
 #!/usr/bin/env node
 /*
  * tools/painel.js — painel local para postar projetos.
- *
- * Uso:            node tools/painel.js
- * Sem abrir o navegador:   node tools/painel.js --sem-abrir
- * Outra porta:    set PORTA=5000 && node tools/painel.js
- *
- * O que ele faz:
- *   - lê e grava conteudo/projetos.json (a fonte da verdade)
- *   - regrava conteudo/projetos.js (o arquivo que o site carrega)
- *   - grava qualquer arquivo enviado em img/projetos/<pasta>/NN.ext, mantendo a extensão
- *   - commita e envia para o GitHub
- *
- * Segurança: escuta só em 127.0.0.1 e as rotas /api exigem o token da
- * sessão (embutido na página do painel). Sem o token, qualquer site aberto
- * no navegador poderia mandar POST para o painel enquanto ele estiver rodando.
  */
 
 const fs = require('fs');
@@ -39,7 +25,6 @@ const TOKEN = process.env.PAINEL_TOKEN || crypto.randomBytes(12).toString('hex')
 const ABRIR = !process.argv.includes('--sem-abrir');
 let porta = Number(process.env.PORTA) || 4173;
 
-/* ---------- conteúdo ---------- */
 function lerProjetos() {
   try {
     const v = JSON.parse(fs.readFileSync(ARQ_JSON, 'utf8'));
@@ -47,7 +32,6 @@ function lerProjetos() {
   } catch (e) { return []; }
 }
 
-/* áreas e categorias vêm do content.js, para não duplicar a lista */
 function lerAreas() {
   try {
     const src = fs.readFileSync(ARQ_CONTENT, 'utf8');
@@ -63,14 +47,11 @@ function lerAreas() {
   }
 }
 
-/* retorna a versão completa das áreas (com short, lead, cats bilíngues) para o editor do painel */
 function lerAreasCompletas() {
-  // prefere areas.json (fonte da verdade do editor)
   try {
     const v = JSON.parse(fs.readFileSync(ARQ_AREAS_JSON, 'utf8'));
     if (Array.isArray(v)) return v;
   } catch (e) {}
-  // fallback: lê direto do content.js
   try {
     const src = fs.readFileSync(ARQ_CONTENT, 'utf8');
     const areas = new Function(src + '\nreturn AREAS;')();
@@ -105,9 +86,7 @@ function normalizarAreas(lista) {
 
 function gravarAreas(lista) {
   fs.mkdirSync(DIR_CONTEUDO, { recursive: true });
-  // salva areas.json (fonte da verdade do editor)
   fs.writeFileSync(ARQ_AREAS_JSON, JSON.stringify(lista, null, 2) + '\n', 'utf8');
-  // substitui o bloco AREAS no content.js
   let src = fs.readFileSync(ARQ_CONTENT, 'utf8');
   const novasAreas = 'const AREAS = ' + JSON.stringify(lista, null, 2) + ';';
   const novo = src.replace(/const AREAS = \[[\s\S]*?\n\];/, novasAreas);
@@ -118,7 +97,6 @@ function gravarAreas(lista) {
   }
 }
 
-/* limpa e valida o que veio do navegador antes de gravar */
 function normalizar(lista) {
   if (!Array.isArray(lista)) throw new Error('formato inválido: esperava uma lista');
   if (lista.length > 500) throw new Error('limite de 500 projetos');
@@ -132,6 +110,7 @@ function normalizar(lista) {
       });
     const item = {
       area: String(p.area || ''),
+      galeria: p.galeria === 'carrossel' ? 'carrossel' : 'slide', /* <--- NOVA OPÇÃO AQUI */
       h: Math.max(0, Math.min(360, Number(p.h) || 0)),
       tools: String(p.tools || ''),
       title: { pt: String(p.title?.pt || ''), en: String(p.title?.en || '') },
@@ -139,10 +118,9 @@ function normalizar(lista) {
       media
     };
     if (p.cat) item.cat = String(p.cat);
-    // mantém a chave cat logo depois de area, como no arquivo original
     if (item.cat) {
-      const { area, cat, ...resto } = item;
-      return { area, cat, ...resto };
+      const { area, galeria, cat, ...resto } = item;
+      return { area, galeria, cat, ...resto };
     }
     return item;
   });
@@ -154,10 +132,7 @@ function gravar(lista) {
   fs.writeFileSync(ARQ_JS, CABECALHO_JS + 'const PROJECTS = ' + JSON.stringify(lista, null, 2) + ';\n', 'utf8');
 }
 
-/* ---------- imagens ---------- */
 function salvarArquivo(pasta, nomeOriginal, dataUrl) {
-  // aceita data URL com ou sem tipo: o Windows não conhece muitos formatos e
-  // o navegador manda "data:;base64,..." nesses casos
   const m = /^data:([^,]*),([\s\S]*)$/.exec(String(dataUrl || ''));
   if (!m) throw new Error('arquivo inválido');
   if (!/;base64$/i.test(m[1])) throw new Error('envio não é base64');
@@ -166,7 +141,6 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
   if (!buf.length) throw new Error('arquivo vazio');
   if (buf.length > 30 * 1024 * 1024) throw new Error('arquivo maior que 30 MB');
 
-  // qualquer extensão é aceita: o arquivo é guardado como veio, com o mesmo nome de extensão
   let ext = String(path.extname(String(nomeOriginal || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
   if (!ext || ext.length > 10) ext = 'bin';
 
@@ -186,7 +160,6 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
   return { caminho: 'img/projetos/' + seg + '/' + arq, bytes: buf.length };
 }
 
-/* ---------- arquivos estáticos ---------- */
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -210,7 +183,6 @@ function servirArquivo(res, abs) {
   });
 }
 
-/* ---------- http ---------- */
 function json(res, codigo, obj) {
   res.writeHead(codigo, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
   res.end(JSON.stringify(obj));
@@ -232,11 +204,7 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && (rota === '/' || rota === '/painel.html')) {
       const html = fs.readFileSync(PAINEL_HTML, 'utf8').replace('__PAINEL_TOKEN__', TOKEN);
-      res.writeHead(200, {
-        'content-type': 'text/html; charset=utf-8',
-        'cache-control': 'no-store',
-        'x-content-type-options': 'nosniff'
-      });
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
       return res.end(html);
     }
     if (req.method === 'GET' && rota === '/site') {
@@ -269,17 +237,12 @@ const server = http.createServer(async (req, res) => {
         console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
       }
-      
-      // NOVA ROTA: COMMIT E PUSH PARA O GITHUB
       if (rota === '/api/git/push' && req.method === 'POST') {
         const dados = await corpo(req);
         const msg = String(dados.mensagem || 'Atualização via painel').replace(/"/g, '\\"');
-        
         return new Promise((resolve) => {
-          // Roda git add, commit e push na pasta raiz do projeto
           exec(`git add . && git commit -m "${msg}" && git push`, { cwd: ROOT }, (err, stdout, stderr) => {
             if (err) {
-              // Se não houver alterações, o Git dá um "erro", mas não é um problema real
               if (stdout.includes('nothing to commit') || stderr.includes('nothing to commit')) {
                 return resolve(json(res, 200, { ok: true, log: 'Nenhuma alteração para enviar.' }));
               }
@@ -289,7 +252,6 @@ const server = http.createServer(async (req, res) => {
           });
         });
       }
-
       return json(res, 404, { erro: 'rota não encontrada' });
     }
 

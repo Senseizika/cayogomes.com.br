@@ -8,7 +8,7 @@
 <title>Cayo Gomes — Artista digital, designer gráfico e modelador 3D</title>
 <meta name="description" content="Portfólio de Cayo Gomes: design gráfico e modelagem 3D. Petrópolis, RJ.">
 <link rel="canonical" href="https://cayogomes.com.br/">
-<link rel="icon" href="img/identidade-cayo.webp" type="image/webp">
+<link rel="icon" href="img/cayo_gomes.webp" type="image/webp">
 <!-- Open Graph / redes sociais -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
@@ -171,44 +171,60 @@ dialog[open]{animation:in .22s ease-out}
   height: 80vh; /* Ocupa 80% da altura da tela */
   min-height: 320px;
   overflow: hidden;
-  touch-action: pan-y; /* Permite rolagem vertical da página, mas nós controlamos a horizontal */
+  touch-action: pan-y; 
 }
 
-/* Contêiner que esconde o que está fora da tela */
 .d-stage-view{
   width: 100%;
   height: 100%;
   display: flex;
 }
 
-/* A "esteira" que contém todas as imagens lado a lado */
 .d-track{
   display: flex;
-  width: 100%;
   height: 100%;
   will-change: transform;
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Cada slide individual */
-.d-slide{
+/* Modo Slide: cada imagem ocupa 100% da tela */
+.d-track.slide {
+  width: 100%;
+}
+.d-track.slide .d-slide {
   flex: 0 0 100%;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modo Carrossel: imagens coladas, o track cresce */
+.d-track.carrossel {
+  width: max-content;
+}
+.d-track.carrossel .d-slide {
+  flex: 0 0 auto;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
 }
 
-/* A imagem se ajusta à altura sem cortar */
 .d-slide img{
-  max-width: 100%;
   max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   user-select: none;
-  -webkit-user-drag: none; /* Impede o navegador de arrastar a imagem por padrão */
+  -webkit-user-drag: none;
+  display: block;
+}
+
+/* vídeo/3D: no modo slide já ocupam a tela toda; no carrossel a largura é
+   definida pelo JS (ajustarLarguras) para o deslocamento ficar exato */
+.d-track.carrossel .d-slide.is-video {
+  flex: 0 0 auto;
 }
 
 .d-slide iframe{
@@ -294,14 +310,7 @@ html{-webkit-text-size-adjust:100%}
   .about,.contact{padding:1.2rem .9rem}
   .svc li{font-size:1rem}
   dialog{width:calc(100% - 1rem);max-height:94dvh}
-  .d-stage{
-  height: 70vh; /* Um pouco menor para telas de celular */
-  min-height: 260px;
-}
-  .d-stage img{
-  max-height: 100%;
-  max-width: 100%;
-}
+  .d-stage{height: 70vh; min-height: 260px; }
   .d-nav{width:40px;height:40px}
   .d-thumb{height:48px;min-width:64px}
   .d-body h3{font-size:2.2rem}
@@ -369,42 +378,21 @@ html{-webkit-text-size-adjust:100%}
    - PALETA: gerado por tools/paleta.js (não edite à mão).
    ============================================================ */
 const FUNDOS = {
-  // camada de trás: arquivos img/Fundo/fundo1.webp ... fundo16.webp
-  // total = quantidade de arquivos; ao adicionar um, aumente este número
   base:   { pasta:"img/Fundo",  prefixo:"fundo",  total:16, ext:"webp" },
-  // camada da frente (com transparência): img/Fundo2/camada1.webp ...
   camada: { pasta:"img/Fundo2", prefixo:"camada", total:6,  ext:"webp" },
-  // intensidade do parallax: 0 = o fundo rola junto; 1 = fica parado. (desligado no celular)
   parallax: .5
 };
 
-/* COR DE DESTAQUE POR FUNDO.
-   O site sorteia um fundo e aplica aqui a cor de destaque correspondente.
-   NÃO edite à mão: rode  node tools/paleta.js  depois de adicionar/trocar fundos.
-   A cor sai da imagem de img/Fundo e é clareada para ter contraste >= 4.5:1. */
 /* PALETA:INICIO (gerado por tools/paleta.js - não edite à mão) */
 const PALETA = {
-  "fundo1.webp": "#d42d9d",
-  "fundo2.webp": "#ef0606",
-  "fundo3.webp": "#0cd925",
-  "fundo4.webp": "#2f73df",
-  "fundo5.webp": "#25c1a8",
-  "fundo6.webp": "#06c1e0",
-  "fundo7.webp": "#06e0ba",
-  "fundo8.webp": "#ef0606",
-  "fundo9.webp": "#ef0606",
-  "fundo10.webp": "#ef0606",
-  "fundo11.webp": "#06e0bb",
-  "fundo12.webp": "#ec0f06",
-  "fundo13.webp": "#ca06e7",
-  "fundo14.webp": "#06e0ba",
-  "fundo15.webp": "#09dc52",
-  "fundo16.webp": "#6262fb"
+  "fundo1.webp": "#d42d9d", "fundo2.webp": "#ef0606", "fundo3.webp": "#0cd925", "fundo4.webp": "#2f73df",
+  "fundo5.webp": "#25c1a8", "fundo6.webp": "#06c1e0", "fundo7.webp": "#06e0ba", "fundo8.webp": "#ef0606",
+  "fundo9.webp": "#ef0606", "fundo10.webp": "#ef0606", "fundo11.webp": "#06e0bb", "fundo12.webp": "#ec0f06",
+  "fundo13.webp": "#ca06e7", "fundo14.webp": "#06e0ba", "fundo15.webp": "#09dc52", "fundo16.webp": "#6262fb"
 };
 /* PALETA:FIM */
 
 let lang = "pt", current = null, filter = "all";
-// idioma inicial: troque o "pt" por "en" para abrir em inglês por padrão
 try { lang = localStorage.getItem("lang") || "pt"; } catch(e){}
 if (!UI[lang]) lang = "pt";
 
@@ -412,10 +400,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pad = n => String(n).padStart(3,"0");
 
-// Capa do projeto = primeira mídia da lista. Sem mídia, mostra o placeholder colorido.
 const capa = p => (p.media && p.media[0]) || null;
 
-// Monta a capa do card. width/height evitam "pulo" no layout.
 function capaHTML(p){
   const c = capa(p);
   const src = c && (c.type === "image" ? c.src : c.poster);
@@ -425,10 +411,8 @@ function capaHTML(p){
 
 const pad2 = n => String(n).padStart(2,"0");
 
-/* ---- galeria: identificar links e navegar entre mídias ---- */
-let mid = 0;   // índice da mídia aberta dentro do projeto atual
+let mid = 0;
 
-// ID do YouTube: aceita youtu.be, watch?v=, shorts, embed, live, ou o ID puro
 const YT = s => {
   s = String(s).trim();
   if (/^[\w-]{11}$/.test(s)) return s;
@@ -436,7 +420,6 @@ const YT = s => {
   return m ? m[1] : null;
 };
 
-// ID do Sketchfab: aceita .../3d-models/nome-ID, /models/ID, ou o ID puro
 const SK = s => {
   s = String(s).trim();
   if (/^[0-9a-f]{32}$/i.test(s)) return s;
@@ -444,7 +427,6 @@ const SK = s => {
   return m ? m[1] : null;
 };
 
-// capa do YouTube: maxresdefault é maior, mas nem sempre existe -> hqdefault como reserva
 const posterYT  = id => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 const posterYT2 = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
@@ -462,7 +444,6 @@ function pick(id, push){
   render();
 }
 
-// render(): redesenha abas, filtros e a grade conforme a área/idioma/filtro.
 function render(){
   const u = UI[lang];
   document.documentElement.lang = u.lang;
@@ -550,6 +531,42 @@ function thumbHTML(m, i){
     aria-label="${esc(UI[lang].media)} ${i+1}">${img}</button>`;
 }
 
+// Deslocamento em pixels até o começo do slide i (base do modo carrossel).
+function deslocamento(track, i){
+  let x = 0;
+  for (let k = 0; k < i && k < track.children.length; k++)
+    x += track.children[k].getBoundingClientRect().width;
+  return x;
+}
+
+// No carrossel cada slide tem a largura natural da imagem. Vídeo e 3D não têm
+// largura natural, então recebem a largura do palco (senão o deslocamento erra).
+function ajustarLarguras(track){
+  if (!track.classList.contains("carrossel")) return;
+  const palco = track.closest(".d-stage");
+  const largura = Math.round((palco && palco.clientWidth) || 0);
+  // diálogo ainda fechado (largura 0): refaz no próximo quadro, quando ele abrir
+  if (!largura) {
+    requestAnimationFrame(() => {
+      const t = $("#d-track");
+      if (t) { ajustarLarguras(t); posicionarTrack(t); }
+    });
+    return;
+  }
+  [...track.children].forEach(slide => {
+    const fixo = slide.classList.contains("is-video");
+    slide.style.flex  = fixo ? "0 0 " + largura + "px" : "";
+    slide.style.width = fixo ? largura + "px" : "";
+  });
+}
+
+// Posiciona a mídia atual: porcentagem no modo slide, pixels no carrossel.
+function posicionarTrack(track){
+  track.style.transform = track.classList.contains("carrossel")
+    ? "translateX(-" + deslocamento(track, mid) + "px)"
+    : "translateX(-" + (mid * 100) + "%)";
+}
+
 // Renderiza o track inteiro ou atualiza a posição
 function pintarMidia(){
   const p = PROJECTS[current];
@@ -559,23 +576,26 @@ function pintarMidia(){
     $("#d-view").innerHTML = `<div class="ph" style="--h:${p.h}">${UI[lang].img}</div>`;
     return;
   }
-  
+
+  const modo = p.galeria === "carrossel" ? "carrossel" : "slide";
   let track = $("#d-track");
-  // Se o track não existe ou o número de itens mudou, recria tudo
-  if (!track || track.children.length !== lista.length) {
-    $("#d-view").innerHTML = `<div class="d-track" id="d-track">
-      ${lista.map((m, i) => `<div class="d-slide" data-index="${i}">${midiaHTML(m, i)}</div>`).join('')}
+  // Recria quando muda o projeto/modo de galeria ou o número de itens
+  if (!track || !track.classList.contains(modo) || track.children.length !== lista.length) {
+    $("#d-view").innerHTML = `<div class="d-track ${modo}" id="d-track">
+      ${lista.map((m, i) => `<div class="d-slide${m.type === "image" ? "" : " is-video"}" data-index="${i}">${midiaHTML(m, i)}</div>`).join('')}
     </div>`;
     track = $("#d-track");
-    
+
+    ajustarLarguras(track);
     // Posiciona instantaneamente sem animação no primeiro carregamento
     track.style.transition = 'none';
-    track.style.transform = `translateX(-${mid * 100}%)`;
+    posicionarTrack(track);
     void track.offsetWidth; // Força o navegador a recalcular
     track.style.transition = ''; // Restaura a animação
   } else {
     // Se só mudou de posição, anima suavemente
-    track.style.transform = `translateX(-${mid * 100}%)`;
+    ajustarLarguras(track);
+    posicionarTrack(track);
   }
   
   // Limpa iframes de vídeos que não estão ativos para não ficarem rodando
@@ -662,7 +682,7 @@ function ligarGaleria(){
     x0 = e.clientX;
     y0 = e.clientY;
     dragging = false;
-    startTranslate = -mid * largura;
+    startTranslate = -deslocamento(track, mid);
     
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
@@ -706,16 +726,24 @@ function ligarGaleria(){
     } else if (dx < -limiar && mid < track.children.length - 1) {
       irMedia(1);
     } else {
-      track.style.transform = `translateX(-${mid * 100}%)`;
+      posicionarTrack(track);
     }
   };
 
   palco.addEventListener("pointerup", finalizarArraste);
   palco.addEventListener("pointercancel", () => {
-      if(track) track.style.transform = `translateX(-${mid * 100}%)`;
+      if (track) posicionarTrack(track);
       x0 = null; dragging = false;
       document.body.style.userSelect = '';
       document.body.style.webkitUserSelect = '';
+  });
+
+  // janela mudou de tamanho: larguras e posição precisam ser recalculadas
+  addEventListener("resize", () => {
+    const t = $("#d-track");
+    if (!t) return;
+    ajustarLarguras(t);
+    posicionarTrack(t);
   });
 }
 
