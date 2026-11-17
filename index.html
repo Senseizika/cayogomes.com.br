@@ -70,7 +70,7 @@ a{color:inherit}
 /* vidro jateado: granulado + reflexo diagonal + luz no aro (tudo gradiente/textura,
    sem custo de blur; o desfoque do fundo continua só no desktop) */
 :root{
-  --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.35'/></svg>");
+  --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.17'/></svg>");
 }
 .win{
   position:relative;
@@ -106,7 +106,7 @@ a{color:inherit}
     radial-gradient(46% 30% at 100% 100%,rgba(255,255,255,.07),transparent 74%);
 }
 .win > *{position:relative;z-index:2}
-@media (min-width: 768px){ .win{ backdrop-filter:blur(4px) saturate(115%); } }
+@media (min-width: 768px){ .win{ backdrop-filter:blur(11px) saturate(125%); } }
 .bar{display:flex;justify-content:space-between;align-items:center;padding:.65rem 1rem;font:400 .85rem var(--mono);letter-spacing:.08em;color:var(--mute);
   border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
 .bar i{font-style:normal;letter-spacing:.25em}
@@ -354,7 +354,7 @@ dialog[open]{animation:in .22s ease-out}
 .hero{padding:clamp(.75rem,1.8vw,1.1rem) 0 clamp(1rem,2.5vw,1.6rem)}
 .sub{align-items:center}
 .sub .right{display:flex;align-items:center;gap:1rem} /* linha de função + botão idioma */
-.tabbar{position:sticky;top:0;z-index:30;background:rgba(5,5,6,.93);backdrop-filter:blur(8px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)} /* sticky = menu cola no topo */
+.tabbar{position:sticky;top:0;z-index:30;background:rgba(5,5,6,.9);backdrop-filter:blur(12px) saturate(120%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)} /* sticky = menu cola no topo */
 .tabs{display:flex;justify-content:center;align-items:center;gap:clamp(.5rem,3vw,1.8rem)} /* justify-content: alinhamento das abas */
 .tab{background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);font:500 clamp(.95rem,2.8vw,1.45rem) var(--tech);letter-spacing:.08em;text-transform:uppercase;padding:.9rem .3rem;cursor:pointer} /* tamanho/fonte das abas */
 .tab:hover{color:var(--white)}
