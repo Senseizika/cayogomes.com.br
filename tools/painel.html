@@ -573,7 +573,6 @@ function desenharListaCategorias() {
   let html = '';
   areasEditaveis.forEach((area, ai) => {
     const cats = area.cats || [];
-    if (cats.length === 0) return;
 
     // Mesma estrutura visual das outras abas: grupo com summary + ol de linhas.
     const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + area.id) ? 'open' : '';
@@ -593,6 +592,7 @@ function desenharListaCategorias() {
         <em>${esc(cat.id)}</em>
       </li>`;
     });
+    if (cats.length === 0) html += `<li class="vazio">nenhuma categoria</li>`;
     html += `</ol></div></details>`;
   });
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
@@ -823,8 +823,8 @@ $("#lista").addEventListener("click", e => {
       e.preventDefault();
       summaryArea.parentElement.open = !summaryArea.parentElement.open;
       salvarEstadoAccordions();
-      if (modoAtual === 'projetos' || modoAtual === 'areas') abrirArea(area);
-      else if (modoAtual === 'projetos') abrirArea(area);
+      if (modoAtual === 'categorias') { areaSelecionada = area; atualizarSelecaoVisual(); }
+      else abrirArea(area);
     }
     return;
   }
@@ -878,7 +878,8 @@ $("#novo").onclick = () => {
     document.querySelector('[data-acampo="name.pt"]')?.focus();
   } else if (modoAtual === 'categorias') {
     if (areasEditaveis.length === 0) return status("Crie uma área primeiro", true);
-    const area = areasEditaveis[0];
+    // usa a área que o usuário clicou (ou a da categoria aberta); senão a primeira
+    const area = areaAtual() || areasEditaveis[0];
     area.cats = area.cats || [];
     area.cats.push({ id: "cat-" + Date.now(), name: { pt: "", en: "" } });
     marcarSujo();
@@ -1135,7 +1136,7 @@ function linhaCategoria(c, i, total) {
 
 function abrir(p) { projetoSelecionado = p && projetos.includes(p) ? p : null; document.body.classList.add("editando"); atualizarTudo(); }
 function abrirArea(a) { areaSelecionada = a && areasEditaveis.includes(a) ? a : null; idOriginalArea = areaSelecionada?.id || ''; document.body.classList.add('editando'); atualizarTudo(); }
-function abrirCat(a, c) { categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null; document.body.classList.add('editando'); atualizarTudo(); }
+function abrirCat(a, c) { categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null; if (categoriaSelecionada) areaSelecionada = a; document.body.classList.add('editando'); atualizarTudo(); }
 function fechar() { document.body.classList.remove("editando"); }
 $("#fechar-drawer").onclick = fechar;
 
