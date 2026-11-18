@@ -73,61 +73,82 @@ a{color:inherit}
 /* LARGURA MÁXIMA DO CONTEÚDO: aumente/diminua o 1500px */
 .wrap{width:min(1500px,100% - 2rem);margin-inline:auto}
 
-/* janela: a unidade visual do site, como no cartão */
-/* vidro jateado: granulado + reflexo diagonal + luz no aro (tudo gradiente/textura,
-   sem custo de blur; o desfoque do fundo continua só no desktop) */
+/* janela: vidro fumê moldado com scanlines horizontais e aro especular nos 4 cantos */
 .win{
   position:relative;
-  background-color:rgba(9,10,12,.55);
+  background-color:rgba(6,7,9,.68);
   background-image:
-    linear-gradient(112deg,transparent 12%,rgba(255,255,255,.07) 18%,rgba(255,255,255,.02) 25%,transparent 32%),
-    linear-gradient(180deg,rgba(255,255,255,.06),transparent 22%),
+    radial-gradient(60% 42% at 15% 0%,rgba(255,255,255,.055),transparent 70%),
+    linear-gradient(155deg,rgba(12,14,17,.12),rgba(3,4,5,.62) 72%),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.03) 0 1px,transparent 1px 2px,rgba(0,0,0,.36) 2px 4px),
     var(--grao);
-  background-size:auto,auto,140px 140px;
-  background-blend-mode:screen,screen,overlay;
-  border:0;                     /* vidro sem contorno: a luz é que desenha a borda */
+  background-size:auto,auto,auto,140px 140px;
+  background-blend-mode:screen,normal,normal,overlay;
+  border:0;
   border-radius:14px;
   overflow:hidden;
-  box-shadow:0 18px 50px rgba(0,0,0,.35),inset 0 16px 18px -18px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.05);
+  box-shadow:
+    0 22px 54px rgba(0,0,0,.62),
+    0 2px 8px rgba(0,0,0,.5),
+    inset 0 0 0 2.5px rgba(0,0,0,.74),
+    inset 0 1px 10px rgba(255,255,255,.06);
 }
-/* bevel abaulado: luz larga na aresta de cima + foco que abraca o canto */
-.win::before,.win::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.win::before,.win::after{content:"";position:absolute;border-radius:inherit;pointer-events:none}
+/* bisel interno sutil sem embranquecer o vidro escuro */
 .win::before{
-  z-index:3;mix-blend-mode:screen;
-  background:
-    radial-gradient(210px 90px at 0% 0%,rgba(255,255,255,.55),rgba(255,255,255,.10) 50%,transparent 78%),
-    radial-gradient(64px 64px at 0% 0%,rgba(255,255,255,.26),transparent 78%),
-    radial-gradient(130px 70px at 100% 0%,rgba(255,255,255,.26),transparent 78%),
-    linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.07) 4px,rgba(255,255,255,0) 14px);
+  inset:2.5px;border-radius:11.5px;z-index:3;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 1px 0 0 rgba(255,255,255,.07);
 }
-/* fio de luz rente a borda (so aparece em cima e nos cantos), como o lip do vidro */
+/* aro especular vivo nos 4 cantos arredondados */
 .win::after{
-  z-index:4;mix-blend-mode:screen;padding:1.6px;
+  inset:0;z-index:4;mix-blend-mode:screen;padding:1.4px;
   background:
-    radial-gradient(180px 95px at 0% 0%,rgba(255,255,255,1),rgba(255,255,255,.55) 40%,rgba(255,255,255,.12) 70%,transparent 86%),
-    radial-gradient(46px 46px at 0% 0%,rgba(255,255,255,1),rgba(255,255,255,.60) 52%,transparent 92%),
-    radial-gradient(120px 70px at 100% 0%,rgba(255,255,255,.60),rgba(255,255,255,.15) 58%,transparent 84%),
-    radial-gradient(90px 70px at 100% 100%,rgba(255,255,255,.18),transparent 80%);
+    radial-gradient(74px 74px at 0% 0%,rgba(255,255,255,.95),rgba(255,255,255,.28) 46%,transparent 76%),
+    radial-gradient(72px 72px at 100% 100%,rgba(255,255,255,.88),rgba(255,255,255,.24) 46%,transparent 76%),
+    radial-gradient(64px 64px at 100% 0%,rgba(255,255,255,.58),rgba(255,255,255,.14) 50%,transparent 78%),
+    radial-gradient(64px 64px at 0% 100%,rgba(255,255,255,.52),rgba(255,255,255,.12) 50%,transparent 78%),
+    linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.10) 35%,rgba(255,255,255,.08) 65%,rgba(255,255,255,.24));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
           mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
           mask-composite:exclude;
 }
 .win > *{position:relative;z-index:2}
-@media (min-width: 768px){ .win{ backdrop-filter:blur(11px) saturate(125%); } }
+@media (min-width: 768px){ .win{ backdrop-filter:blur(15px) saturate(135%); -webkit-backdrop-filter:blur(15px) saturate(135%); } }
+@media (max-width: 767px){ .win{ background-color:rgba(7,8,10,.86); } }
 .bar{display:flex;justify-content:space-between;align-items:center;padding:.65rem 1rem;font:400 .85rem var(--mono);letter-spacing:.08em;color:var(--mute);
   border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
-.bar i{font-style:normal;letter-spacing:.25em}
+.win-ctl{display:inline-flex;align-items:center;gap:.85rem;opacity:.72;flex:0 0 auto}
+.win-ctl i{display:block;width:12px;height:1px;background:currentColor}
+.win-ctl b{display:block;width:11px;height:11px;position:relative}
+.win-ctl b::before,.win-ctl b::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:1px;background:currentColor}
+.win-ctl b::before{transform:translate(-50%,-50%) rotate(45deg)}
+.win-ctl b::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.hud-plus{position:absolute;width:14px;height:14px;pointer-events:none;z-index:5;color:rgba(255,255,255,.34);
+  background:linear-gradient(currentColor,currentColor) center/100% 1px no-repeat,linear-gradient(currentColor,currentColor) center/1px 100% no-repeat}
+.hud-plus.tr{top:1rem;right:1rem}
+.hud-plus.bl{bottom:1rem;left:1rem}
+.hud-plus.br{bottom:1rem;right:1rem}
+.pl-menu,.pl-ico,.ftr-cat,.ftr-globe,.ftr-spk,.ico{fill:currentColor;fill-rule:evenodd}
 
 /* topo */
 #lang{font:500 .85rem var(--mono);letter-spacing:.1em;background:none;color:var(--white);border:1px solid var(--accent);padding:.3rem .75rem;border-radius:6px;cursor:pointer}
 /* o preenchimento do hover só em aparelhos com mouse: no toque ele ficaria aceso */
 @media(hover:hover){#lang:hover{background:var(--accent);color:var(--ink)}} /* texto escuro: o destaque é claro */
 
-/* hero = "capa" do topo (logo + linha de função + botão de idioma) */
-/* padding do hero: 1º = espaço acima da linha de função (menor = sobe), 2º = base */
-.hero{position:relative;overflow:hidden;min-height:var(--hero-h);padding:clamp(.75rem,1.8vw,1.1rem) 0 clamp(1rem,2.5vw,1.6rem)}
-.hero-overlay{position:absolute;inset:0;z-index:1;display:grid;place-items:center;pointer-events:none}
+/* hero = logo + código de barras vertical na altura exata da logo + linha de função */
+.hero{position:relative;overflow:hidden;padding:clamp(.25rem,.8vw,.6rem) 0 clamp(.8rem,2vw,1.2rem)}
+.hero-row{position:relative;width:fit-content;max-width:100%;margin-inline:auto;padding-right:clamp(28px,3.4vw,46px)}
+.hero-logo{display:block;margin:0;line-height:0}
+.hero-logo img{display:block;width:auto;height:auto;max-width:100%;max-height:var(--logo-max-h);object-fit:contain}
+.hero-barcode{position:absolute;right:0;top:13.9%;bottom:9.5%;width:clamp(24px,3vw,42px);display:flex;align-items:stretch;gap:clamp(3px,.35vw,5px);color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
+.bc-bars{flex:1;height:100%;background:repeating-linear-gradient(180deg,currentColor 0 2px,transparent 2px 5px,currentColor 5px 6px,transparent 6px 9px,currentColor 9px 13px,transparent 13px 16px,currentColor 16px 17px,transparent 17px 21px)}
+.bc-txt{--ls:.32em;flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 .68rem/1 var(--mono);letter-spacing:var(--ls);white-space:nowrap}
+@supports (font-size:1cqh){
+  .hero-barcode{container-type:size}
+  .bc-txt{--ls:4.4cqh;height:100%;font-size:4.2cqh}
+  :lang(en) .bc-txt{--ls:5.55cqh}
+}
 /* fundo em duas camadas: ocupa a largura da tela, começa no topo da página e sobe
    mais devagar que ela (parallax). As duas camadas têm sempre o mesmo tamanho. */
 .fundo-clip{position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
@@ -137,13 +158,10 @@ a{color:inherit}
 .fundo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;opacity:0;transition:opacity .8s}
 .fundo img.ready{opacity:1}
 .fundo .f2.ready{opacity:var(--camada)}
-/* TAMANHO DA LOGO do topo: 40vh (mesmo tamanho em qualquer hero), no máx. 80% da largura.
-   Como não depende de --hero-h, dá para baixar o hero sem encolher a logo. */
-.hero-overlay img{max-width:80%;max-height:var(--logo-max-h);width:auto;height:auto;object-fit:contain;transform:translateY(calc(var(--logo-sobe) * -1))}
 .hero .wrap{position:relative;z-index:2}
 
-/* linha de função + botão EN. margin-top: distância até o topo do hero (menor = sobe) */
-.sub{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:nowrap;margin-top:.15rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
+/* linha de função + botão EN */
+.sub{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:nowrap;margin-top:.2rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
 .sub > span[data-i18n]{flex:1 1 auto;min-width:0}
 .sub .right{flex:0 0 auto;display:flex;align-items:center;gap:1rem}
 /* em telas estreitas o "CG / 001" sai para o EN não cair para a linha de baixo */
@@ -183,42 +201,105 @@ a{color:inherit}
   background:linear-gradient(160deg,hsl(var(--h) 30% 14%),#08090b)}
 .item h3{font:500 1.2rem/1.2 var(--tech);margin-top:.7rem;letter-spacing:.03em}
 
-/* sobre: 1fr 1fr = duas colunas (texto | serviços). Ex.: 1.4fr 1fr deixa o texto maior */
-.about{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,5vw,4rem);padding:clamp(1.4rem,4vw,2.6rem)}
-.about h2,.contact h2{font:400 clamp(2.4rem,5vw,3.6rem)/1 var(--big);margin-bottom:1rem;letter-spacing:.02em}
-.about p+p{margin-top:1rem}
-.about p{max-width:60ch}
+/* grid institucional estilo pôster (sobre + player + contato) */
+.home-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:clamp(1rem,2vw,1.4rem);align-items:start}
+.side-col{display:grid;gap:clamp(1rem,2vw,1.4rem);min-width:0}
+@media(max-width:960px){.home-grid{grid-template-columns:1fr}}
+
+/* sobre (janela esquerda do pôster) */
+.about{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(.8rem,2vw,1.5rem);padding:clamp(1.2rem,3vw,2.2rem)}
+.about-side{display:flex;flex-direction:column;align-items:flex-end;gap:1.4rem;color:var(--mute)}
+.vert-tag{writing-mode:vertical-rl;transform:rotate(180deg);font:400 .72rem/1 var(--mono);letter-spacing:.42em;color:var(--accent);opacity:.7;white-space:nowrap;user-select:none}
+.pitch-lg{font:400 clamp(2.6rem,5.5vw,4.5rem)/.96 var(--big);letter-spacing:.02em;max-width:13ch;margin-bottom:1rem}
+.about-copy{max-width:58ch}
+.about-copy+.about-copy{margin-top:.85rem}
+.about-hr{border:0;height:1px;background:rgba(255,255,255,.5);margin:1.4rem 0 1rem}
 .svc{list-style:none;padding:0;counter-reset:s}
-.svc li{counter-increment:s;display:flex;gap:.9rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--line);font:500 1.15rem var(--tech);letter-spacing:.06em;text-transform:uppercase}
-.svc li::before{content:counter(s,decimal-leading-zero);font:400 1.1rem var(--mono);color:var(--accent);flex:0 0 auto}
-/* traço curto entre o número e o serviço, como no cartão promocional */
-.svc li::after{content:"";order:1;flex:0 0 clamp(1rem,2.4vw,1.7rem);height:1px;background:var(--line)}
+.svc li{counter-increment:s;display:flex;gap:.85rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--line);font:500 clamp(1rem,1.4vw,1.25rem) var(--tech);letter-spacing:.06em;text-transform:uppercase}
+.svc li:last-child{border-bottom:0}
+.svc li::before{content:counter(s,decimal-leading-zero);font:400 1.05rem var(--mono);color:var(--accent);flex:0 0 auto}
+.svc li::after{content:"";order:1;flex:0 0 clamp(1.2rem,2.5vw,2rem);height:1px;background:linear-gradient(90deg,var(--mute) 0 42%,transparent 42% 58%,var(--mute) 58% 100%)}
 .svc li span{order:2}
-@media(min-width:761px){ /* divisória entre o texto e a lista (linha extra do cartão) */
-  .about > div:first-child{border-right:1px solid var(--line);padding-right:clamp(1.5rem,4vw,3rem)}
+
+/* player musical HUD */
+.player-hud{padding:.4rem .2rem 0;--prog:41%}
+.pl-wrap{position:relative;display:flex;align-items:flex-end;gap:.8rem}
+.pl-list{list-style:none;padding:0;margin:0;flex:1;min-width:0;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.18),#000 32%);mask-image:linear-gradient(180deg,rgba(0,0,0,.18),#000 32%)}
+.trk{display:block;width:100%;text-align:left;background:none;border:0;padding:.38rem 0;color:var(--mute);cursor:pointer;font:400 .78rem/1.3 var(--tech);transition:color .18s}
+.trk strong{display:block;font:500 .95rem/1.2 var(--tech);letter-spacing:.02em;color:inherit}
+.trk small{display:block;font:400 .74rem/1.25 var(--mono);color:var(--mute)}
+.trk:hover,.trk.on{color:var(--white)}
+.trk.on strong{color:var(--white)}
+.trk-e{display:inline-grid;place-items:center;width:.9em;height:.9em;margin-right:.35em;font-size:.72em;background:rgba(255,255,255,.45);color:var(--ink);border-radius:1px;font-weight:700;vertical-align:baseline}
+.pl-menu{color:var(--accent);width:22px;height:14px;flex:0 0 auto;margin-bottom:.5rem;opacity:.7}
+.pl-bar{position:relative;height:14px;display:flex;align-items:center;margin:.7rem 0 .45rem;cursor:pointer;opacity:.7}
+.pl-bar::before{content:"";width:100%;height:3px;border-radius:99px;background:var(--accent);opacity:.38}
+.pl-fill{position:absolute;left:0;width:var(--prog);height:3px;border-radius:99px;background:var(--accent);pointer-events:none}
+.pl-knob{position:absolute;left:var(--prog);width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translateX(-50%);pointer-events:none}
+.pl-btns{display:flex;justify-content:space-around;align-items:center;padding-top:.2rem}
+.pl-btn{background:none;border:0;padding:.35rem .5rem;color:var(--accent);cursor:pointer;display:grid;place-items:center;opacity:.7;transition:opacity .18s,transform .18s}
+.pl-btn:hover,.pl-btn.lit{opacity:1;transform:scale(1.08)}
+.player-hud.paused [data-pl="play"]{opacity:.4}
+.pl-ico{width:20px;height:18px;display:block}
+.pl-btn.main .pl-ico{width:22px;height:22px}
+
+/* contato (janela direita do pôster) */
+.contact-body{position:relative;padding:clamp(1.2rem,3vw,2rem)}
+.contact-chev{color:var(--mute);margin-bottom:.75rem;display:flex;justify-content:center}
+.contact-chev svg{width:26px;height:15px}
+.contact p{color:var(--mute);margin-bottom:1.1rem}
+.contact a.big{display:flex;align-items:center;gap:.65rem;width:fit-content;max-width:100%;overflow-wrap:anywhere;text-decoration:none;margin-bottom:.75rem}
+.contact a.big .ico{width:1.1em;height:1.1em;flex:0 0 auto}
+.contact a.wa{font:700 clamp(1.55rem,3vw,2.25rem)/1.1 var(--tech);border-bottom:2px solid var(--white);padding-bottom:.15rem}
+.contact a.mail{font:500 clamp(1rem,1.6vw,1.25rem)/1.3 var(--tech)}
+.contact a.big:hover{color:var(--accent);border-color:var(--accent)}
+.brk{display:inline-block;position:relative;margin-top:1rem;padding:.75rem 1.5rem;font:500 1.15rem/1.15 var(--big);letter-spacing:.14em;text-transform:uppercase;text-align:center;
+  background:
+    linear-gradient(var(--white),var(--white)) 0 0/14px 2px no-repeat,
+    linear-gradient(var(--white),var(--white)) 0 0/2px 14px no-repeat,
+    linear-gradient(var(--white),var(--white)) 100% 0/14px 2px no-repeat,
+    linear-gradient(var(--white),var(--white)) 100% 0/2px 14px no-repeat,
+    linear-gradient(var(--white),var(--white)) 0 100%/14px 2px no-repeat,
+    linear-gradient(var(--white),var(--white)) 0 100%/2px 14px no-repeat,
+    linear-gradient(var(--white),var(--white)) 100% 100%/14px 2px no-repeat,
+    linear-gradient(var(--white),var(--white)) 100% 100%/2px 14px no-repeat}
+
+/* rodapé HUD */
+.hud-ftr{margin-top:clamp(2.2rem,5vw,3.8rem);padding-bottom:clamp(2rem,4vw,3rem)}
+.ftr-top{display:flex;align-items:center;gap:clamp(.8rem,2vw,1.6rem);color:var(--accent);opacity:.7}
+.ftr-cat{width:clamp(50px,5.5vw,72px);height:auto;aspect-ratio:1;flex:0 0 auto}
+.ftr-motto{display:grid;font:400 .88rem/1.4 var(--mono);letter-spacing:.04em;flex:0 0 auto}
+.ftr-globe{width:clamp(64px,6.8vw,90px);height:auto;aspect-ratio:200/121;flex:0 0 auto}
+.ftr-vol{flex:1;min-width:140px;display:flex;flex-direction:column;gap:.2rem}
+.vol-pct{align-self:flex-end;font:400 .95rem/1 var(--mono);letter-spacing:.06em}
+.vol-row{display:flex;align-items:center;gap:.6rem}
+.ftr-spk{width:34px;height:24px;flex:0 0 auto}
+.vol-track{position:relative;flex:1;height:4px;background:rgba(239,43,49,.28);background:color-mix(in srgb,currentColor 32%,transparent)}
+.vol-fill{position:absolute;inset:0 auto 0 0;width:99%;background:currentColor}
+.vol-knob{position:absolute;right:1%;top:50%;width:4px;height:14px;background:currentColor;transform:translateY(-50%)}
+.ftr-bot{display:flex;align-items:center;gap:1rem;margin-top:1rem;color:var(--mute);font:400 .78rem/1 var(--mono);letter-spacing:.26em}
+.ftr-place{flex:0 1 auto}
+.ftr-line{flex:1;height:1px;background:rgba(255,255,255,.28)}
+.ftr-scan{flex:0 0 auto;display:grid;justify-items:center;gap:.3rem;opacity:.7}
+.scan-bars{width:clamp(108px,12vw,148px);height:26px;background:repeating-linear-gradient(90deg,var(--white) 0 2px,transparent 2px 5px,var(--white) 5px 8px,transparent 8px 10px,var(--white) 10px 11px,transparent 11px 15px,var(--white) 15px 18px,transparent 18px 21px)}
+.scan-txt{font-size:.66rem;letter-spacing:.45em;padding-left:.45em}
+@media(max-width:720px){
+  .ftr-top{flex-wrap:wrap}
+  .ftr-vol{flex:1 0 100%}
+  .ftr-bot{flex-wrap:wrap;letter-spacing:.14em}
 }
-@media(max-width:760px){.about{grid-template-columns:1fr}}
-
-/* contato (WhatsApp/e-mail ficam no HTML, perto do fim do arquivo) */
-.contact{padding:clamp(1.4rem,4vw,2.6rem)}
-.contact p{color:var(--mute);margin-bottom:1.4rem}
-.contact a.big{display:block;width:fit-content;max-width:100%;overflow-wrap:anywhere;font:700 clamp(1.4rem,4.2vw,2.6rem)/1.3 var(--tech);text-decoration:none;border-bottom:2px solid var(--accent);margin-bottom:.8rem}
-.contact a.big:hover{color:var(--accent)}
-.brk{display:inline-block;position:relative;margin-top:1rem;padding:.7rem 1.4rem;font:500 1.15rem var(--big);letter-spacing:.14em;text-transform:uppercase}
-.brk::before,.brk::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--white)}
-.brk::before{left:0;top:0;border-right:0;border-bottom:0}
-.brk::after{right:0;bottom:0;border-left:0;border-top:0}
-
 
 /* projeto aberto */
-dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:#0a0b0d;color:var(--white);border:0;border-radius:14px;padding:0;margin:auto;
+dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:rgba(7,8,10,.92);color:var(--white);border:0;border-radius:14px;padding:0;margin:auto;
   background-image:
-    linear-gradient(112deg,transparent 12%,rgba(255,255,255,.05) 18%,rgba(255,255,255,.012) 25%,transparent 32%),
-    linear-gradient(180deg,rgba(255,255,255,.045),transparent 16%),
+    radial-gradient(60% 42% at 15% 0%,rgba(255,255,255,.05),transparent 70%),
+    linear-gradient(155deg,rgba(12,14,17,.12),rgba(3,4,5,.62) 72%),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.03) 0 1px,transparent 1px 2px,rgba(0,0,0,.36) 2px 4px),
     var(--grao);
-  background-size:auto,auto,140px 140px;
-  background-blend-mode:screen,screen,overlay;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 4px 12px -8px rgba(255,255,255,.8),0 30px 90px rgba(0,0,0,.65)}
+  background-size:auto,auto,auto,140px 140px;
+  background-blend-mode:screen,normal,normal,overlay;
+  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.18),inset 0 0 0 3px rgba(0,0,0,.72),inset 0 1px 12px rgba(255,255,255,.08)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -367,21 +448,16 @@ dialog[open]{animation:in .22s ease-out}
 .chip{background:none;border:1px solid var(--line);color:var(--mute);font:500 .85rem var(--mono);letter-spacing:.06em;padding:.4rem .9rem;border-radius:999px;cursor:pointer}
 .chip:hover{color:var(--white);border-color:var(--mute)}
 .chip[aria-pressed="true"]{color:var(--white);border-color:var(--accent);background:rgba(239,43,49,.16);background:color-mix(in srgb,var(--accent) 16%,transparent)}
-.pitch-sm{font:400 clamp(2rem,4.5vw,3rem)/1 var(--big);margin-bottom:1rem;max-width:18ch}
 
 /* celular: os ajustes abaixo valem para telas <= 640px */
 .chip,#lang,#close{min-height:40px}
 @media(hover:none){.item:hover .thumb img{transform:none}}
 @media(max-width:640px){
-  .win,.tabbar,dialog{backdrop-filter:none}
+  .win,.tabbar,dialog{backdrop-filter:none;-webkit-backdrop-filter:none}
   .wrap{width:calc(100% - 1.5rem)}
-  /* topo compacto: a logo define a altura, sem faixas vazias */
-  .hero{min-height:0;display:flex;flex-direction:column;padding:clamp(.6rem,2vw,.9rem) 0 clamp(.9rem,3vw,1.2rem)}
-  .hero .wrap{order:1}
-  .hero-overlay{position:static;order:2;inset:auto;margin-top:clamp(.4rem,1.6vw,.8rem)}
-  .hero-overlay img{max-width:92%;max-height:34vh;transform:none}
-  /* linha de função + EN: o botão fica preso no canto superior direito */
-  .sub{align-items:flex-start;gap:.6rem;font-size:.72rem;letter-spacing:.03em}
+  .hero{padding:.25rem 0 .75rem}
+  .hero-logo img{max-height:30vh}
+  .sub{align-items:center;gap:.6rem;font-size:.72rem;letter-spacing:.03em}
   .sub > span[data-i18n]{line-height:1.35}
   .sub .right{gap:0}
   .tabs{gap:.65rem}
@@ -392,7 +468,8 @@ dialog[open]{animation:in .22s ease-out}
   .cat-separator{margin:1.1rem .9rem 0}
   .grid{grid-template-columns:1fr;gap:1rem;padding:1rem .9rem}
   .item h3{font-size:1rem}
-  .about,.contact{padding:1.2rem .9rem}
+  .about{padding:1.1rem .9rem}
+  .contact-body{padding:1.1rem .9rem}
   .svc li{font-size:1rem}
   dialog{width:calc(100% - 1rem);max-height:94dvh}
   .d-stage{height: 70vh; min-height: 260px; }
@@ -405,19 +482,39 @@ dialog[open]{animation:in .22s ease-out}
 <body>
 <noscript><p style="padding:2rem;text-align:center">Ative o JavaScript para ver o portfólio.</p></noscript>
 
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" fill="currentColor" fill-rule="evenodd">
+<symbol id="i-shuffle" viewBox="0 0 66 43"><path fill="currentColor" fill-rule="evenodd" d="M29.6 21.4c-6.1-6.2-8.5-9.1-11.7-10.5c-3.4-1.5-7.6-1-17.8-1l0-4.6c11.3 0 15.9-.2 19.6 1.4c3.5 1.5 6.4 4.7 13.1 11.5c10-10.1 11.6-12.3 19.4-12.8l0-4.7l13.8 6.9l-13.8 6.9l0-4.5c-6.4.5-7.7 2.8-16.2 11.4c8.4 8.5 9.9 10.8 16.2 11.4l0-4.5l13.8 6.9l-13.8 6.9l0-4.7c-7.6-.5-9.5-2.7-19.4-12.8c-6.8 6.8-9.6 10-13.1 11.5c-3.8 1.6-8.4 1.4-19.6 1.4l0-4.6c10.2 0 14.4.5 17.8-1c3.2-1.4 5.6-4.3 11.7-10.5Z"/></symbol>
+<symbol id="i-pause" viewBox="0 0 55 62"><path fill="currentColor" fill-rule="evenodd" d="M21.1.8l0 61.2l-20.6 0l0-61.2l20.6 0Zm33 0l0 61.2l-20.6 0l0-61.2l20.6 0Z"/></symbol>
+<symbol id="i-next" viewBox="0 0 40 45"><path fill="currentColor" fill-rule="evenodd" d="M33.9 22.4l-33.8 21.9l0-43.8l33.8 21.9Zm0 19.9l0-39.9c0-1.1 1.1-2 2.5-2c1.4 0 2.5.9 2.5 2l0 39.9c0 1.1-1.1 2-2.5 2c-1.4 0-2.5-.9-2.5-2Z"/></symbol>
+<symbol id="i-prev" viewBox="0 0 40 45"><path fill="currentColor" fill-rule="evenodd" d="M5.8 22.4l33.8 21.9l0-43.8l-33.8 21.9Zm0 19.9l0-39.9c0-1.1-1.1-2-2.5-2c-1.4 0-2.5.9-2.5 2l0 39.9c0 1.1 1.1 2 2.5 2c1.4 0 2.5-.9 2.5-2Z"/></symbol>
+<symbol id="i-repeat" viewBox="0 0 67 43"><path fill="currentColor" fill-rule="evenodd" d="M53 32.9l0-4.6l13.7 6.8l-13.7 6.8l0-4.6l-45.7 0c-1.3 0-2.3-1-2.3-2.3l0-23l4.6 2.4l0 18.3l43.4 0Zm-38.6-23l0 4.6l-13.7-6.8l13.7-6.8l0 4.6l45.7 0c1.3 0 2.3 1 2.3 2.3l0 23l-4.6-2.4l0-18.3l-43.4 0Z"/></symbol>
+<symbol id="i-list" viewBox="0 0 52 30"><path fill="currentColor" fill-rule="evenodd" d="M.6 5.4l0-4.6l50.7 0l0 4.6l-50.7 0Zm50.7 7.2l0 4.6l-50.7 0l0-4.6l50.7 0Zm-50.7 16.4l0-4.6l50.7 0l0 4.6l-50.7 0Z"/></symbol>
+<symbol id="i-cat" viewBox="0 0 213 213"><path fill="currentColor" fill-rule="evenodd" d="M47.8 111.2l-47.3-4.6l52-5c.5-1.5.8-2.6.9-3.1c-.2-.3-1-1.8-1.8-3l-13.7-7.2l11.4.4c-.7-1-1.2-1.8-1.3-1.9c-1.9-2.8-1.7-4.4-1.4-6.3c.2-1 .5-2.1.4-3.8l-32.2-23l27.7 12.6c-4.7-13.4-5.9-27.4-6.1-29.9c-.2-2.1-1.6-4.5-1.8-5.1c-.1-.4-.1-.7-.1-.9l.1-.6l.2-.5c-.3-.6-.6-1.1-1.1-2c-.3-.5-.7-1.1-.9-1.4c-.2-.5-.3-.9-.3-1.2l.2-1l.5-.6c-.4-.7-.6-1.3-.7-1.6c-.2-.7-.2-1.2-.1-1.4l.2-.6l.4-.5l.7-.5l.8-.2l.6 0l.5.2c.2.1.5.2.8.5c.2.1.3.3.4.5c.2.2.3.7 3 3l.2-.2c.2-.1 1.7-1 3.2.6c.4.4 2 1.9 5.8 4.7c8 5.8 9.1 7.3 16.6 14.1l-12.1-26.6l31 43.5c0 0 .1.1.1.1c.1-.1.1-.1.2-.1l.6-.4l.6-.2l.6 0l.6.2c.2.1.6.3 1 .7c.2.2.4.4.6.6l-.8-21.2l11.6 21.9c.4 0 .7-.1 1.1-.1l5.7-59.1l5.7 59.1c.4 0 .7.1 1.1.1l11.5-21.9l-.8 21.3c.2-.2.4-.4.4-.4c.1-.1 1-.9 1.4-1.1l.7-.1l.8.1l.7.4l.2.2c.1-.1.1-.1.2-.2l30.9-43.3l-12.1 26.5c6.1-5.5 11.6-10.4 13.9-12.1c8.3-6.1 8.1-6.4 8.8-6.9c.7-.5 1.3-.5 1.5-.6l1 .2l.6.4c1.2-1 1.8-1.8 2.3-2.3c.7-.8 1.3-1.3 2.1-1.5c.7-.3 1.4-.2 2 .2c.6.4 1 1.1 1 1.8l0 .2c0 .5-.1 1-.4 1.5c-.2.2-.4.5-.5.8l.1.1l.5.8l.1.5l0 .6c0 .2-.1.5-.3.9c-.2.3-.7 1.1-1.8 3.2l.2.5l.1.6c0 .2 0 .6-.2 1.2c-.2.5-.6 1.4-1.1 2.7c-.6 1.5-.7 2.5-.9 4c-.2 2.6-.5 6.5-2.6 16c-1.2 5.4-2.3 9.4-3.4 12.3l27.7-12.6l-32.2 23c-.2 2 .3 3.4.5 4.6c.4 1.9-.3 3.7-1.5 5.6c-.4.6-.9 1.2-1.3 1.8l11.4-.4l-13.8 7.3c-.6.9-1.1 1.5-1.3 2.1c-.3.6-.3.8-.3 1.2c.2 1 .5 1.9.8 2.8l51.9 5l-47.2 4.6c.6.8 1.2 1.5 1.4 1.9c.4.7.5 1.3.4 1.7l-.2.8l-.3.4l-.4.4l-.2.1l.1.1l.3.7l0 .2c-.1-.4-.3-.8-.5-1.1l0 0c.3.4.5.8.5 1.3l0 .3c0 .2-.1.5-.2.7l-.3.5c.1-.1.2-.3.3-.4c0 .1-.1.1-.1.2l-.1.1c-.1.3-.3.5-.6.7l9.7 5.1l-15.5-.6c-.4.2-.8.5-1.2.8l.2.2l.3.8l0 .8l-.3.8c-.1.2-.3.4-.6.6c-.2.2-.7.5-1.7 1.1l42 30l-51.8-23.6c-.6.4-1.3.9-1.9 1.3l12.3 19.5l-20.3-12.8c-.4.4-.8.8-1.1 1.1l24.2 53.2l-30.9-43.3c-1.6 3.3-3 6.6-4.1 9l.4 11.1l-3-5.8c-.5.6-1.1 1-1.6 1.4c-.4.3-.9.5-1.2.9c-1.4 2.1-1.5 2-3 3.8c-1.2 1.4-2.3 1-2.7.9l-.6-.3l-.4-.3c-.7.4-1.6.7-2.5.9l-3.5 35.7l-3.5-35.7c-.9-.2-1.8-.5-2.5-.9l-.3.3l-.7.3l-1 0c-.4-.1-1.2-.4-1.9-1.2c-.8-.9-2.7-3.5-3-3.9c-1.1-.7-1.9-1.3-2.5-1.9l-3 5.8l.4-11.2c-.3-.7-.7-1.6-1.1-2.6c-1.2-2.6-2.1-4.7-2.9-6.3l-30.9 43.3l24.2-53.2c-.3-.4-.7-.7-1.1-1.1l-20.3 12.8l12.3-19.6c-.5-.4-1.2-.8-1.9-1.3l-51.9 23.6l42-30c-.7-.5-1.2-.8-1.5-.9c-.4-.3-.6-.5-.7-.6l-.3-.5l-.2-.7l0-.8l.3-.8c0 0 .1-.1.1-.1c-.4-.3-.8-.5-1.2-.7l-15.6.6l9.6-5.1c-.1-.1-.2-.2-.3-.3c-.2-.2-.3-.4-.4-.6l-.2-.5l0-.5l.1-.5l.4-.9c0 0 0 0 .1-.1l-.3-.1l-.4-.4l-.3-.5l-.2-.6l0-.6l.2-.8c.1-.2.2-.4.4-.6c.4-.5.9-1 1.3-1.6Zm118.4 6.4c0 .2 0 .5 0 .7l0-.2c0-.1 0-.2 0-.3l0-.2Zm0 .7l0 0l0 0c0 0 0 0 0-.1Zm0 .1c0 .1-.1.3-.1.4l.1-.4Zm-.1.4c0 0 0 .1 0 .1c0 0 0 0 0-.1l0 0Zm12.2-98c-1.5.5-1.6 2.7-9.3 7.3c-2.2 1.3 4.2-5 2.3-3.7c-.7.5-.5.8-8.7 6.8c-6.2 4.6-35.7 32.3-36.3 31.4c-.1-.1.3-2.1.4-2.3c.1-.7-.5.1-.6.2c-.2.3-3.6 3.7-3.7 3.7c-.8.4-6.2-3-20.1-2.1c-6.7.4-11.6 2.4-12 2.1c-3.5-3.4-4.4-4.9-4.1-3.5c.4 2.1.2 2.2.1 2.1c-1.6-.9-13.1-11.4-17.5-15.3c-12-10.4-11.8-11.3-21.1-18.1c-4-2.9-5.6-4.5-6.1-4.9c-1.1-1.1.3 1.2 2.6 3.5c1.4 1.5-3-1.3-4.9-2.9c-4.6-3.7-4.2-4.1-4.5-4.4c-1.2-1.1 2.5 5.3 3.6 6.7c2.5 3.3-3.4-2.9-3.6-2.7c-.2.1.5 1 .8 1.5c1.2 2.1 1.2 2.1 2.8 5.5c.7 1.5-1.6-1.5-1.8-1.2c-.1.2 1.7 3.2 1.9 5.7c.2 2.4 1.5 16.7 6.3 30.1c2.3 6.3 3.6 5.8 4.1 8.7c1.1 6-1.9 6.6.8 10.6c.2.2 6.3 8.2 4.4 7.3c-1.4-.7-3.6-2.3-2.2-.6c1.2 1.4 3.7 5 3.7 6.2c0 .8-2.6 10.5-7.5 15.9c-.6.7 3-.3 4.1-.8c1.1-.5 1-.5 2-1.1c1-.6-1.5 3.1-5 5.2c-.5.3-.7.3-.5.5c.5.6 1.1-.8 9.2 3.2c.2.1 1.2.6 1.3.6l-.1.3c-.5-.1-6.8-1.2-6.8-1.1c-.2.3.8.4 6.9 4.4c.1.1 2.3 1.4 1.5 1.3c-1.6-.1-3.8-.3-4.2-.3c-.8-.1.1.3 2.5 1.9c4.7 3.1 5.8 3.2 4.8 3.7c-.1 0-4.8 2.3-5.2 2.6c-.3.2-.2.4.1.3c1.9-.9 6.1-2.8 6.7-2.4c7.2 4.6 7.6 5.2 7.4 5.5c-.9 1-5.7 5.4-4.7 5.4c.6 0 0-.8 5.1-4.7c.6-.4.7-.2 3.8 2.7c6.5 6.3 6.8 7.2 12.2 18.9c2.8 6.2 2 7 5.5 9.1c.7.4 3.9 5.6 4 4.6c0 0-1-2.4-.3-2.1c.2.1 4 4 10.6 2.5c4.2-.9 5.6-4 5-1.8c-.1.4-.7 2.1 0 1.3c1.4-1.7 1.5-1.6 2.8-3.6c.9-1.4 2.7-1.5 3.7-3.8c.5-1.2 3.2-8 6.3-14.1c1.6-3.2 2.9-6.1 11-13.4c.1-.1.9-.8 1.1-.7c2.6 1.7 5.3 5 5.5 4.8c.4-.4-5-5.2-4.9-5.6c.1-.2 7.3-5.4 7.9-5.3c1.3.3 13.1 5.5 3.6.8c-2.1-1-3-1.4-2.7-1.6c.4-.3 4.2-2.7 4.5-2.9c3.2-2 3.6-2.2 3.3-2.3c0 0-3.1.2-3.4.2c-.9.1-1.1.2-1.1-.1c0-.1 6.2-4.2 7.9-5c.3-.2.3-.2.6-.3l0-.2c-.5-.1-.5.1-6.7 1.1c-1.5.3 3.8-2.4 7.7-3.5c1.2-.3 1.2-.3 2.4-.5l.1-.1c0 0 .1-.1 0-.1c-.1-.1-.3.1-1.9-1.2c-3-2.4-4.3-4.6-3.6-4.2c2.8 1.4 2.8 1.3 5.9 2.2c.9.2-.7-1.2-1.8-3c-.6-.9-3.7-5.9-5.3-12.3c-.3-1.3-.3-2.1 3.3-6.8c.4-.5.8-.9.7-1c-.2-.1-3.4 2.1-3 1.2c2.2-4.8 6.6-7.7 5.9-11c-.4-1.8-1-3.9-.2-7.6c.4-1.5 3.6-2.7 7.5-20.7c3.4-15.6 1.8-15.9 3.5-20.3c.8-2.2 1.6-3.5.7-2.6c-.3.3-2 2.4-1.5 1.3c3.1-7 4.2-7.3 3.5-7.2c-.3 0-.2.2-2.6 2.5c-.1.1-2.2 2.1-.9.4c1.5-2 2.8-5.1 4-6.6l0-.2Zm-81.9 129.9c.6 3.6-2.7-.1-2.6-1.3c.2-2.2 1.8-1.5 2.4.3l.3.9Zm12.1-32.4c2.4-.5 2.4-.6 2.6-.6c1.8-.2-.7.6-1.2.9c-4.5 2.2-5.4.4-8.1-.5c0 0-1.7-.5-.3-.4c2.7.2 2.6 1.1 6.9.6Zm11.8-15.4c0-.2.5-4.2 3.5-7.2c8.5-8.4 21 .3 14.4 10.3c-5.1 7.7-18.4 4.4-17.9-3.1Zm7.4-.2c.1.4.6 3.7 1.6 4.3c.6.4 3.3-5.1.9-9.7c-.7-1.4-.9-1.3-.9-1.2c-.1.1-.8.7-.5 1.2c1.4 2.4-1 2.4-1.1 3.1c-.2 1.2-.1 1.1 0 2.3Zm-2.7-20.6c-1.5 2.2-1.5 2.2-2.9 4.5c-1.6 2.5 1.3-5.7 9.3-12.6c5.8-5 9.9-6.9 7.1-4.9c-5.9 4.2-8.8 6.8-13.5 13Zm2.8 56l.1 0c-.1 1.7-1.7 1.1-8.5 19.7c-2.9 8.1-4.6 9.1-11.1 8.5c-6.9-.6-10.5 2.9-14-6.2c-3.1-7.8-2.4-8.1-9.3-21.6c-3.1-6 6.4 10.2 8.1 15c2 5.6 1.2 12.6 9.6 11.8c4.2-.4 4.2-.2 8.3 0c7.6.4 6.3-7.3 9.5-14c2.7-5.9 7.2-13.3 7.2-13.3Zm-7.7-68.8c0-.6 3.1-2.5 4.7-4.6c.5-.7.3.2.2 1c0 .4.3.2 4.5-2.7c4.7-3.3 29.7-26.9 30.7-27.5c.1-.1.3.1.1.4c-.2.2-1.7 1.7-3.2 3c-3 2.6-26.6 26.3-28.3 28.2c-3.3 3.7 1.7-3.3.7-2.9c-.9.4-1.4 3.1-9.4 5.2Zm-35-1.3c-.3 0-.3 0-.3 0c-4.3-4.8-22.2-22.4-24.1-24.3c-3-3-8.2-7.7-8.2-7.9c-.5-1 .5.1 5.2 4.4c16.7 15.1 23.6 22.2 29.9 25.7c.6.3-.1-1.9.6-1c1.6 1.9 4.6 4.2 4.7 4.3c.1.4-.9 0-1.7-.2c-5.6-1.7-7.6-4.7-7.7-4.7c-.3.1-.2.3 1.8 3.8Zm59.8 10.3l.1.2c-.3.2-2.5 2.4-2.5 2.5c0 .5.2.1 1.3-.6c3-1.8 2.9-2 3.2-2c.5-.1-3.7 6.2-2.6 5.5c.3-.2 2.7-1.6 3.7-1.8c.8-.1-2.9 3.6-1.2 2.8c.6-.3 3.4-1.1 2.8-.5c-.6.6-2 2.3-2 2.5c-.2.5 7.4 6.8 5.4 6.3c-2.2-.5-2.8-1.2-3.1-1.2c-.3 0 0 .2.7 1.1c4.4 5.6 4.3 7.2 5.6 10.9c1.9 5.5 3.9 7.7 2.6 6.6c-3.1-2.6-5.1-4.5-6.8-7.5c-.3-.6-.4-.1-.4 0c2.7 7.2 2.8 9.1 6.4 13c1.1 1.2-1-.4-1.1-.4c-7.8-6-6-7.9-6.9-7.9c-.2 0-1.2 5.7-.8 1.2c.3-4.1-2-11.9-1.6-8.6c.1.9 1 6.7-3.5 11.2c-2 2-3.4 2.5-3.5 2.5c-1.4 1.1 2.2-.5 2.4-.6c0 0 2.1-.8.4.2c-4.5 2.7-7.8 3-11.1 3.7c-.8.2-.6-.6-3.1-1.8c-2.2-1.1-6.9-1.6-7.1-1.5c-1.2.7 1.3-.5 5.9 2.6c1.1.7-.4.3-1.6.3c-2 0-3.2 1.2-3.3 1.3c-.4.9-.7.6-1.9 1.5c-1 .7-1 .7-1 .8c0 0-1.8 1.5-.1.5c3.3-1.9 3.3-1.7 3.6-1.9c3.8-2.2 5.9-.2 6.6-.4c2.1-.5 14.5-3.3 26.4-2c.4 0 .6.4.2.4c-3.6 0-8.8-1.5-26.1 2.1c-.6.1-.3.3-.1.9c.5 1.2.5 2.4 1 2.4c1.4 0 11.2-.3 17.9 1.2c1.1.3-.1.3-.1.3c-6.1-1.1-17.9-1.4-18-.7c-.2 1.6-.2 1.5-.6 3.1c-.2.9.9-.5 14.4 4.4c0 0 2.6 1.3.3.5c-1.3-.4-10.5-3.6-16-4.2c-.3 0-.4 0-2.5 2.1c-.7.7 2.8.7 11.2 7.8c2.7 2.3-.7-.1-.8-.2c-.9-.6-9.9-7.3-11.2-7c-5.1 1-5.2-.3-5.5 0c-.3.2 1.5.7.8.8c-2.3.1-6-.7-6.5-.8c-7.3-1.6-5.9-3.7-5.5-4.1c2.6-3.2 5.9-3.5 7-10.5c.3-2.1-1 1.5-1.2 1.5c-.1 0-.9-3.2-1.6-4.4c-1.8-3.3.7 1.1.3 4.9c-.1 1.1-1.4-1.2-4.3-.3c-3.8 1.2-3.9.8-7.4-.1c-2.9-.7-4 1.5-4.1.6c-.6-3.8 2.1-8.5.3-5.1c-1 1.9-1.4 3.9-1.4 4.3c-.2 1-1.8-3.5-1.5-1.7c1.2 7.3 3.6 7 6.9 10.7c2.6 2.9-6.1 4.6-9.4 4.8c-2.4.1-2.9.4-2.6 0c.1 0 4.1-1.4.6-.5c-4.1 1-4.7-.4-5.5 0c-7.1 3.5-12.1 8.2-12.3 8c-.3-.3 5.4-4.9 10.7-7.7c1.4-.8 1.5-.9 1.4-1c-2.2-2.1-2.2-2.1-2.5-2.1c-.1 0-9.1 1.6-15.6 4c0 0-1.6.7-1.7.4c-.2-.3.1-.3 3.9-1.6c12.2-4.2 13.5-2.7 13.2-3.8c0-.1-.3-1 .1-.8c.5.3.3.4.8.7c.5.3 3.6.3 1.5.7c-.7.1 1.5 1.2 5.4 1.2c.1 0 6.8-.1 1.7-.5c-4.5-.3-8.6-2.9-9.3-3.3c-1.4-.8-1.2 1.1-1.8.7c-.3-.2 0-1.7-.5-1.8c-.2 0-8.8-.6-17.9 1l-.2-.3c.3-.1 8.2-1.7 16.8-1.4c1.1 0 1.5.5 1.7-.5c.4-2.2 1.3-2.5.5-2.7c-17.8-4-26.5-1.6-26.2-2.4c0-.1 11.3-1.8 26.5 1.8c1.1.3 2.8-1.7 6.4.3c1.4.8 1.5.6 2.8 1.4c.1.1 1.4.8 1.5.7c.2-.3-2.8-2-3-2.2c-.5-.3-.8-2.2-4.5-1.9c0 0-1.9.5-.8-.3c4.1-3 6.8-1.9 5.9-2.7c0 0-4.1.2-6.7 1.4c-2.6 1.2-2.5 2.1-3.4 1.9c-3.3-.6-6.9-1.2-11-3.8c-1.7-1.1 1.1.1 1.2.2c1.6.7 1.7.5 1.7.4c0-.2-6-2.4-7.1-10.3c-.4-2.9.5-6.5-.3-3.7c-2.4 9.5-.4 10.5-1.2 10.3c-.3-.1-.6-3.7-1-2.5c-1.5 4.7-9.6 10-7.6 8c2.4-2.5 3.1-4 6.3-12.8c1-2.8-.3 1.3-5.4 6c-.2.1-3.1 2.8-2.2 1.5c4.2-6.6 2.8-10.8 8.8-17.6c.1-.1 1.2-1.3.4-.9c-3 1.6-3.4 1.1-3.2.9c2.5-3.3 6-5.5 5.5-6.2c-1.1-1.6-2.9-2.9-1.4-2.5c1.3.3 1.3.3 2.5.8c1.3.5-2.2-3.1-1.4-2.9c1.3.4 3.4 1.7 3.7 1.9c.7.4-.2-.9-1.8-3.9c-.6-1.2-1.6-2.5-.6-1.6c.5.4 5.7 3.7 4.3 2.4c-2.4-2.3-2.7-2.5-2.4-2.6c.2-.1.2.1 3.2 1.4c.7.3 1.3.8.9.1c-2-3.4-2.2-3.6-1.9-3.7c.1 0 5.3 1.6 5.7 1.7c7.4 2.3 13.3 6.7 12 6.8c0 0-2-1.5-1.7-.6c.1.3.3.2 3 2.9c1.1 1.1 5.2 4.6 6.7 4.6c3.3-.1.4-6.3.2-6.8c-2.1-4.6 8.1 11.7.9 11.7c-2.7 0-3.9-2.5-9.4-5.9c-.8-.5-4.2-3.6-8.8-5.2c-5-1.7-11.4 2.7-9.1 2c3.5-1 7.6-.8 10.6.3c3.4 1.3-2.2-1.9-1.9-2c.2-.1 3.4 1.1 5.9 3.6c.1.1 1.6 1.6 1 1.3c-2.7-1.2-4.5-2.7-11.9-1.8c-3.8.4 1.1.1 4.8.9c1.7.4-1.2-.4-6 2.7c-1.4.9-4.1 2.9-4.1 3.2c0 .1.9.6.9.8c-.1.8-1.1 3.4.1 7.4c.9 3.1 4.4 6.2 3 4.1c-3.3-4.7-1.4-12.3-1.5-9.4c-.4 11.2 9.5 16.1 18 12.7c.3-.1 7.7-3.1 4-.2c-1.8 1.4-7 2.7-4.4 2.3c6-.9 6-.9 6.5-1.2c4.1-2.2 5.2-3.4 7.7.5c0 0 1.3 1.9.5.1c-1.3-2.8-2-4.8-4.9-3.8c-1 .3 1.4-2.3 3.5-1.7c3.2.9 4.8 5.7 3.7 2.6c-.2-.6-1.8-3.1-3.4-3.6c-3.2-1.1-4.9 1.7-5.3.5c-1-2.9-.7-2.9-1.7-5.8c-.3-1 .4 0 1.8 1.1c1.9 1.4 1.8 2.6 2.3 2.4c.6-.2 3.4-1.6 6-.2c2.3 1.3-1.6-2.1-3.9-2.3c-.6-.1.1-.4.2-.4c.3-.2.8-1 3.2.1c1.2.6 2.1 1.7 2.3 1.6c.2-.2 1.7-1.8 4.1-2.2c0 0 2.5.7.9 1c-2 .3-6.1 3.5-3.1 2c2.4-1.2 5.7.6 5.9.3c1.5-2.1 1.7-1.9 3.6-3.6c.7-.6.1.4-1.2 5c-.1.3-.3 1.6-.7 1.5c-1.8-.8-4.9-3.4-8.3 2.7c-.7 1.3 1.2-1 2-1.6c2.7-2.1 4.1-.6 5.4.5c1.6 1.3-1.7-1-3.3.1c-1.5 1-1.9 2.6-2.5 5.2l.1.1c1.1-.4 2-5.3 5.5-3.7c2.2 1 2.6 2 4.4 2.1c.4 0 9.5 1.7 4.3.3c-3-.9-5.4-3-4.5-3c4.7.5 7.9 4 14.7 1.8c2.9-.9 8.8-4.6 8.3-13.1c-.1-2.3 2 4.6-1.6 9.6c-1.5 2 5.1-3 3.4-11c-.1-.7-.4-.9.2-1.2c.4-.2.8-.3.4-.6c-7.7-6.1-9.7-4.9-10.1-5.4l.1-.1c3.3-.5 3.3-.5 4-.6c4.9-.1-5-1.9-10.5 1.1c-2.3 1.3 1.2-1.9 2.8-3c1.1-.7 5.6-2.5 3.2-1.8c-3.3.9-4.4 2-4.6 2c-.7.1.7-1 .8-1c1.1-.8 1.2-.8 2.3-1.6c1.1-.8-1.7.4-1.9.5c-6.6 2.7-14.1 15.1-18.2 10.6c-3.6-4 2.5-9.7 3.9-11.8c2.6-3.9-2.5 4.6-.2 6.5c1.6 1.4 7-2.8 8.1-4.8c.2-.4.5-2 6.3-5.2c5.2-2.9 12-4.5 12.1-4.4c.2.2-2.6 4.2-1.8 3.9c3.5-1.6 3.6-1.6 3.9-1.8Zm-59.8 42.6c-.6-.1-3.1-.7-2.3-.1c2.7 2 5.4 2.3 5.9 2.3c.4 0 0 .2-.3.5c-.2.3.1.3 4 .8c.1 0 2.9.3 1.4-.2c-4.4-1.5-4.2-2.1-8.6-3.3Zm42.9 0c-4.5 1.3-4.3 1.8-8.8 3.3c-1.5.5 2.3.1 4.1-.2c.1 0 1.5-.2 1.2-.5c-.3-.3-.7-.4-.3-.5c.5-.1 3.3-.4 5.8-2.3c.8-.6-2 .1-2.1.1Zm1.7 4.7c.7-.6.7-.6.7-.7c.5-.6.3-1.2-.6-.7c-.7.4-4.6 2.9-9.3 3.3c-4.2.4 1.1.5 2.9.5c2.4-.1 5.1-1.1 4-1.2c-2.1-.2.3-.5.3-.5c1 0 1-.1 1.9-.7Zm-11.5-57.2l.6-1.1c.2-.5-5-1.6-11.1-1.7c-7.6-.2-13.3 1.4-13.4 1.4c-.4.3 2.3 3.8 1 2.5c-2.9-2.6-3.5-2.7-3.3-3c.3-.3 4.5-1.2 4.9-1.2c1.9-.4 12.6-2.5 24 1.1c.7.2-1 1.2-3.1 3.1c-1 .9.3-1 .3-1.1Zm-21.9 69.2c-.3 3.5-.1 3.5-.2 6.9c0 1.3-3.7-4.7-4-9.6c0-.3.3-.4 3.6-1.2c1-.2 1.1-.5 1.4-.2c.2.3-.1.3-.7 4Zm26.4-57.9c-1.5 4.1-3.2 9.9-2.4 6c.3-1.2 1.9-8.4 5.9-14.4c1.7-2.6-.5 1.7-.6 1.8c-1.6 3-2.6 5.9-2.9 6.6Zm-7.3 76.8c.1-.2.7-1.2 1-2.1c.8-2.4 1.1 6.2-1.5 8.2c-2.9 2.2-3.8-3.5-2.3-4c1.3-.4 1.4-.3 2.8-2.2Zm-28.4-76.6c4.3 5.8 4.5 8.2 3.8 6.9c-8.2-14.3-17-17-16.9-18.2c0-.3 7.5 4.4 12.3 10.2c.1.1.1.1.8 1Zm14.1 81.3c-1.1 4-4.7 2-5.1-4.3c-.1-1 .1-3.8.6-2.3c1.2 3.6 3.2 4.1 3.6 4.2c1 .2.9 2.2.9 2.4Zm-55.8-104.1l.1 0c0-.3 0-.3 0-.3c-1.4-5.7-3.4-18.9-2.1-21.1c1.4-2.2 9.5 7.5 13.4 12.7c.6.7 8 10.5 6.4 9.4c-2.2-1.4-2.2-1.5-8.7-4.6c-2.4-1.2.5.6 2.6 2.1c4.4 3.2 8.6 7.2 8.7 7.3c2.2 1.7-.8 0-4.5-1.3c-.5-.2-5.7-2-6.6-2.1c-1.4-.2.2.4 1.5 1c6.5 3 11.7 8.1 11.8 8.2c0 0 1.4 1.2.2.7c-2.6-1.2-4.2-1.4-7.4-2.4c-.2.1-.2.1-.2.2c3.7 2.1 3.9 1.9 7.2 4.6c1.7 1.4 2 1.2 1.9 1.7l-.1 0c-.6-.2-6.1-1.6-8-1.2c-.9.2 1.2 5.6 1.1 5.7c-.1.1-.2 0-1.6-1.3c-7.8-7.1-9-8.8-12.2-14.6c-.6-1.1-.2.2-.2.3c3.2 6.9 8.3 12.9 11.3 17.1c2 2.8 2.3 2.7 2.2 3c-.1.3-4.8-1.9-5-2c-2.3-1.2.8.6 3.7 6c.3.6-.8.8-2.1 1.8c-.5.3-.8.9-3.1-1.1c-2.2-1.9-2.6-2.9-2.8-3c0 0-.4.1.5 1.9c1.6 3.3-1.4-1.3-1.6-1.7c-1.2-2 .5-3.3-.2-7.5c-.1-.6.6.2.8.4c.6.5-.1 6.1.5 4.4c.7-1.8.6-4.8 3.4-3.8c0 0 1.3.5.4-.2c-5.7-4.4-6.9-3.8-10.1-13.6c-1.5-4.7-3.2-11.9-3.2-11.9c.5-.6 1.3 4.7 2.1 5.6Zm58.3 78c-.5.8-.8 1.3-1.5.3c-1.3-1.9-.1-4.1 1.5-2.4c.4.4.4.1.8-.3c.4-.5 1.2-.7 1.8.2c.5.8 1.1-1.6 2.3-.3c.4.4.2.9.7.5c1.1-.9 1.6-1.1 2.1.2c.4 1-.7 3.5-1.6 2.4c-.7-.8-.6-1.7-1-1c-1.3 2.7-1.9-.4-2.3-.2c0 0-1.1 2.5-2.1.3c0 0-.3-.6-.4-.3c-.1.3-.1.3-.3.6Zm56.6-51.5c-1.2 1.7-4.5 5.1-5.5 4.4c-1.4-.9-1.4-.8-2.5-1.5c-.5-.3 2.1-4.2 4.2-6.5c.8-.8-.7.2-4.4 1.6c-.1 0-1.6.8-1 .1c1.2-1.5 12.1-15.7 13.4-19.9c1-3.1-.8 2.2-5.8 8c-3.3 3.8-7.1 6.8-8.1 7.8c-.7.7.3-1.4 1-4.4c.2-.7.3-1.4-.4-1.3c-5.6.2-9.2 2-7.5.7c1.3-.9 4.3-3.6 8.3-5.6c2.5-1.2-5.3 1.1-6.7 1.8c-.1 0-1.8.9-.8 0c1.1-.9 6.7-6.3 13.3-9c5.2-2.1-6.8 1.6-10.3 3.3c-.1 0-1.9.9-.9.1c3.3-2.7 7-6.4 11.8-9.4c.6-.4.1-.5.1-.4c-8.6 4-8.8 5.3-8.9 4.6c-.1-.4 18.7-26.9 20.3-21.6c.4 1.4 1 3.4-1.6 17.6c-.5 2.7-1.3 5.9-.4 3.4c1.5-4.2 2.7-9.8 1.9-5.4c-.1.6-2.5 9.6-2.9 10.8c-3.2 10.4-4.8 10.2-9.4 13.8c-.3.2-1.2.8-1.2 1c.3.7 2.1-2 3.3 1.4c.3.9 1 3.5 1 2.1c-.1-3.6-.3-3.8.5-4.5c0 0 .7-.6.5 0c-.7 3.4 1.3 5.2-.4 7.8c-.1.1-3.1 4.7-1.3 1.3c.5-.9.5-.9.6-1.9l-.2 0Zm-68.7 15.7c.8 1.8 3.8 7.8-4.8 10.7c-11.3 3.8-19.3-11.9-9.1-16.7c.9-.4 9-3.4 13.9 6.1Zm-9.5 5.1c.1.2 1.1 3.4 1.7 2.6c3.5-5 .1-11.4-.4-10.7c-1 1.5-.5 1.6-.2 1.8c.7.6.1 1.8-.7 1.7c-.7 0-.7.5-.7 1.9c0 1 .3 2.4.4 2.6Zm10.6-18.2c-.6-.2-.4-3-4.5-11.8c-.2-.5-2.8-5.3-1.3-3.2c2.2 3.2 5.3 10.3 5.9 14.9l-.1.1Zm27.8 51.8c-.1.3-1 3.9-3.2 6.5c-.9 1.1.4-.9-.9-9.1c-.3-1.6-.6-2 0-1.9c4.5.9 4.6 1.1 4.6 1.4c0 .4-.5 2.8-.5 3.1Zm-10.1 29.7c.5.1 3.5.4 5.7-.8c4.7-2.7 2.7-7 7.3-15.8c4.9-9.2 9.6-14.1 8.3-11.9c-2.6 4.1-2.8 4-8.6 17c-4.4 9.9-3.6 12.1-9.9 12.9c-2 .3.9.3.9.3c.8 0-2.3 1.9-2.8 2.1c-6.4 3-10.9-1-12.1-1.7c-.9-.5.8-.4.8-.4c0 0 .9-.2 0-.4c-.5-.1-3.8-.5-5.3-2.5c-1-1.2-8.1-20.3-12.8-26.9c0-.1-1.5-2.1-.2-.8c3.1 3.2 7.1 10.3 7.6 11.3c5 8.9 2.6 10.1 5.8 15c2.9 4.3 10 1.9 7.4 3c-.3.6.4.1 8.2.2c-.1-.2-.1-.2-.3-.3l-.1-.3Zm7.6-16c-1.2 1.3-1.6.2-1.5-.1c.6-3.9 2.2-3.7 2.5-2.9c.6 1.7-.5 2.4-1 3.1Zm2.7-7.1c0 .3.4 2.7-1 3.3c-.6.3-.6-.5-1.2-.3c-1.8.5.1-1.6 1.3-3.5c0 0 .3-.5.6-.3c.1.1.3.9.4.9Zm-21.7-9.7c0-.1-.4-1.2-.3-1.6c0-.1.2-.4 1.5-.6c.9-.1 1.6.9 1.4 1.5c-.1.2-1.2 3.1-1.2 3.1c-.2.1-.2 0-1.3-2.5Zm12.8-.8c-.1-2 2.4-1.2 2.7-1.1c.8.3-1 4.1-1.3 4.3c-.3.1-.2-.1-1.4-3.2Zm-17.9 10.6c0 .1 2.7 3.1.9 2.8c-.8-.1-.9.7-1.5.1c-1.1-1.1-.8-2.8-.7-3.1c.4-2.1 1.2-.1 1.3.1Zm7.5 17.9c.2-1.5.8-1.9 1.2-1.3c.3.5.2.5.4 1c.3.5.7-1.8 1.5-.6c.3.5.5.5.8 0c.4-.5.5-.1 1 .4c.4.4.4 0 .8-.4c.4-.5.5-.1.9.4c.4.4.9-1.7 1.6-.2c.6 1.1.7-1.4 1.4-.8c1.4 1.4 0 3.7-1 2.2c-.3-.5-.4 0-.8.3c-.7.4-.8-.6-1.4-.1c-.9.7-1.1-.5-1.5-.2c-.6.5-.7.5-1.3.1c-.4-.2-.8.9-1.5 0c-.5-.6-.5.1-.9.3c-.9.5-1.2-1-1.3-1.1Zm-.8-8.9c.2 0 .2 0 .2 0c.2.3.1.3.2.4c1.6 3.7 8.6 5.1 11.1-.1c.8-1.7.2.4.2.4c-1.7 4.1-5.2 3.7-6.3 3.7c-4.3-.1-5.3-3.9-5.5-4.5Z"/></symbol>
+<symbol id="i-globe" viewBox="0 0 200 121"><path fill="currentColor" fill-rule="evenodd" d="M99.9.4c54.9 0 99.6 26.9 99.6 60c0 33.1-44.6 60-99.6 60c-54.9 0-99.6-26.9-99.6-60c0-33.1 44.6-60 99.6-60Zm0 115.4c31.4 0 59.2-8.8 76.4-22.2c11.9-9.3 18.8-20.8 18.8-33.2c0-12.4-6.9-23.9-18.8-33.2c-17.2-13.4-45-22.2-76.4-22.2c-31.4 0-59.2 8.8-76.4 22.2c-11.9 9.3-18.8 20.8-18.8 33.2c0 12.4 6.9 23.9 18.8 33.2c17.2 13.4 45 22.2 76.4 22.2Zm40.8-10.2c17.6-9.8 29.2-25.9 29.7-43.9l20-.4c-.3 10.7-6.7 20.5-17 28.5c-8.5 6.6-19.7 12-32.7 15.7Zm-74.3-43.1c4.6.1 7.2.1 8.3.1c14.9.2 22.7.2 24.6.2c4.3 0 8.6 0 12.9-.1c4.9-.1 9.8-.1 14.8-.2l6.4-.1c-.4 16.1-5.8 30.3-14 39.2c-5.5 5.9-12.2 9.5-19.4 9.5c-7.3 0-14-3.6-19.4-9.5c-8.2-8.9-13.6-23.1-14-39.1Zm22.3 31.4c-.5 0-1 .1-1.6.2c-1.9.5-3.9 2.2-6.3 5.3l3.2 2.4c2-2.6 3.5-3.9 4.6-3.9c.3 0 .6.1.8.2c.5.3.7 1.2.7 2.6l2.7 1c5.1-7 8.1-12.9 9-17.9l5.2 11.4c.5 1.1 1.1 2 1.8 2.7c1.9 2.1 4.4 3.1 7.5 3.1l0-4c-1.7 0-3.2-.7-4.4-2c-.6-.8-1.2-1.8-1.6-3c-.4-1.3-.6-3-.6-5.3c0-2.3.5-4.6 1.6-6.9c.5-1.2 1.5-2.7 3-4.6l1.7-2.1c1.9-2.4 2.9-5 2.9-7.8l-4 0c0 1-.2 2.1-.7 3.3c-.5 1.1-1.5 2.7-3.2 4.7c-2.8 3.4-4.5 6.9-5 10.4l-5.1-11.2c-2.2-4.8-5.4-7.1-9.5-7.1c-2.4 0-4.4.7-5.7 2c-.7.6-1.1 1.4-1.5 2.2c-.3.9-.5 1.9-.5 3.1c0 1.2.4 2.4 1.1 3.5c.4.6 1.1 1.2 2.1 2c-.5.2-1 .4-1.4.7c-1.4 1-2 2.4-2 4.1c0 1.4.5 2.6 1.5 3.6c1 1 2.2 1.5 3.6 1.5c1.4 0 2.7-.5 3.7-1.5c1-1 1.5-2.2 1.5-3.7c0-1.6-.5-3-1.6-4.4c-.5-.6-.9-1.1-1.5-1.6c-.5-.5-1-.9-1.4-1.4c-.4-.5-.8-1-1.1-1.5c-.3-.5-.5-1.1-.5-1.9c0-.8.3-1.4.9-2c.6-.6 1.5-.9 2.8-.9c1.9 0 3.5.9 4.8 2.8c1.3 1.9 2 4.3 2 7.1c0 5-2 10.6-6 16.6c-.7-1.3-1.9-2-3.5-2Zm0-12c.3 0 .6.1.9.4c.2.2.4.5.4.9c0 .3-.1.6-.4.9c-.2.2-.5.4-.9.4c-.3 0-.6-.1-.9-.4c-.2-.2-.4-.5-.4-.9c0-.3.1-.6.4-.9c.2-.2.5-.4.9-.4Zm29.6 27.1c1.6-1.3 3.1-2.7 4.5-4.2c8.9-9.7 14.9-25.1 15.3-42.5l27.5-.5c-.8 22.6-20.6 41.3-47.4 47.3Zm-84.1-47.2l15 .3c4.9.1 9.1.2 12.5.2c.4 17.4 6.4 32.8 15.3 42.4c1.4 1.6 3 3 4.5 4.2c-26.7-6-46.5-24.7-47.4-47.2Zm156.2-2.4l-20-.4c-.6-18-12.1-34-29.7-43.8c13 3.7 24.2 9.1 32.7 15.7c10.3 8 16.6 17.8 17 28.4Zm-24.7-.4l-27.5-.5c-.4-17.4-6.4-32.8-15.3-42.4c-1.4-1.6-3-3-4.5-4.2c26.7 6 46.5 24.6 47.4 47.2Zm-106.6-43.7c-17.6 9.8-29.2 25.8-29.7 43.8l-20 .4c.4-10.7 6.7-20.4 17-28.5c8.5-6.6 19.7-12 32.7-15.7Zm22.4-3.5c-1.6 1.3-3.1 2.7-4.5 4.2c-8.9 9.7-14.9 25-15.3 42.4l-27.5.5c.8-22.5 20.6-41.2 47.4-47.2Zm51.9 46.6l-6.4-.1c-4.9-.1-9.8-.1-14.8-.2c-4.3 0-8.6-.1-12.9-.1c-4 0-8 0-12 .1c-1.8 0-8.4.1-20.9.3c.4-16 5.8-30.2 14-39.1c5.5-5.9 12.2-9.5 19.4-9.5c7.3 0 14 3.6 19.4 9.5c8.2 8.9 13.6 23.1 14 39.1Zm-48.4-17.3l-3.2 2.4c1.4 1.9 2.8 3.6 4.3 5c4.4 4.2 9.4 6.3 15 6.3c5 0 9.1-1.3 12.3-3.9c1.5-1.2 2.6-2.6 3.5-4.2c.8-1.6 1.2-3.3 1.2-5.2c0-3.1-.9-5.5-2.6-7.2c-1.4-1.3-3.1-2-5-2c-1.8 0-3.6.5-5.4 1.6c-.8.5-1.5 1-2.2 1.5c-.7.5-1.4 1-2.2 1.5c-1.8 1.1-3.6 1.6-5.5 1.6c-2.3 0-4.2-.7-5.7-2c-1.7-1.5-2.5-3.6-2.5-6.2c0-2 .7-3.6 2-5c.7-.7 1.6-1.3 2.6-1.7c1.1-.4 2.3-.6 3.6-.6c1.3 0 2.5.2 3.7.7c1.2.4 2.7 1.3 4.4 2.7c2.9 2.2 5.6 3.3 7.9 3.3c2 0 3.6-.4 4.7-1.3c.6-.4 1.1-1 1.4-1.7c.3-.7.5-1.6.5-2.8c0-1.2-.5-2.3-1.5-3.3c-.5-.5-1-.8-1.6-1.1c-.6-.3-1.3-.4-2.1-.4c-.8 0-1.4.2-2 .5c-1.8.9-2.7 2.7-2.7 5.3c-.5-.3-1.1-.7-1.6-1.1l-1.6-1.3c-.6-.5-1.2-.9-1.8-1.3c-2.2-1.5-4.7-2.2-7.4-2.2c-4.2 0-7.4 1.2-9.6 3.6c-1.9 2.1-2.9 4.6-2.9 7.6c0 3.9 1.2 7 3.7 9.2c1.1 1 2.4 1.7 3.9 2.2c1.5.5 3.2.7 5.2.7c2 0 4-.5 6-1.6c.8-.5 1.6-1 2.4-1.5c.7-.5 1.4-1.1 2-1.5c.7-.5 1.3-.8 2-1.2c.7-.3 1.5-.5 2.3-.5c.9 0 1.7.4 2.4 1.2c.8.9 1.3 2.3 1.3 4.1c0 2.6-1.2 4.8-3.6 6.6c-2.5 1.8-5.6 2.7-9.4 2.7c-6.1 0-11.4-3.2-16.1-9.7Zm27.7-18c.3 0 .6.1.9.4c.2.2.4.5.4.9c0 .3-.1.6-.4.9c-.2.2-.5.4-.9.4c-.3 0-.6-.1-.9-.4c-.2-.2-.4-.5-.4-.9c0-.3.1-.6.4-.9c.2-.2.5-.4.9-.4Zm-103.2 38.3l20 .4c.6 18 12.1 34 29.7 43.8c-13-3.7-24.2-9.1-32.7-15.7c-10.3-8-16.6-17.8-17-28.5Z"/></symbol>
+<symbol id="i-vol" viewBox="0 0 124 89"><path fill="currentColor" fill-rule="evenodd" d="M57.6 85.8l-.8-.1c-2.2-.6-14.3-12-26.4-22.1c-2.6-2.2-3.1-1.1-24-1.2c-5.8 0-4.9-3.2-4.9-14.6c0-20.6-.3-21.2 1.9-22.5c2.2-1.3 22.4-.2 25.6-.6c.9-.1 17.5-14.9 25.9-22.1c1.5-1.3 4.4-1.8 6.1 1.1c.5.9.5 1 .5 63.6c0 16 .7 18.1-3.9 18.5Zm44-46.6c-1.4-15-7-23.9-11.7-30.2c-4.1-5.5 2.2-8.8 5.2-6c6 5.5 28.9 43.4 1.1 80.5c-3.8 5.1-9.9.4-6.2-4.7c10.3-14.2 12.3-24.6 11.7-39.6Zm-7.1 13.3c-.4 1.8-2.7 14-9.2 21.4c-3 3.5-9.5.2-5.7-5.4c3-4.5 16.4-25.4-.3-49.8c-3.3-4.8 2.7-9.9 6.7-4.1c12.4 18 8.8 35.4 8.5 37.8Zm-15.2-15.7c.2 1.6 3 12.7-4.2 25c-3.3 5.6-9.6 1.3-7-3.5c10.3-18.8-1.7-27.9-.7-32c.9-3.8 5.4-4.2 7.3-1.1c3.2 5.3 4 9.2 4.6 11.6Z"/></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2m0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20m4.4-5.9c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5 0a6.6 6.6 0 0 1-3.3-2.9c-.2-.3 0-.4.2-.6l.4-.5.2-.4v-.5l-.8-1.8c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4a2.9 2.9 0 0 0-.9 2.1c0 1.2.9 2.4 1 2.6.1.2 1.8 2.8 4.4 3.9a5 5 0 0 0 2.3.5 2 2 0 0 0 1.3-.9 1.6 1.6 0 0 0 .1-.9c-.1-.1-.3-.2-.5-.3"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 18"><path fill="currentColor" fill-rule="evenodd" d="M2 0h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m10 9.6L21.5 2H2.5zm0 2.5L2 4v12h20V4z"/></symbol>
+</svg>
+
 <!-- camadas do fundo (as imagens são sorteadas pelo JS no fim do arquivo) -->
 <div class="fundo-clip" aria-hidden="true"><div class="fundo"><img class="f1" alt="" decoding="async"><img class="f2" alt="" decoding="async"></div></div>
 
-<!-- HERO (capa do topo): logo + linha de função + botão de idioma -->
-<div class="hero" id="top">
-  <h1 class="hero-overlay"><img src="img/cayo_gomes.webp" alt="Cayo Gomes" fetchpriority="high" decoding="async"></h1>
+<!-- HERO (capa do topo): logo + código de barras vertical da mesma altura + linha de função -->
+<header class="hero" id="top">
   <div class="wrap">
+    <div class="hero-row">
+      <h1 class="hero-logo"><img src="img/cayo_gomes.webp" width="1920" height="842" alt="Cayo Gomes" fetchpriority="high" decoding="async"></h1>
+      <div class="hero-barcode" aria-hidden="true">
+        <span class="bc-bars"></span>
+        <span class="bc-txt" data-i18n="soul"></span>
+      </div>
+    </div>
     <div class="sub">
       <span data-i18n="role"></span>
       <span class="right"><span>CG / 001</span><button id="lang" type="button" aria-label="Mudar idioma / Change language">EN</button></span>
     </div>
   </div>
-</div>
+</header>
 
 <!-- menu de abas (gerado pelo JS a partir do array AREAS) -->
 <div class="tabbar"><div class="wrap tabs" id="tabs" role="tablist"></div></div>
@@ -426,29 +523,89 @@ dialog[open]{animation:in .22s ease-out}
   <!-- painel de projetos (preenchido pelo JS) -->
   <div class="wrap"><section class="win area" id="panel" role="tabpanel"></section></div>
 
-  <!-- SEÇÃO SOBRE (os textos vêm do objeto UI, no fim do arquivo) -->
-  <div class="wrap home-sec">
+  <!-- SEÇÃO SOBRE + PLAYER HUD + CONTATO (estilo pôster promocional) -->
+  <div class="wrap home-sec home-grid">
     <section class="win about" id="sobre">
-      <div>
-        <p class="pitch-sm" data-i18n="pitch"></p>
-        <p data-i18n="about_p1"></p>
-        <p data-i18n="about_p2"></p>
+      <div class="about-main">
+        <p class="pitch-lg" data-i18n="pitch"></p>
+        <p class="about-copy" data-i18n="about_p1"></p>
+        <p class="about-copy" data-i18n="about_p2"></p>
+        <hr class="about-hr">
+        <ul class="svc" id="services"></ul>
       </div>
-      <ul class="svc" id="services"></ul>
+      <div class="about-side" aria-hidden="true">
+        <span class="win-ctl"><i></i><b></b></span>
+        <span class="vert-tag" data-i18n="water"></span>
+      </div>
     </section>
-  </div>
 
-  <!-- SEÇÃO CONTATO (edite o número do WhatsApp e o e-mail abaixo) -->
-  <div class="wrap" style="margin-top:1.2rem">
-    <section class="win contact" id="contato">
-      <h2 data-i18n="contact_h"></h2>
-      <p data-i18n="contact_p"></p>
-      <a class="big" href="https://wa.me/5524999283346" target="_blank" rel="noopener">WhatsApp 24 99928-3346</a>
-      <a class="big" href="mailto:cayogomes.99@gmail.com">cayogomes.99@gmail.com</a>
-      <span class="brk" data-i18n="quote"></span>
-    </section>
+    <div class="side-col">
+      <!-- SEÇÃO CONTATO (edite o número do WhatsApp e o e-mail abaixo) -->
+      <section class="win contact" id="contato">
+        <div class="bar"><span data-i18n="contact_bar"></span><span class="win-ctl" aria-hidden="true"><i></i><b></b></span></div>
+        <div class="contact-body">
+          <span class="hud-plus tr" aria-hidden="true"></span>
+          <span class="hud-plus bl" aria-hidden="true"></span>
+          <div class="contact-chev" aria-hidden="true"><svg viewBox="0 0 28 16"><path d="M1 2l13 6 13-6M1 8l13 6 13-6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></div>
+          <p data-i18n="contact_p"></p>
+          <a class="big wa" href="https://wa.me/5524999283346" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg><span>24 99928-3346</span></a>
+          <a class="big mail" href="mailto:cayogomes.99@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg><span>cayogomes.99@gmail.com</span></a>
+          <span class="brk" data-i18n="quote"></span>
+        </div>
+      </section>
+
+      <!-- PLAYER HUD (vetores extraídos de img/assets.svg) -->
+      <aside class="player-hud" aria-label="Playlist">
+        <div class="pl-wrap">
+          <div class="pl-list">
+            <button class="trk" type="button" data-pct="18"><strong>Roots Bloody Roots</strong><small>Sepultura - 3:33</small></button>
+            <button class="trk" type="button" data-pct="31"><strong>Bulls On Parade</strong><small><span class="trk-e">E</span>Rage Against The Machine - 3:50</small></button>
+            <button class="trk" type="button" data-pct="42"><strong>Linha de Frente</strong><small>Criolo - 4:31</small></button>
+            <button class="trk" type="button" data-pct="56"><strong>O Drama da Humana...</strong><small>El Efecto - 7:51</small></button>
+            <button class="trk" type="button" data-pct="70"><strong>Lucro</strong><small>BaianaSystem - 4:07</small></button>
+            <button class="trk on" type="button" data-pct="41"><strong>Cafeína</strong><small>Último Sopro - 3:33</small></button>
+          </div>
+          <svg class="pl-menu" aria-hidden="true"><use href="#i-list"/></svg>
+        </div>
+        <div class="pl-bar" aria-hidden="true"><span class="pl-fill"></span><span class="pl-knob"></span></div>
+        <div class="pl-btns">
+          <button class="pl-btn" type="button" data-pl="repeat" aria-label="Repetir"><svg class="pl-ico"><use href="#i-repeat"/></svg></button>
+          <button class="pl-btn" type="button" data-pl="prev" aria-label="Faixa anterior"><svg class="pl-ico"><use href="#i-prev"/></svg></button>
+          <button class="pl-btn main" type="button" data-pl="play" aria-label="Pausar ou continuar"><svg class="pl-ico"><use href="#i-pause"/></svg></button>
+          <button class="pl-btn" type="button" data-pl="next" aria-label="Próxima faixa"><svg class="pl-ico"><use href="#i-next"/></svg></button>
+          <button class="pl-btn" type="button" data-pl="shuffle" aria-label="Ordem aleatória"><svg class="pl-ico"><use href="#i-shuffle"/></svg></button>
+        </div>
+      </aside>
+    </div>
   </div>
 </main>
+
+<!-- RODAPÉ HUD (vetores extraídos de img/assets.svg) -->
+<footer class="wrap hud-ftr">
+  <div class="ftr-top">
+    <svg class="ftr-cat" aria-hidden="true"><use href="#i-cat"/></svg>
+    <div class="ftr-motto">
+      <span data-i18n="motto_1"></span>
+      <span data-i18n="motto_2"></span>
+    </div>
+    <svg class="ftr-globe" aria-hidden="true"><use href="#i-globe"/></svg>
+    <div class="ftr-vol" aria-hidden="true">
+      <span class="vol-pct">99%</span>
+      <div class="vol-row">
+        <svg class="ftr-spk"><use href="#i-vol"/></svg>
+        <div class="vol-track"><span class="vol-fill"></span><span class="vol-knob"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ftr-bot">
+    <span class="ftr-place" data-i18n="place"></span>
+    <span class="ftr-line" aria-hidden="true"></span>
+    <div class="ftr-scan" aria-hidden="true">
+      <span class="scan-bars"></span>
+      <span class="scan-txt" data-i18n="scan"></span>
+    </div>
+  </div>
+</footer>
 
 <!-- projetos (gerado pelo painel) + demais textos -->
 <script src="conteudo/projetos.js"></script>
@@ -624,7 +781,9 @@ function renderPainel(soGrade){
         .map(c => `<button class="chip" type="button" data-c="${esc(c.id)}" aria-pressed="${c.id === filter}">${esc(c.name)}</button>`).join("") + `</div>`
     : "";
   $("#panel").innerHTML = `
-    <div class="bar"><span>${esc(tr(a.name)).toUpperCase()} / ${pad(i + 1)}</span><i aria-hidden="true">— ✕</i></div>
+    <div class="bar"><span>${esc(tr(a.name)).toUpperCase()} / ${pad(i + 1)}</span><span class="win-ctl" aria-hidden="true"><i></i><b></b></span></div>
+    <span class="hud-plus tr" aria-hidden="true" style="top:3.1rem"></span>
+    <span class="hud-plus bl" aria-hidden="true"></span>
     <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
     <div id="grade">${renderGradeHTML(a, list)}</div>`;
@@ -1103,6 +1262,38 @@ document.addEventListener("click", e => {
     lang = lang === "pt" ? "en" : "pt";
     try { localStorage.setItem("lang", lang); } catch(err){}
     render();
+    return;
+  }
+  const trk = e.target.closest(".trk");
+  if (trk) {
+    const hud = trk.closest(".player-hud");
+    hud.querySelectorAll(".trk").forEach(x => x.classList.toggle("on", x === trk));
+    hud.style.setProperty("--prog", (trk.dataset.pct || 41) + "%");
+    return;
+  }
+  const pb = e.target.closest("[data-pl]");
+  if (pb) {
+    const hud = pb.closest(".player-hud"), op = pb.dataset.pl;
+    if (op === "play") hud.classList.toggle("paused");
+    else if (op === "repeat" || op === "shuffle") pb.classList.toggle("lit");
+    else {
+      const list = [...hud.querySelectorAll(".trk")];
+      const idx = list.findIndex(x => x.classList.contains("on"));
+      const prox = list[(idx + (op === "next" ? 1 : -1) + list.length) % list.length];
+      if (prox) {
+        list.forEach(x => x.classList.toggle("on", x === prox));
+        hud.style.setProperty("--prog", (prox.dataset.pct || 41) + "%");
+      }
+    }
+    return;
+  }
+  const pbar = e.target.closest(".pl-bar");
+  if (pbar) {
+    const r = pbar.getBoundingClientRect();
+    if (r.width > 0) {
+      const pct = Math.max(4, Math.min(98, Math.round(((e.clientX - r.left) / r.width) * 100)));
+      pbar.closest(".player-hud").style.setProperty("--prog", pct + "%");
+    }
   }
 });
 /* imagem que o navegador não consegue mostrar (formato errado ou arquivo faltando)

@@ -68,6 +68,9 @@ const SERVICES = {
    prev/next/play/model3d/media/media_error: galeria do projeto aberto. */
 const UI = {
   pt:{ all:"Todos", filters:"Filtrar projetos", role:"ARTISTA DIGITAL / DESIGNER GRÁFICO / MODELADOR 3D",
+       soul:"VENDE-SE A ALMA", water:"GASTO MENOS ÁGUA QUE VOCÊ",
+       motto_1:"Algoritmo produz imagens", motto_2:"Humanos produzem arte",
+       place:"PETRÓPOLIS — RIO DE JANEIRO — BR", contact_bar:"CONTATO / 002", scan:"ESCANEIE",
        pitch:"Ideias ganham forma. Marcas ganham identidade.",
        about_p1:"Sou o Cayo, artista digital de Petrópolis, no Rio de Janeiro. Trabalho com modelagem 3D e design gráfico, e levo o mesmo clima sombrio e artesanal pras duas áreas.",
        about_p2:"Também experimento outras linguagens, então este site cresce com o meu trabalho. Se você tem uma ideia, me conte.",
@@ -77,6 +80,9 @@ const UI = {
        media:"Mídia", media_error:"Mídia indisponível",
        empty:"Nenhum projeto publicado ainda." },
   en:{ all:"All", filters:"Filter projects", role:"DIGITAL ARTIST / GRAPHIC DESIGNER / 3D MODELER",
+       soul:"SOUL FOR SALE", water:"I USE LESS WATER THAN YOU",
+       motto_1:"Algorithms produce images", motto_2:"Humans produce art",
+       place:"PETRÓPOLIS — RIO DE JANEIRO — BR", contact_bar:"CONTACT / 002", scan:"SCAN",
        pitch:"Ideas take shape. Brands gain identity.",
        about_p1:"I’m Cayo, a digital artist from Petrópolis, Rio de Janeiro. I work in 3D modeling and graphic design, and bring the same dark, handcrafted mood to both.",
        about_p2:"I also experiment with other mediums, so this site grows along with my work. If you have an idea, tell me about it.",
