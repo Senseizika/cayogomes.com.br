@@ -56,13 +56,9 @@
   /* ---------- TEXTURA DO VIDRO + MEDIDAS DO FUNDO E HERO ---------- */
   --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.055'/></svg>");
   /* SCAN LINES do vidro: 2px claro + 2px escuro a cada 6px */
-  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 2px,rgba(0,0,0,.22) 2px 4px,transparent 4px 6px);
+  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 2px,rgba(0,0,0,.18) 2px 4px,transparent 4px 6px);
   /* ruído fino do CRT (grão menor e mais denso que o --grao) */
   --ruido:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='90' height='90' filter='url(%23n)' opacity='.22'/></svg>");
-  /* fósforo aceso no centro: sem isso a vinheta não lê como vinheta (só escurece o que já é quase preto) */
-  --brilho:radial-gradient(74% 66% at 50% 45%,rgba(255,255,255,.10) 0%,rgba(255,255,255,.055) 40%,rgba(255,255,255,.015) 68%,transparent 86%);
-  /* vinheta: escurece as bordas, deixando as linhas mais visíveis no centro */
-  --vinheta:radial-gradient(62% 58% at 50% 46%,transparent 32%,rgba(0,0,0,.24) 62%,rgba(0,0,0,.58) 100%);
   --fundo-h:133.34vw;          /* altura das camadas de fundo */
   --camada:.6;                 /* opacidade da 2ª camada */
   --hero-h:max(200px,35vh);    /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
@@ -86,15 +82,13 @@ a{color:inherit}
   position:relative;
   background-color:rgba(7,9,13,.70);
   background-image:
-    var(--vinheta),
     var(--scan),
-    var(--brilho),
     var(--ruido),
     linear-gradient(132deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.022) 26%,transparent 48%),
     linear-gradient(160deg,rgba(18,22,30,.20),rgba(4,5,8,.66) 72%),
     var(--grao);
-  background-size:auto,auto,auto,90px 90px,auto,auto,140px 140px;
-  background-blend-mode:normal,normal,screen,overlay,screen,normal,overlay;
+  background-size:auto,90px 90px,auto,auto,140px 140px;
+  background-blend-mode:normal,overlay,screen,normal,overlay;
   border:0;
   border-radius:16px;
   overflow:hidden;
@@ -109,24 +103,31 @@ a{color:inherit}
 .win::before{
   inset:0;z-index:3;mix-blend-mode:screen;
   background:
-    radial-gradient(20px 20px at 5px 5px,rgba(255,255,255,.12),transparent 70%),
-    radial-gradient(18px 18px at calc(100% - 5px) calc(100% - 5px),rgba(255,255,255,.08),transparent 70%);
+    radial-gradient(30px 18px at 5px 2px,rgba(255,255,255,.10),transparent 74%),
+    radial-gradient(22px 16px at calc(100% - 5px) calc(100% - 2px),rgba(255,255,255,.07),transparent 74%);
 }
-/* crista especular fina e dura (superfície lisa, roughness ~0): banda de ~2px a 3px da borda */
+/* crista especular fina e dura (superfície lisa, roughness ~0): banda colada na borda, ~1,5px a 2px */
 .win::after{
   /* banda a mesma distância da borda nas retas e nas curvas (evita degrau na junção) */
-  --bvr:#0000 12.1px,rgba(0,0,0,.45) 12.6px,#000 13.1px 13.7px,rgba(0,0,0,.45) 14.2px,#0000 14.7px;
-  --bvl:#0000 1.2px,rgba(0,0,0,.45) 1.7px,#000 2.2px 2.8px,rgba(0,0,0,.45) 3.3px,#0000 3.9px;
+  --bvr:#0000 12.9px,rgba(0,0,0,.45) 13.5px,#000 14px 14.5px,rgba(0,0,0,.45) 14.9px,#0000 15.4px;
+  --bvl:#0000 .6px,rgba(0,0,0,.45) 1.1px,#000 1.5px 2px,rgba(0,0,0,.45) 2.5px,#0000 3.1px;
   inset:0;z-index:4;mix-blend-mode:screen;
+  /* desalinho mínimo em relação à borda: o brilho flutua mais no topo e encosta embaixo (nada de anel perfeito) */
+  transform:translateY(.5px);
   background:
-    /* quinas: foco curto, sem correr pela lateral inteira */
-    radial-gradient(9px 9px at 5px 5px,#fff 0 72%,rgba(255,255,255,.55) 86%,transparent),
-    radial-gradient(42px 42px at 4px 4px,#fff 0 34%,rgba(255,255,255,.80) 52%,rgba(255,255,255,.20) 72%,transparent 82%),
-    radial-gradient(38px 38px at calc(100% - 4px) calc(100% - 4px),#fff 0 24%,rgba(255,255,255,.55) 48%,rgba(255,255,255,.10) 72%,transparent 86%),
-    radial-gradient(30px 30px at calc(100% - 4px) 4px,rgba(255,255,255,.58),rgba(255,255,255,.08) 62%,transparent 84%),
-    radial-gradient(30px 30px at 4px calc(100% - 4px),rgba(255,255,255,.52),rgba(255,255,255,.07) 62%,transparent 84%),
+    /* quina TL: brilho curto grudado no alto (não no meio da curva) + rastro comprido na aresta de cima */
+    radial-gradient(11px 9px at 8px 2px,#fff 0 58%,rgba(255,255,255,.55) 76%,transparent 94%),
+    radial-gradient(92px 26px at 7px 2px,#fff 0 18%,rgba(255,255,255,.75) 40%,rgba(255,255,255,.18) 70%,transparent 88%),
+    radial-gradient(22px 76px at 2px 9px,rgba(255,255,255,.50),rgba(255,255,255,.10) 55%,transparent 84%),
+    /* quina TR: mais fraca e deslocada pra fora, escorrendo pela aresta de cima */
+    radial-gradient(58px 22px at calc(100% - 6px) 2px,rgba(255,255,255,.50),rgba(255,255,255,.08) 62%,transparent 86%),
+    radial-gradient(20px 40px at calc(100% - 2px) 4px,rgba(255,255,255,.28),transparent 84%),
+    /* quina BR: contraluz curto e torto */
+    radial-gradient(46px 22px at calc(100% - 5px) calc(100% - 2px),rgba(255,255,255,.36),rgba(255,255,255,.06) 64%,transparent 86%),
+    /* quina BL: quase nada, só um respingo */
+    radial-gradient(38px 20px at 5px calc(100% - 2px),rgba(255,255,255,.28),transparent 84%),
     /* fio mínimo em toda a aresta (só pra silhueta não sumir no meio do lado) */
-    linear-gradient(rgba(255,255,255,.13),rgba(255,255,255,.13));
+    linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.11));
   -webkit-mask:
     radial-gradient(circle at 16px 16px,var(--bvr)) 0 0/16px 16px no-repeat,
     radial-gradient(circle at 0 16px,var(--bvr)) 100% 0/16px 16px no-repeat,
@@ -326,18 +327,16 @@ a{color:inherit}
 /* projeto aberto */
 dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:rgba(7,9,13,.93);color:var(--white);border:0;border-radius:16px;padding:0;margin:auto;
   background-image:
-    var(--vinheta),
     var(--scan),
-    var(--brilho),
     var(--ruido),
-    radial-gradient(54px 54px at 3px 3px,rgba(255,255,255,.50),rgba(255,255,255,.10) 58%,transparent 82%),
-    radial-gradient(46px 46px at calc(100% - 3px) calc(100% - 3px),rgba(255,255,255,.32),transparent 82%),
+    radial-gradient(58px 26px at 3px 2px,rgba(255,255,255,.46),rgba(255,255,255,.10) 60%,transparent 86%),
+    radial-gradient(48px 24px at calc(100% - 3px) calc(100% - 2px),rgba(255,255,255,.30),transparent 86%),
     linear-gradient(132deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.02) 26%,transparent 48%),
     linear-gradient(160deg,rgba(18,22,30,.20),rgba(4,5,8,.66) 72%),
     var(--grao);
-  background-size:auto,auto,auto,90px 90px,auto,auto,auto,auto,140px 140px;
-  background-blend-mode:normal,normal,screen,overlay,screen,screen,screen,normal,overlay;
-  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 2.2px rgba(255,255,255,.12)}
+  background-size:auto,90px 90px,auto,auto,auto,auto,140px 140px;
+  background-blend-mode:normal,overlay,screen,screen,screen,normal,overlay;
+  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 1.6px rgba(255,255,255,.11)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
