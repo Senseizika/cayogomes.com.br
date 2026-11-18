@@ -55,8 +55,15 @@
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;/* números/rótulos */
   /* ---------- TEXTURA DO VIDRO + MEDIDAS DO FUNDO E HERO ---------- */
   --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.055'/></svg>");
-  /* SCAN LINES do vidro: 1px claro + 1px escuro a cada 3px (ajuste espessura/opacidade aqui) */
-  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 2px,rgba(0,0,0,.22) 2px 4px,transparent 4px 6px);
+  /* SCAN LINES do vidro: 3px claro + 3px escuro a cada 9px */
+  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 3px,rgba(0,0,0,.22) 3px 6px,transparent 6px 9px);
+  /* franjas de aberração cromática: 1px vermelho acima e 1px azul abaixo de cada linha */
+  --scan-r:repeating-linear-gradient(180deg,transparent 0 8px,rgba(255,70,70,.14) 8px 9px);
+  --scan-b:repeating-linear-gradient(180deg,transparent 0 3px,rgba(70,150,255,.14) 3px 4px,transparent 4px 9px);
+  /* ruído fino do CRT (grão menor e mais denso que o --grao) */
+  --ruido:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='90' height='90' filter='url(%23n)' opacity='.22'/></svg>");
+  /* vinheta: escurece as bordas, deixando as linhas mais visíveis no centro */
+  --vinheta:radial-gradient(118% 96% at 50% 46%,transparent 58%,rgba(0,0,0,.20) 84%,rgba(0,0,0,.42) 100%);
   --fundo-h:133.34vw;          /* altura das camadas de fundo */
   --camada:.6;                 /* opacidade da 2ª camada */
   --hero-h:max(200px,35vh);    /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
@@ -80,12 +87,16 @@ a{color:inherit}
   position:relative;
   background-color:rgba(7,9,13,.70);
   background-image:
+    var(--vinheta),
+    var(--scan-r),
+    var(--scan-b),
     var(--scan),
+    var(--ruido),
     linear-gradient(132deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.022) 26%,transparent 48%),
     linear-gradient(160deg,rgba(18,22,30,.20),rgba(4,5,8,.66) 72%),
     var(--grao);
-  background-size:auto,auto,auto,140px 140px;
-  background-blend-mode:normal,screen,normal,overlay;
+  background-size:auto,auto,auto,auto,90px 90px,auto,auto,140px 140px;
+  background-blend-mode:normal,screen,screen,normal,overlay,screen,normal,overlay;
   border:0;
   border-radius:16px;
   overflow:hidden;
@@ -317,14 +328,18 @@ a{color:inherit}
 /* projeto aberto */
 dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:rgba(7,9,13,.93);color:var(--white);border:0;border-radius:16px;padding:0;margin:auto;
   background-image:
+    var(--vinheta),
+    var(--scan-r),
+    var(--scan-b),
+    var(--scan),
+    var(--ruido),
     radial-gradient(54px 54px at 3px 3px,rgba(255,255,255,.50),rgba(255,255,255,.10) 58%,transparent 82%),
     radial-gradient(46px 46px at calc(100% - 3px) calc(100% - 3px),rgba(255,255,255,.32),transparent 82%),
-    var(--scan),
     linear-gradient(132deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.02) 26%,transparent 48%),
     linear-gradient(160deg,rgba(18,22,30,.20),rgba(4,5,8,.66) 72%),
     var(--grao);
-  background-size:auto,auto,auto,auto,auto,140px 140px;
-  background-blend-mode:screen,screen,normal,screen,normal,overlay;
+  background-size:auto,auto,auto,auto,90px 90px,auto,auto,auto,auto,140px 140px;
+  background-blend-mode:normal,screen,screen,normal,overlay,screen,screen,screen,normal,overlay;
   box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 2.2px rgba(255,255,255,.12)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
