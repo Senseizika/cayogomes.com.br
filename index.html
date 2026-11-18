@@ -93,30 +93,31 @@ a{color:inherit}
     0 22px 54px rgba(0,0,0,.66),
     0 2px 8px rgba(0,0,0,.52),
     inset 0 0 0 1px rgba(0,0,0,.92),
-    inset 0 0 5px 1.5px rgba(0,0,0,.82);
+    inset 0 0 2.5px .8px rgba(0,0,0,.82);
 }
 .win::before,.win::after{content:"";position:absolute;border-radius:inherit;pointer-events:none}
-/* bloom óptico curto do reflexo glossy nos cantos (dá brilho de vidro polido sem esbranquiçar o painel) */
+/* respiro mínimo atrás do reflexo (só pra o brilho não parecer recortado) */
 .win::before{
   inset:0;z-index:3;mix-blend-mode:screen;
   background:
-    radial-gradient(36px 36px at 5px 5px,rgba(255,255,255,.24),transparent 74%),
-    radial-gradient(32px 32px at calc(100% - 5px) calc(100% - 5px),rgba(255,255,255,.15),transparent 74%);
+    radial-gradient(20px 20px at 5px 5px,rgba(255,255,255,.12),transparent 70%),
+    radial-gradient(18px 18px at calc(100% - 5px) calc(100% - 5px),rgba(255,255,255,.08),transparent 70%);
 }
-/* crista especular abaulada fina (~4.2px para dentro da borda) com specular forte */
+/* crista especular fina e dura (superfície lisa, roughness ~0): banda de ~2px a 3px da borda */
 .win::after{
-  --bvr:#0000 7.8px,rgba(0,0,0,.20) 9.4px,rgba(0,0,0,.72) 10.8px,#000 11.5px 12px,rgba(0,0,0,.78) 12.5px,rgba(0,0,0,.22) 13.4px,#0000 14.4px;
-  --bvl:#0000 1.6px,rgba(0,0,0,.22) 2.6px,rgba(0,0,0,.78) 3.5px,#000 4px 4.5px,rgba(0,0,0,.72) 5.2px,rgba(0,0,0,.20) 6.6px,#0000 8.2px;
+  --bvr:#0000 8.8px,rgba(0,0,0,.55) 9.6px,#000 10.1px 10.9px,rgba(0,0,0,.55) 11.7px,#0000 12.4px;
+  --bvl:#0000 1.1px,rgba(0,0,0,.45) 1.7px,#000 2.3px 3px,rgba(0,0,0,.45) 3.6px,#0000 4.3px;
   inset:0;z-index:4;mix-blend-mode:screen;
   background:
-    radial-gradient(64px 64px at 4px 4px,#fff 0 28%,rgba(255,255,255,.88) 48%,rgba(255,255,255,.38) 76%,transparent),
-    radial-gradient(58px 58px at calc(100% - 4px) calc(100% - 4px),#fff 0 18%,rgba(255,255,255,.72) 45%,rgba(255,255,255,.24) 76%,transparent),
-    radial-gradient(44px 44px at calc(100% - 4px) 4px,rgba(255,255,255,.52),rgba(255,255,255,.16) 60%,transparent),
-    radial-gradient(44px 44px at 4px calc(100% - 4px),rgba(255,255,255,.48),rgba(255,255,255,.14) 60%,transparent),
-    linear-gradient(90deg,rgba(255,255,255,.46) 0 10px,transparent 14px),
-    linear-gradient(180deg,rgba(255,255,255,.34) 0 10px,transparent 14px),
-    linear-gradient(270deg,rgba(255,255,255,.18) 0 10px,transparent 14px),
-    linear-gradient(0deg,rgba(255,255,255,.22) 0 10px,transparent 14px);
+    radial-gradient(9px 9px at 5px 5px,#fff 0 72%,rgba(255,255,255,.55) 86%,transparent),
+    radial-gradient(34px 34px at 4px 4px,#fff 0 40%,rgba(255,255,255,.85) 58%,rgba(255,255,255,.25) 74%,transparent 84%),
+    radial-gradient(30px 30px at calc(100% - 4px) calc(100% - 4px),#fff 0 26%,rgba(255,255,255,.60) 52%,rgba(255,255,255,.12) 76%,transparent 88%),
+    radial-gradient(24px 24px at calc(100% - 4px) 4px,rgba(255,255,255,.62),rgba(255,255,255,.10) 66%,transparent 86%),
+    radial-gradient(24px 24px at 4px calc(100% - 4px),rgba(255,255,255,.55),rgba(255,255,255,.08) 66%,transparent 86%),
+    linear-gradient(90deg,rgba(255,255,255,.60) 0 4px,transparent 8px),
+    linear-gradient(180deg,rgba(255,255,255,.50) 0 4px,transparent 8px),
+    linear-gradient(270deg,rgba(255,255,255,.25) 0 4px,transparent 8px),
+    linear-gradient(0deg,rgba(255,255,255,.30) 0 4px,transparent 8px);
   -webkit-mask:
     radial-gradient(circle at 16px 16px,var(--bvr)) 0 0/16px 16px no-repeat,
     radial-gradient(circle at 0 16px,var(--bvr)) 100% 0/16px 16px no-repeat,
@@ -322,7 +323,7 @@ dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-
     var(--grao);
   background-size:auto,auto,auto,140px 140px;
   background-blend-mode:normal,screen,normal,overlay;
-  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 5px 1.5px rgba(0,0,0,.82),inset 0 0 0 4.2px rgba(255,255,255,.16)}
+  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 2.4px rgba(255,255,255,.22)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
