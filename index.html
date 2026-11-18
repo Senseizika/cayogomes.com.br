@@ -105,19 +105,19 @@ a{color:inherit}
 }
 /* crista especular fina e dura (superfície lisa, roughness ~0): banda de ~2px a 3px da borda */
 .win::after{
-  --bvr:#0000 8.8px,rgba(0,0,0,.55) 9.6px,#000 10.1px 10.9px,rgba(0,0,0,.55) 11.7px,#0000 12.4px;
-  --bvl:#0000 1.1px,rgba(0,0,0,.45) 1.7px,#000 2.3px 3px,rgba(0,0,0,.45) 3.6px,#0000 4.3px;
+  /* banda a mesma distância da borda nas retas e nas curvas (evita degrau na junção) */
+  --bvr:#0000 12.1px,rgba(0,0,0,.45) 12.6px,#000 13.1px 13.7px,rgba(0,0,0,.45) 14.2px,#0000 14.7px;
+  --bvl:#0000 1.2px,rgba(0,0,0,.45) 1.7px,#000 2.2px 2.8px,rgba(0,0,0,.45) 3.3px,#0000 3.9px;
   inset:0;z-index:4;mix-blend-mode:screen;
   background:
+    /* quinas: foco curto, sem correr pela lateral inteira */
     radial-gradient(9px 9px at 5px 5px,#fff 0 72%,rgba(255,255,255,.55) 86%,transparent),
-    radial-gradient(34px 34px at 4px 4px,#fff 0 40%,rgba(255,255,255,.85) 58%,rgba(255,255,255,.25) 74%,transparent 84%),
-    radial-gradient(30px 30px at calc(100% - 4px) calc(100% - 4px),#fff 0 26%,rgba(255,255,255,.60) 52%,rgba(255,255,255,.12) 76%,transparent 88%),
-    radial-gradient(24px 24px at calc(100% - 4px) 4px,rgba(255,255,255,.62),rgba(255,255,255,.10) 66%,transparent 86%),
-    radial-gradient(24px 24px at 4px calc(100% - 4px),rgba(255,255,255,.55),rgba(255,255,255,.08) 66%,transparent 86%),
-    linear-gradient(90deg,rgba(255,255,255,.60) 0 4px,transparent 8px),
-    linear-gradient(180deg,rgba(255,255,255,.50) 0 4px,transparent 8px),
-    linear-gradient(270deg,rgba(255,255,255,.25) 0 4px,transparent 8px),
-    linear-gradient(0deg,rgba(255,255,255,.30) 0 4px,transparent 8px);
+    radial-gradient(42px 42px at 4px 4px,#fff 0 34%,rgba(255,255,255,.80) 52%,rgba(255,255,255,.20) 72%,transparent 82%),
+    radial-gradient(38px 38px at calc(100% - 4px) calc(100% - 4px),#fff 0 24%,rgba(255,255,255,.55) 48%,rgba(255,255,255,.10) 72%,transparent 86%),
+    radial-gradient(30px 30px at calc(100% - 4px) 4px,rgba(255,255,255,.58),rgba(255,255,255,.08) 62%,transparent 84%),
+    radial-gradient(30px 30px at 4px calc(100% - 4px),rgba(255,255,255,.52),rgba(255,255,255,.07) 62%,transparent 84%),
+    /* fio mínimo em toda a aresta (só pra silhueta não sumir no meio do lado) */
+    linear-gradient(rgba(255,255,255,.13),rgba(255,255,255,.13));
   -webkit-mask:
     radial-gradient(circle at 16px 16px,var(--bvr)) 0 0/16px 16px no-repeat,
     radial-gradient(circle at 0 16px,var(--bvr)) 100% 0/16px 16px no-repeat,
@@ -317,13 +317,15 @@ a{color:inherit}
 /* projeto aberto */
 dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:rgba(7,9,13,.93);color:var(--white);border:0;border-radius:16px;padding:0;margin:auto;
   background-image:
+    radial-gradient(54px 54px at 3px 3px,rgba(255,255,255,.50),rgba(255,255,255,.10) 58%,transparent 82%),
+    radial-gradient(46px 46px at calc(100% - 3px) calc(100% - 3px),rgba(255,255,255,.32),transparent 82%),
     var(--scan),
     linear-gradient(132deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.02) 26%,transparent 48%),
     linear-gradient(160deg,rgba(18,22,30,.20),rgba(4,5,8,.66) 72%),
     var(--grao);
-  background-size:auto,auto,auto,140px 140px;
-  background-blend-mode:normal,screen,normal,overlay;
-  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 2.4px rgba(255,255,255,.22)}
+  background-size:auto,auto,auto,auto,auto,140px 140px;
+  background-blend-mode:screen,screen,normal,screen,normal,overlay;
+  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 2.2px rgba(255,255,255,.12)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
