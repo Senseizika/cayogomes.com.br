@@ -56,7 +56,7 @@
   /* ---------- TEXTURA DO VIDRO + MEDIDAS DO FUNDO E HERO ---------- */
   --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.055'/></svg>");
   /* SCAN LINES do vidro: 2px claro + 2px escuro a cada 6px */
-  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 2px,rgba(0,0,0,.18) 2px 4px,transparent 4px 6px);
+  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.03) 0 2px,rgba(0,0,0,.14) 2px 4px,transparent 4px 6px);
   /* ruído fino do CRT (grão menor e mais denso que o --grao) */
   --ruido:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='90' height='90' filter='url(%23n)' opacity='.22'/></svg>");
   --fundo-h:133.34vw;          /* altura das camadas de fundo */
@@ -80,7 +80,7 @@ a{color:inherit}
 /* janela: vidro jateado por dentro com superfície glossy lisa e borda abaulada fina + specular forte */
 .win{
   position:relative;
-  background-color:rgba(7,9,13,.70);
+  background-color:rgba(5,7,10,.78);
   background-image:
     var(--scan),
     var(--ruido),
@@ -95,39 +95,38 @@ a{color:inherit}
   box-shadow:
     0 22px 54px rgba(0,0,0,.66),
     0 2px 8px rgba(0,0,0,.52),
-    inset 0 0 0 1px rgba(0,0,0,.92),
-    inset 0 0 2.5px .8px rgba(0,0,0,.82);
+    inset 0 0 3px rgba(0,0,0,.28);
 }
 .win::before,.win::after{content:"";position:absolute;border-radius:inherit;pointer-events:none}
 /* respiro mínimo atrás do reflexo (só pra o brilho não parecer recortado) */
 .win::before{
   inset:0;z-index:3;mix-blend-mode:screen;
   background:
-    radial-gradient(30px 18px at 5px 2px,rgba(255,255,255,.10),transparent 74%),
-    radial-gradient(22px 16px at calc(100% - 5px) calc(100% - 2px),rgba(255,255,255,.07),transparent 74%);
+    radial-gradient(38px 20px at 6px 1px,rgba(255,255,255,.10),transparent 76%),
+    radial-gradient(26px 16px at calc(100% - 6px) calc(100% - 1px),rgba(255,255,255,.06),transparent 76%);
 }
-/* crista especular fina e dura (superfície lisa, roughness ~0): banda colada na borda, ~1,5px a 2px */
+/* crista especular fina e dura (superfície lisa, roughness ~0): a luz nasce em cima da própria borda */
 .win::after{
   /* banda a mesma distância da borda nas retas e nas curvas (evita degrau na junção) */
-  --bvr:#0000 12.9px,rgba(0,0,0,.45) 13.5px,#000 14px 14.5px,rgba(0,0,0,.45) 14.9px,#0000 15.4px;
-  --bvl:#0000 .6px,rgba(0,0,0,.45) 1.1px,#000 1.5px 2px,rgba(0,0,0,.45) 2.5px,#0000 3.1px;
+  --bvr:#0000 13.1px,rgba(0,0,0,.40) 13.7px,#000 14.4px 15.5px,rgba(0,0,0,.60) 16px;
+  --bvl:rgba(0,0,0,.60) 0,#000 .5px 1.6px,rgba(0,0,0,.40) 2.3px,#0000 2.9px;
   inset:0;z-index:4;mix-blend-mode:screen;
-  /* desalinho mínimo em relação à borda: o brilho flutua mais no topo e encosta embaixo (nada de anel perfeito) */
-  transform:translateY(.5px);
+  /* desalinho mínimo: desloca só no eixo horizontal, então o brilho continua encostado em cima e embaixo */
+  transform:translateX(.4px);
   background:
-    /* quina TL: brilho curto grudado no alto (não no meio da curva) + rastro comprido na aresta de cima */
-    radial-gradient(11px 9px at 8px 2px,#fff 0 58%,rgba(255,255,255,.55) 76%,transparent 94%),
-    radial-gradient(92px 26px at 7px 2px,#fff 0 18%,rgba(255,255,255,.75) 40%,rgba(255,255,255,.18) 70%,transparent 88%),
-    radial-gradient(22px 76px at 2px 9px,rgba(255,255,255,.50),rgba(255,255,255,.10) 55%,transparent 84%),
+    /* quina TL: foco afastado do canto + rastro comprido correndo pelos dois lados */
+    radial-gradient(12px 8px at 11px 1px,#fff 0 58%,rgba(255,255,255,.55) 76%,transparent 94%),
+    radial-gradient(120px 24px at 10px 1px,#fff 0 16%,rgba(255,255,255,.75) 38%,rgba(255,255,255,.18) 68%,transparent 88%),
+    radial-gradient(20px 96px at 1px 10px,rgba(255,255,255,.50),rgba(255,255,255,.10) 55%,transparent 84%),
     /* quina TR: mais fraca e deslocada pra fora, escorrendo pela aresta de cima */
-    radial-gradient(58px 22px at calc(100% - 6px) 2px,rgba(255,255,255,.50),rgba(255,255,255,.08) 62%,transparent 86%),
-    radial-gradient(20px 40px at calc(100% - 2px) 4px,rgba(255,255,255,.28),transparent 84%),
+    radial-gradient(80px 20px at calc(100% - 8px) 1px,rgba(255,255,255,.48),rgba(255,255,255,.08) 62%,transparent 86%),
+    radial-gradient(16px 56px at calc(100% - 1px) 7px,rgba(255,255,255,.26),transparent 84%),
     /* quina BR: contraluz curto e torto */
-    radial-gradient(46px 22px at calc(100% - 5px) calc(100% - 2px),rgba(255,255,255,.36),rgba(255,255,255,.06) 64%,transparent 86%),
+    radial-gradient(56px 20px at calc(100% - 8px) calc(100% - 1px),rgba(255,255,255,.34),rgba(255,255,255,.06) 64%,transparent 86%),
     /* quina BL: quase nada, só um respingo */
-    radial-gradient(38px 20px at 5px calc(100% - 2px),rgba(255,255,255,.28),transparent 84%),
+    radial-gradient(44px 18px at 8px calc(100% - 1px),rgba(255,255,255,.26),transparent 84%),
     /* fio mínimo em toda a aresta (só pra silhueta não sumir no meio do lado) */
-    linear-gradient(rgba(255,255,255,.11),rgba(255,255,255,.11));
+    linear-gradient(rgba(255,255,255,.10),rgba(255,255,255,.10));
   -webkit-mask:
     radial-gradient(circle at 16px 16px,var(--bvr)) 0 0/16px 16px no-repeat,
     radial-gradient(circle at 0 16px,var(--bvr)) 100% 0/16px 16px no-repeat,
@@ -149,9 +148,12 @@ a{color:inherit}
 }
 .win > *{position:relative;z-index:2}
 @media (min-width: 768px){ .win{ backdrop-filter:blur(15px) saturate(135%); -webkit-backdrop-filter:blur(15px) saturate(135%); } }
-@media (max-width: 767px){ .win{ background-color:rgba(9,11,16,.88); } }
+@media (max-width: 767px){ .win{ background-color:rgba(6,8,12,.93); } }
 .bar{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1.15rem .65rem;font:400 .85rem var(--mono);letter-spacing:.08em;color:var(--mute);
-  border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)}
+  /* entalhe: a faixa escurece até a ranhura, 1px de sombra e um lábio claro embaixo */
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 50%,rgba(0,0,0,.42));
+  border-bottom:1px solid rgba(0,0,0,.92);
+  box-shadow:0 1px 0 rgba(255,255,255,.16)}
 .win-ctl{display:inline-flex;align-items:center;gap:.85rem;opacity:.72;flex:0 0 auto}
 .win-ctl i{display:block;width:12px;height:1px;background:currentColor}
 .win-ctl b{display:block;width:11px;height:11px;position:relative}
@@ -336,7 +338,7 @@ dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-
     var(--grao);
   background-size:auto,90px 90px,auto,auto,auto,auto,140px 140px;
   background-blend-mode:normal,overlay,screen,screen,screen,normal,overlay;
-  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1px rgba(0,0,0,.92),inset 0 0 2.5px .8px rgba(0,0,0,.82),inset 0 0 0 1.6px rgba(255,255,255,.11)}
+  box-shadow:0 30px 90px rgba(0,0,0,.85),inset 0 0 0 1.4px rgba(255,255,255,.10),inset 0 0 3px rgba(0,0,0,.25)}
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
