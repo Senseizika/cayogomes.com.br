@@ -19,6 +19,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <!-- logo do topo: prioridade máxima -->
 <link rel="preload" as="image" href="img/cayo_gomes.webp" fetchpriority="high">
+<link rel="preload" as="script" href="conteudo/projetos.js">
+<link rel="preload" as="script" href="content.js">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fontes carregadas sem bloquear a renderização (com fallback sem JS) -->
@@ -42,36 +44,38 @@
 :root{
   color-scheme:dark;
   /* ---------- CORES DO SITE (mude aqui e vale no site inteiro) ---------- */
-  --ink:#050506;      /* fundo geral */
-  --panel:rgba(9,10,12,.86); /* fundo dos painéis (janelas) */
-  --line:rgba(255,255,255,.13); /* bordas/divisórias */
-  --white:#f4f4f2;    /* texto principal */
-  --mute:#8d9490;     /* texto secundário */
-  --accent:#ef2b31;   /* destaque padrão; o fundo sorteado troca este valor (ver PALETA) */
-  --glow:rgba(40,130,95,.40);  /* brilho verde do fundo */
-  --violet:rgba(90,60,150,.30);/* brilho roxo do fundo */
+  --ink:#050506;               /* fundo geral */
+  --line:rgba(255,255,255,.13);/* bordas/divisórias */
+  --white:#f4f4f2;             /* texto principal */
+  --mute:#8d9490;              /* texto secundário */
+  --accent:#ef2b31;            /* destaque padrão; o fundo sorteado troca este valor (ver PALETA) */
   /* ---------- FONTES (troque a família aqui; carregue o peso no head) ---------- */
   --big:"Bebas Neue","Arial Narrow",Impact,sans-serif;   /* títulos grandes */
   --tech:"Chakra Petch","Arial Narrow",Arial,sans-serif; /* texto/interface */
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;/* números/rótulos */
+  /* ---------- TEXTURA DO VIDRO + MEDIDAS DO FUNDO E HERO ---------- */
+  --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.17'/></svg>");
+  --fundo-h:133.34vw;          /* altura das camadas de fundo */
+  --camada:.6;                 /* opacidade da 2ª camada */
+  --hero-h:max(200px,35vh);    /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
+  --logo-max-h:40vh;           /* tamanho da logo mantido (independe da altura do hero) */
+  --logo-sobe:1vh;             /* 0 = logo centralizada. Para subir, use ex.: 1vh */
 }
+@supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
 *{box-sizing:border-box;margin:0}
 /* distância que o menu fixo ocupa ao pular para uma âncora */
-html{scroll-behavior:smooth;scroll-padding-top:80px}
+html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%}
 /* fundo e fonte padrão do site */
 body{background:var(--ink);color:var(--white);font:400 1.0625rem/1.6 var(--tech);-webkit-font-smoothing:antialiased;position:relative}
 a{color:inherit}
 /* contorno de acessibilidade ao navegar com teclado */
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-/* LARGURA MÁXIMA DO CONTEÚDO: aumente/diminua o 1180px */
+/* LARGURA MÁXIMA DO CONTEÚDO: aumente/diminua o 1500px */
 .wrap{width:min(1500px,100% - 2rem);margin-inline:auto}
 
 /* janela: a unidade visual do site, como no cartão */
 /* vidro jateado: granulado + reflexo diagonal + luz no aro (tudo gradiente/textura,
    sem custo de blur; o desfoque do fundo continua só no desktop) */
-:root{
-  --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.17'/></svg>");
-}
 .win{
   position:relative;
   background-color:rgba(9,10,12,.55);
@@ -121,18 +125,11 @@ a{color:inherit}
 @media(hover:hover){#lang:hover{background:var(--accent);color:var(--ink)}} /* texto escuro: o destaque é claro */
 
 /* hero = "capa" do topo (logo + linha de função + botão de idioma) */
-.hero{position:relative;overflow:hidden;min-height:var(--hero-h);padding:clamp(1.5rem,4vw,3rem) 0 clamp(2rem,5vw,4rem);}
+/* padding do hero: 1º = espaço acima da linha de função (menor = sobe), 2º = base */
+.hero{position:relative;overflow:hidden;min-height:var(--hero-h);padding:clamp(.75rem,1.8vw,1.1rem) 0 clamp(1rem,2.5vw,1.6rem)}
 .hero-overlay{position:absolute;inset:0;z-index:1;display:grid;place-items:center;pointer-events:none}
 /* fundo em duas camadas: ocupa a largura da tela, começa no topo da página e sobe
    mais devagar que ela (parallax). As duas camadas têm sempre o mesmo tamanho. */
-:root{
-  --fundo-h:133.34vw;               /* altura das camadas de fundo */
-  --camada:.6;                      /* opacidade da 2ª camada */
-  --hero-h:max(200px,35vh);         /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
-  --logo-max-h:40vh;                /* tamanho da logo mantido (independe da altura do hero) */
-  --logo-sobe:1vh;                  /* 0 = logo centralizada. Para subir, use ex.: 1vh */
-}
-@supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
 .fundo-clip{position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
 .fundo{position:absolute;top:0;left:0;width:100%;height:var(--fundo-h);
   -webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}
@@ -140,26 +137,27 @@ a{color:inherit}
 .fundo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;opacity:0;transition:opacity .8s}
 .fundo img.ready{opacity:1}
 .fundo .f2.ready{opacity:var(--camada)}
-/* TAMANHO DA LOGO do topo: 31vh (mesmo tamanho em qualquer hero), no máx. 80% da largura.
+/* TAMANHO DA LOGO do topo: 40vh (mesmo tamanho em qualquer hero), no máx. 80% da largura.
    Como não depende de --hero-h, dá para baixar o hero sem encolher a logo. */
 .hero-overlay img{max-width:80%;max-height:var(--logo-max-h);width:auto;height:auto;object-fit:contain;transform:translateY(calc(var(--logo-sobe) * -1))}
 .hero .wrap{position:relative;z-index:2}
 
 /* linha de função + botão EN. margin-top: distância até o topo do hero (menor = sobe) */
-.sub{display:flex;justify-content:space-between;gap:1rem;flex-wrap:nowrap;margin-top:.15rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
+.sub{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:nowrap;margin-top:.15rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
 .sub > span[data-i18n]{flex:1 1 auto;min-width:0}
-.sub .right{flex:0 0 auto}
+.sub .right{flex:0 0 auto;display:flex;align-items:center;gap:1rem}
 /* em telas estreitas o "CG / 001" sai para o EN não cair para a linha de baixo */
 @media(max-width:720px){.sub .right > span{display:none}}
 
 /* áreas / grade de projetos */
 .about,.contact{content-visibility:auto;contain-intrinsic-size:1px 500px}
-.area{margin-top:clamp(3rem,7vw,5rem)}
+.area{margin-top:0}
 .area .head{padding:1.2rem 1.2rem 0}   /* espaço ao redor do título da área */
 .area h2{font:400 clamp(2.6rem,6vw,4.4rem)/1 var(--big);letter-spacing:.02em}
-.area .lead{color:var(--mute);max-width:56ch;margin-top:.4rem}
+.area .lead{color:var(--mute);max-width:56ch;margin-top:.4rem;white-space:pre-line}
 /* Separadores discretos das categorias na visualização "Todos". */
 .cat-group{min-width:0}
+.cat-group+.cat-group{content-visibility:auto;contain-intrinsic-size:auto 360px}
 .cat-separator{
   display:flex;align-items:center;gap:.8rem;
   margin:1.25rem 1.2rem 0;
@@ -169,7 +167,7 @@ a{color:inherit}
   content:"";height:1px;flex:1;
   background:currentColor;opacity:.7;
 }
-/* GRADE: minmax(250px,1fr) = largura mínima de cada card; gap = espaço entre eles */
+/* GRADE: minmax(300px,1fr) = largura mínima de cada card; gap = espaço entre eles */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.15rem;padding:1.4rem 1.2rem 1.4rem}
 .item{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
 /* Cada miniatura acompanha a proporção natural da imagem, sem cortes ou deformações. */
@@ -247,6 +245,7 @@ dialog[open]{animation:in .22s ease-out}
 }
 
 .d-track{
+  position: relative;
   display: flex;
   height: 100%;
   will-change: transform;
@@ -346,24 +345,23 @@ dialog[open]{animation:in .22s ease-out}
 .d-body h3{font:400 2.8rem/1 var(--big);letter-spacing:.02em}
 .d-body .meta{font:400 .9rem var(--mono);color:var(--accent);margin:.6rem 0 1rem;letter-spacing:.05em}
 .d-body p{max-width:62ch}
+#d-desc{white-space:pre-line}
 /* mensagem quando a área ainda não tem projeto */
 .vazio{padding:2.4rem 1.2rem;margin:0;color:var(--mute);font:400 .95rem var(--mono);letter-spacing:.06em}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-.area{margin-top:0}
 .home-sec{margin-top:clamp(2rem,5vw,3.5rem)}
 
 /* cabeçalho fixo + abas */
-/* padding do hero: 1º = espaço acima da linha de função (menor = sobe), 2º = base */
-.hero{padding:clamp(.75rem,1.8vw,1.1rem) 0 clamp(1rem,2.5vw,1.6rem)}
-.sub{align-items:center}
-.sub .right{display:flex;align-items:center;gap:1rem} /* linha de função + botão idioma */
 .tabbar{position:sticky;top:0;z-index:30;background:rgba(5,5,6,.9);backdrop-filter:blur(12px) saturate(120%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)} /* sticky = menu cola no topo */
-.tabs{display:flex;justify-content:center;align-items:center;gap:clamp(.5rem,3vw,1.8rem)} /* justify-content: alinhamento das abas */
-.tab{background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);font:500 clamp(.95rem,2.8vw,1.45rem) var(--tech);letter-spacing:.08em;text-transform:uppercase;padding:.9rem .3rem;cursor:pointer} /* tamanho/fonte das abas */
+.tabs{display:flex;flex-wrap:nowrap;align-items:center;gap:clamp(.65rem,3vw,1.8rem);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;white-space:nowrap;background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);font:500 clamp(.95rem,2.8vw,1.45rem) var(--tech);letter-spacing:.08em;text-transform:uppercase;padding:.9rem .3rem;cursor:pointer} /* tamanho/fonte das abas */
+.tab:first-child{margin-left:auto}
+.tab:last-child{margin-right:auto}
 .tab:hover{color:var(--white)}
 .tab[aria-selected="true"]{color:var(--white);border-bottom-color:var(--accent)}
-.sep{color:var(--accent);font:400 1.4rem var(--mono)}
+.sep{flex:0 0 1px;width:1px;height:clamp(1.2rem,2.5vw,1.7rem);background:rgba(255,255,255,.72)}
 #panel{margin-top:clamp(1.2rem,3vw,2rem)} /* espaço entre as abas e o painel */
 .chips{display:flex;flex-wrap:wrap;gap:.5rem;padding:1.1rem 1.2rem 0} /* botões de filtro */
 .chip{background:none;border:1px solid var(--line);color:var(--mute);font:500 .85rem var(--mono);letter-spacing:.06em;padding:.4rem .9rem;border-radius:999px;cursor:pointer}
@@ -372,9 +370,7 @@ dialog[open]{animation:in .22s ease-out}
 .pitch-sm{font:400 clamp(2rem,4.5vw,3rem)/1 var(--big);margin-bottom:1rem;max-width:18ch}
 
 /* celular: os ajustes abaixo valem para telas <= 640px */
-html{-webkit-text-size-adjust:100%}
 .chip,#lang,#close{min-height:40px}
-.chips{flex-wrap:wrap}
 @media(hover:none){.item:hover .thumb img{transform:none}}
 @media(max-width:640px){
   .win,.tabbar,dialog{backdrop-filter:none}
@@ -388,7 +384,7 @@ html{-webkit-text-size-adjust:100%}
   .sub{align-items:flex-start;gap:.6rem;font-size:.72rem;letter-spacing:.03em}
   .sub > span[data-i18n]{line-height:1.35}
   .sub .right{gap:0}
-  .tabs{gap:.4rem}
+  .tabs{gap:.65rem}
   .tab{padding:.8rem .2rem;letter-spacing:.04em}
   .bar{padding:.55rem .8rem;font-size:.78rem}
   .area .head{padding:1rem .9rem 0}
@@ -486,31 +482,24 @@ try { lang = localStorage.getItem("lang") || "pt"; } catch(e){}
 if (!UI[lang]) lang = "pt";
 
 const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tr = o => (o && (o[lang] || o.pt || o.en)) || "";
 const pad = n => String(n).padStart(3,"0");
+const slugProj = p => String(p?.title?.pt || p?.title?.en || "")
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
-const capa = p => (p.media && p.media[0]) || null;
-
-function capaHTML(p){
-  const c = capa(p);
-  const src = c && (c.type === "image" ? c.src : c.poster);
-  if (!src) return `<div class="ph" style="--h:${p.h}">${UI[lang].img}</div>`;
-  return `<img src="${esc(src)}" alt="${esc(p.title[lang])}" width="600" height="450" loading="lazy" decoding="async">`;
-}
-
-const pad2 = n => String(n).padStart(2,"0");
-
-let mid = 0;
+let mid = 0, thumbRun = 0;
 
 const YT = s => {
-  s = String(s).trim();
+  s = String(s || "").trim();
   if (/^[\w-]{11}$/.test(s)) return s;
   const m = s.match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/|live\/)([\w-]{11})/);
   return m ? m[1] : null;
 };
 
 const SK = s => {
-  s = String(s).trim();
+  s = String(s || "").trim();
   if (/^[0-9a-f]{32}$/i.test(s)) return s;
   const m = s.match(/sketchfab\.com\/(?:3d-models\/[^/?#]*-|models\/)([0-9a-f]{32})/i);
   return m ? m[1] : null;
@@ -519,113 +508,252 @@ const SK = s => {
 const posterYT  = id => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 const posterYT2 = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
+function capaMidia(m){
+  if (!m) return { src: "", fb: "" };
+  if (m.type === "image") return { src: m.src || "", fb: "" };
+  if (m.type === "video") {
+    if (m.poster) return { src: m.poster, fb: "" };
+    const id = YT(m.src);
+    return id ? { src: posterYT(id), fb: posterYT2(id) } : { src: "", fb: "" };
+  }
+  return { src: m.poster || "", fb: "" };
+}
+
+const capa = p => (p.media && p.media[0]) || null;
+
+function capaHTML(p, eager){
+  const { src, fb } = capaMidia(capa(p));
+  if (!src) return `<div class="ph" style="--h:${p.h || 0}">${UI[lang].img}</div>`;
+  return `<img src="${esc(src)}" alt="${esc(tr(p.title))}" width="600" height="450" decoding="async"${eager ? "" : ' loading="lazy"'} data-h="${p.h || 0}"${fb ? ` data-fb="${esc(fb)}"` : ""}>`;
+}
+
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="bar"><span id="d-bar"></span><button id="close" type="button"></button></div>
 <div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
 <div class="d-thumbs" id="d-thumbs" hidden></div>
 <div class="d-body"><h3 id="d-title"></h3><p class="meta" id="d-meta"></p><p id="d-desc"></p></div></dialog>`;
 let area = null;
 
-function pick(id, push){
-  if (!AREAS.some(a => a.id === id)) id = AREAS[0].id;
-  if (id !== area) filter = "all";
-  area = id;
-  if (push) { try { history.replaceState(null, "", "#" + id); } catch(err){} }
-  render();
+function garantirDialogo(){
+  if ($("#dlg")) return;
+  document.body.insertAdjacentHTML("beforeend", DLG);
+  ligarGaleria();
 }
 
-function render(){
+function pick(id, push){
+  if (!AREAS.length) return;
+  if (!AREAS.some(a => a.id === id)) id = AREAS[0].id;
+  const mudouArea = id !== area;
+  if (mudouArea) filter = "all";
+  area = id;
+  if (push) { try { history.replaceState(null, "", "#" + id); } catch(err){} }
+  if (!mudouArea && $("#panel").firstElementChild) return;
+  if ($("#tabs").firstElementChild) {
+    renderAbas();
+    renderPainel(false);
+  } else {
+    render();
+  }
+}
+
+function aplicarIdioma(){
   const u = UI[lang];
   document.documentElement.lang = u.lang;
-  if (!$("#dlg")) { document.body.insertAdjacentHTML("beforeend", DLG); ligarGaleria(); }
+  garantirDialogo();
   $("#close").textContent = u.close;
   $("#lang").textContent = u.btn;
   $("#d-prev").setAttribute("aria-label", u.prev);
   $("#d-next").setAttribute("aria-label", u.next);
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = u[el.dataset.i18n]);
   $("#services").innerHTML = SERVICES[lang].map(s => `<li><span>${esc(s)}</span></li>`).join("");
+}
 
+function renderAbas(){
+  if (!AREAS.length) { $("#tabs").innerHTML = ""; return; }
   $("#tabs").innerHTML = AREAS.map(a =>
-    `<button class="tab" type="button" role="tab" id="tab-${a.id}" aria-selected="${a.id === area}" tabindex="${a.id === area ? 0 : -1}" aria-controls="panel" data-id="${a.id}">${esc(a.name[lang])}</button>`
-  ).join('<span class="sep" aria-hidden="true">/</span>');
+    `<button class="tab" type="button" role="tab" id="tab-${esc(a.id)}" aria-selected="${a.id === area}" tabindex="${a.id === area ? 0 : -1}" aria-controls="panel" data-id="${esc(a.id)}">${esc(tr(a.name))}</button>`
+  ).join('<span class="sep" role="presentation" aria-hidden="true"></span>');
+}
 
-  const a = AREAS.find(x => x.id === area), i = AREAS.indexOf(a);
-  $("#panel").setAttribute("aria-labelledby", "tab-" + a.id);
+function renderGradeHTML(a, list){
+  const u = UI[lang];
+  if (!list.length) return `<p class="vazio">${esc(u.empty)}</p>`;
   const cats = a.cats || [];
-  const list = PROJECTS.map((p,j) => [p,j]).filter(([p]) => p.area === a.id && (filter === "all" || p.cat === filter));
+  const cardsHTML = (items, offset) => `<div class="grid">${items.map(([p, j], idx) => `
+      <button class="item" type="button" data-i="${j}">
+        <div class="thumb">${capaHTML(p, offset + idx < 3)}</div>
+        <h3>${esc(tr(p.title))}</h3>
+      </button>`).join("")}</div>`;
+
   // Em "Todos", agrupa pela ordem das categorias cadastradas; dentro de cada
   // categoria, preserva a ordem original dos projetos em PROJECTS.
-  const grupos = filter === "all" && cats.length
-    ? cats.map(c => ({ cat:c, items:list.filter(([p]) => p.cat === c.id) })).filter(g => g.items.length)
-    : [];
+  if (filter === "all" && cats.length) {
+    const catIds = new Set(cats.map(c => c.id));
+    const grupos = cats.map(c => ({ cat: c, items: list.filter(([p]) => p.cat === c.id) })).filter(g => g.items.length);
+    const semCat = list.filter(([p]) => !p.cat || !catIds.has(p.cat));
+    if (grupos.length) {
+      let visto = 0;
+      const htmlGrupos = grupos.map(g => {
+        const bloco = `<section class="cat-group"><div class="cat-separator"><span>${esc(tr(g.cat.name))}</span></div>${cardsHTML(g.items, visto)}</section>`;
+        visto += g.items.length;
+        return bloco;
+      }).join("");
+      const htmlSemCat = semCat.length ? `<section class="cat-group">${cardsHTML(semCat, visto)}</section>` : "";
+      return htmlGrupos + htmlSemCat;
+    }
+  }
+  return cardsHTML(list, 0);
+}
+
+function renderPainel(soGrade){
+  const u = UI[lang];
+  const a = AREAS.find(x => x.id === area);
+  if (!a) { $("#panel").innerHTML = `<p class="vazio">${esc(u.empty)}</p>`; return; }
+  const i = AREAS.indexOf(a);
+  const cats = a.cats || [];
+  const list = PROJECTS.map((p, j) => [p, j]).filter(([p]) => p.area === a.id && (filter === "all" || p.cat === filter));
+
+  if (soGrade && $("#grade")) {
+    $("#panel").querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", String(ch.dataset.c === filter)));
+    $("#grade").innerHTML = renderGradeHTML(a, list);
+    return;
+  }
+
+  $("#panel").setAttribute("aria-labelledby", "tab-" + a.id);
   const chips = cats.length
-    ? `<div class="chips" role="group" aria-label="${u.filters}">` + [{id:"all",name:u.all}, ...cats.map(c => ({id:c.id,name:c.name[lang]}))]
-        .map(c => `<button class="chip" type="button" data-c="${c.id}" aria-pressed="${c.id === filter}">${esc(c.name)}</button>`).join("") + `</div>`
+    ? `<div class="chips" role="group" aria-label="${esc(u.filters)}">` + [{ id: "all", name: u.all }, ...cats.map(c => ({ id: c.id, name: tr(c.name) }))]
+        .map(c => `<button class="chip" type="button" data-c="${esc(c.id)}" aria-pressed="${c.id === filter}">${esc(c.name)}</button>`).join("") + `</div>`
     : "";
-  const cardsHTML = items => `<div class="grid${items.length > 2 ? " feat" : ""}">${items.map(([p,j]) => `
-      <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${capaHTML(p)}</div>
-        <h3>${esc(p.title[lang])}</h3>
-      </button>`).join("")}</div>`;
-  const grade = list.length
-    ? grupos.length
-      ? grupos.map(g => `<section class="cat-group"><div class="cat-separator"><span>${esc(g.cat.name[lang])}</span></div>${cardsHTML(g.items)}</section>`).join("")
-      : cardsHTML(list)
-    : `<p class="vazio">${esc(u.empty)}</p>`;
   $("#panel").innerHTML = `
-    <div class="bar"><span>${esc(a.name[lang]).toUpperCase()} / ${pad(i+1)}</span><i aria-hidden="true">— ✕</i></div>
-    <div class="head"><h2>${esc(a.name[lang])}</h2><p class="lead">${esc(a.lead[lang])}</p></div>
+    <div class="bar"><span>${esc(tr(a.name)).toUpperCase()} / ${pad(i + 1)}</span><i aria-hidden="true">— ✕</i></div>
+    <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
-    ${grade}`;
+    <div id="grade">${renderGradeHTML(a, list)}</div>`;
+}
+
+function render(){
+  aplicarIdioma();
+  renderAbas();
+  renderPainel(false);
   if (current !== null && $("#dlg").open) fill(current);
 }
 
 // fill(i): preenche o modal com os dados do projeto i.
 function fill(i){
   const p = PROJECTS[i];
-  const a = AREAS.find(x => x.id === p.area);
-  $("#d-bar").textContent = a.name[lang].toUpperCase() + " / " + pad(i+1);
-  $("#d-title").textContent = p.title[lang];
-  $("#d-meta").textContent = p.tools;
+  if (!p) return;
+  garantirDialogo();
+  const a = AREAS.find(x => x.id === p.area) || AREAS[0];
+  $("#d-bar").textContent = (a ? tr(a.name).toUpperCase() : "") + " / " + pad(i + 1);
+  $("#d-title").textContent = tr(p.title);
+  $("#d-meta").textContent = p.tools || "";
   $("#d-meta").hidden = !p.tools;
-  $("#d-desc").textContent = p.desc[lang];
+  $("#d-desc").textContent = tr(p.desc);
   mid = 0;
+  thumbRun++;
+  delete $("#d-thumbs").dataset.chave;
+  $("#d-view").innerHTML = "";
   pintarMidia();
 }
 
 // HTML de uma mídia dentro do slide (sem o wrapper .d-slide)
-function midiaHTML(m, i){
+function midiaHTML(m, i, imediato){
   const p = PROJECTS[current];
-  const alt = esc(p.title[lang]);
+  const alt = esc(tr(p.title));
   if (m.type === "video") {
     const id = YT(m.src);
     if (!id) return `<div class="ph">${esc(UI[lang].media_error)}</div>`;
+    const { src, fb } = capaMidia(m);
+    const attrSrc = imediato ? `src="${esc(src)}"${i === mid ? ' fetchpriority="high"' : ""}` : `data-src="${esc(src)}"`;
     return `<button class="d-play" type="button" data-play="${i}" aria-label="${esc(UI[lang].play)}">
-      <img src="${esc(m.poster || posterYT(id))}" alt="${alt}" data-fb="${m.poster ? "" : esc(posterYT2(id))}"></button>`;
+      <img ${attrSrc} alt="${alt}" decoding="async" data-h="${p.h || 0}"${fb ? ` data-fb="${esc(fb)}"` : ""}></button>`;
   }
   if (m.type === "sketchfab") {
     const id = SK(m.src);
     if (!id) return `<div class="ph">${esc(UI[lang].media_error)}</div>`;
-    const capa = m.poster ? `<img src="${esc(m.poster)}" alt="${alt}">` : `<span class="d-rotulo">SKETCHFAB</span>`;
-    return `<button class="d-play sk" type="button" data-play="${i}" aria-label="${esc(UI[lang].model3d)}">${capa}</button>`;
+    let capaEl = `<span class="d-rotulo">SKETCHFAB</span>`;
+    if (m.poster) {
+      const attrSrc = imediato ? `src="${esc(m.poster)}"${i === mid ? ' fetchpriority="high"' : ""}` : `data-src="${esc(m.poster)}"`;
+      capaEl = `<img ${attrSrc} alt="${alt}" decoding="async" data-h="${p.h || 0}">`;
+    }
+    return `<button class="d-play sk" type="button" data-play="${i}" aria-label="${esc(UI[lang].model3d)}">${capaEl}</button>`;
   }
-  return `<img src="${esc(m.src)}" alt="${alt}" decoding="async">`;
+  const attrSrc = imediato ? `src="${esc(m.src)}"${i === mid ? ' fetchpriority="high"' : ""}` : `data-src="${esc(m.src)}"`;
+  return `<img ${attrSrc} alt="${alt}" decoding="async" data-h="${p.h || 0}">`;
 }
 
 // HTML de uma miniatura da tira de baixo.
 function thumbHTML(m, i){
   const classe = m.type === "video" ? " vid" : m.type === "sketchfab" ? " sk" : "";
-  const src = m.type === "image" ? m.src : m.poster;
-  const img = src ? `<img src="${esc(src)}" alt="">` : "";
+  const { src, fb } = capaMidia(m);
+  const img = src ? `<img data-tsrc="${esc(src)}"${fb ? ` data-fb="${esc(fb)}"` : ""} alt="" decoding="async" fetchpriority="low">` : "";
   return `<button class="d-thumb${classe}" type="button" data-thumb="${i}" aria-current="${i === mid}"
-    aria-label="${esc(UI[lang].media)} ${i+1}">${img}</button>`;
+    aria-label="${esc(UI[lang].media)} ${i + 1}">${img}</button>`;
+}
+
+function hidratarSlides(track, lista, modo){
+  const total = lista.length;
+  if (!total) return;
+  const ativos = new Set([mid, (mid - 1 + total) % total, (mid + 1) % total]);
+  if (modo === "carrossel") ativos.add(0);
+
+  for (const idx of ativos) {
+    const slide = track.children[idx];
+    const img = slide && slide.querySelector("img");
+    if (!img) continue;
+    if (img.dataset.src) {
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+    }
+    if (idx === mid) img.setAttribute("fetchpriority", "high");
+    else img.removeAttribute("fetchpriority");
+    if (!img.dataset.janelaOk) {
+      img.dataset.janelaOk = "1";
+      img.addEventListener("load", () => {
+        const t = $("#d-track");
+        if (!t || !$("#dlg")?.open) return;
+        ajustarJanela(t, lista);
+        ajustarLarguras(t);
+        posicionarTrack(t);
+      });
+    }
+  }
+}
+
+function hidratarThumbs(){
+  const box = $("#d-thumbs");
+  if (!box || box.hidden) return;
+  const run = ++thumbRun;
+  const fila = () => [...box.querySelectorAll("img[data-tsrc]")].sort((a, b) => {
+    const ia = +a.parentElement.dataset.thumb, ib = +b.parentElement.dataset.thumb;
+    return Math.abs(ia - mid) - Math.abs(ib - mid);
+  });
+  if (!fila().length) return;
+
+  const proximo = () => {
+    if (run !== thumbRun || !$("#dlg")?.open) return;
+    const img = fila()[0];
+    if (!img) return;
+    const src = img.dataset.tsrc;
+    delete img.dataset.tsrc;
+    let foi = false;
+    const seguir = () => {
+      if (foi) return;
+      foi = true;
+      if (run === thumbRun && $("#dlg")?.open) proximo();
+    };
+    img.addEventListener("load", seguir, { once: true });
+    img.addEventListener("error", seguir, { once: true });
+    img.src = src;
+    if (img.complete) seguir();
+  };
+
+  for (let w = 0; w < 2; w++) proximo();
 }
 
 // Deslocamento em pixels até o começo do slide i (base do modo carrossel).
 function deslocamento(track, i){
-  let x = 0;
-  for (let k = 0; k < i && k < track.children.length; k++)
-    x += track.children[k].getBoundingClientRect().width;
-  return x;
+  const slide = track.children[i];
+  return slide ? slide.offsetLeft : 0;
 }
 
 // Janela do carrossel: tem a mesma proporção da imagem original (como no
@@ -677,8 +805,7 @@ function larguraDaJanela(track){
   return Math.round(Number(track.dataset.janela) || (palco && palco.clientWidth) || 0);
 }
 
-// No carrossel cada slide tem a largura natural da imagem. Vídeo e 3D não têm
-// largura natural, então recebem a largura da janela (senão o deslocamento erra).
+// No carrossel cada slide tem a largura da janela; vídeo e 3D acompanham a mesma largura.
 function ajustarLarguras(track){
   if (!track.classList.contains("carrossel")) return;
   const largura = larguraDaJanela(track);
@@ -690,11 +817,11 @@ function ajustarLarguras(track){
     });
     return;
   }
-  [...track.children].forEach(slide => {
+  for (const slide of track.children) {
     // cada arte ocupa exatamente a janela; a proporção é preservada pelo object-fit
     slide.style.flex  = "0 0 " + largura + "px";
     slide.style.width = largura + "px";
-  });
+  }
 }
 
 // Posiciona a mídia atual: porcentagem no modo slide, pixels no carrossel.
@@ -708,21 +835,34 @@ function posicionarTrack(track){
 function pintarMidia(){
   const p = PROJECTS[current];
   const lista = p.media || [];
-  
+
   if (!lista.length) {
-    $("#d-view").innerHTML = `<div class="ph" style="--h:${p.h}">${UI[lang].img}</div>`;
+    thumbRun++;
+    $("#d-view").innerHTML = `<div class="ph" style="--h:${p.h || 0}">${UI[lang].img}</div>`;
+    $("#d-prev").hidden = true;
+    $("#d-next").hidden = true;
+    $("#d-count").hidden = true;
+    $("#d-thumbs").hidden = true;
+    $("#d-thumbs").innerHTML = "";
+    $("#d-dots").hidden = true;
+    $("#d-dots").innerHTML = "";
     return;
   }
 
   const modo = p.galeria === "carrossel" ? "carrossel" : "slide";
+  const total = lista.length;
+  const iniciais = new Set([mid, (mid - 1 + total) % total, (mid + 1) % total]);
+  if (modo === "carrossel") iniciais.add(0);
+
   let track = $("#d-track");
   // Recria quando muda o projeto/modo de galeria ou o número de itens
-  if (!track || !track.classList.contains(modo) || track.children.length !== lista.length) {
+  if (!track || !track.classList.contains(modo) || track.children.length !== total) {
     $("#d-view").innerHTML = `<div class="d-track ${modo}" id="d-track">
-      ${lista.map((m, i) => `<div class="d-slide${m.type === "image" ? "" : " is-video"}" data-index="${i}">${midiaHTML(m, i)}</div>`).join('')}
+      ${lista.map((m, i) => `<div class="d-slide${m.type === "image" ? "" : " is-video"}" data-index="${i}">${midiaHTML(m, i, iniciais.has(i))}</div>`).join('')}
     </div>`;
     track = $("#d-track");
 
+    hidratarSlides(track, lista, modo);
     ajustarJanela(track, lista);
     ajustarLarguras(track);
     // Posiciona instantaneamente sem animação no primeiro carregamento
@@ -731,52 +871,62 @@ function pintarMidia(){
     void track.offsetWidth; // Força o navegador a recalcular
     track.style.transition = ''; // Restaura a animação
   } else {
-    // Se só mudou de posição, anima suavemente
+    // Se só mudou de posição, anima suavemente e hidrata vizinhos sob demanda
+    hidratarSlides(track, lista, modo);
     ajustarJanela(track, lista);
     ajustarLarguras(track);
     posicionarTrack(track);
   }
 
-  // Imagem grande pode terminar de carregar depois: refaz a janela e a posição
-  [...track.querySelectorAll("img")].forEach(img => {
-    if (img.dataset.janelaOk) return;
-    img.dataset.janelaOk = "1";
-    img.addEventListener("load", () => {
-      const t = $("#d-track");
-      if (!t) return;
-      ajustarJanela(t, lista);
-      ajustarLarguras(t);
-      posicionarTrack(t);
-    });
-  });
-  
   // Limpa iframes de vídeos que não estão ativos para não ficarem rodando
   [...track.children].forEach((slide, i) => {
     if (i !== mid && slide.querySelector('iframe')) {
-      slide.innerHTML = midiaHTML(lista[i], i);
+      slide.innerHTML = midiaHTML(lista[i], i, iniciais.has(i));
     }
   });
-  
-  // Carrega o vídeo atual
-  const m = lista[mid];
-  if (m && (m.type === "video" || m.type === "sketchfab")) {
-    tocar(mid, false);
-  }
-  
-  // Atualiza setas, contador e miniaturas
-  const varias = lista.length > 1;
+
+  // Atualiza setas, contador, miniaturas e bolinhas
+  const varias = total > 1;
   $("#d-prev").hidden = !varias;
   $("#d-next").hidden = !varias;
   $("#d-count").hidden = !varias;
-  $("#d-count").textContent = varias ? (mid+1) + " / " + lista.length : "";
+  $("#d-count").textContent = varias ? (mid + 1) + " / " + total : "";
+
   const ehCarrossel = modo === "carrossel";
-  $("#d-thumbs").hidden = !varias || ehCarrossel;
-  $("#d-thumbs").innerHTML = varias && !ehCarrossel ? lista.map(thumbHTML).join("") : "";
+  const thumbs = $("#d-thumbs");
+  const mostraThumbs = varias && !ehCarrossel;
+  thumbs.hidden = !mostraThumbs;
+  if (mostraThumbs) {
+    const chave = current + ":" + total + ":" + lang;
+    if (thumbs.dataset.chave !== chave) {
+      thumbs.dataset.chave = chave;
+      thumbs.innerHTML = lista.map(thumbHTML).join("");
+    } else {
+      thumbs.querySelectorAll("[data-thumb]").forEach(b =>
+        b.setAttribute("aria-current", String(+b.dataset.thumb === mid))
+      );
+    }
+    hidratarThumbs();
+  } else {
+    thumbRun++;
+    delete thumbs.dataset.chave;
+    thumbs.innerHTML = "";
+  }
+
   const dots = $("#d-dots");
-  dots.hidden = !(varias && ehCarrossel);
-  dots.innerHTML = varias && ehCarrossel
-    ? lista.map((_, i) => `<button type="button" data-dot="${i}" aria-current="${i === mid}" aria-label="${i+1} / ${lista.length}"></button>`).join("")
-    : "";
+  const mostraDots = varias && ehCarrossel;
+  dots.hidden = !mostraDots;
+  if (mostraDots) {
+    if (dots.children.length !== total) {
+      dots.innerHTML = lista.map((_, i) => `<button type="button" data-dot="${i}" aria-current="${i === mid}" aria-label="${i + 1} / ${total}"></button>`).join("");
+    } else {
+      dots.querySelectorAll("[data-dot]").forEach(b =>
+        b.setAttribute("aria-current", String(+b.dataset.dot === mid))
+      );
+    }
+  } else {
+    dots.innerHTML = "";
+  }
 }
 
 // Troca a mídia (n = +1 ou -1)
@@ -792,11 +942,11 @@ function tocar(i, autoplay = true){
   const p = PROJECTS[current];
   const m = (p.media || [])[i];
   if (!m) return;
-  
+
   const slide = document.querySelector(`.d-slide[data-index="${i}"]`);
   if (!slide) return;
-  
-  const titulo = esc(p.title[lang]);
+
+  const titulo = esc(tr(p.title));
   if (m.type === "video") {
     const id = YT(m.src);
     if (!id) return;
@@ -810,7 +960,7 @@ function tocar(i, autoplay = true){
   } else if (m.type === "sketchfab") {
     const id = SK(m.src);
     if (!id) return;
-    slide.innerHTML = `<iframe src="https://sketchfab.com/models/${id}/embed?autospin=0.2&autostart=1&ui_theme=dark"
+    slide.innerHTML = `<iframe src="https://sketchfab.com/models/${id}/embed?autospin=0.2&autostart=${autoplay ? 1 : 0}&ui_theme=dark"
       title="${titulo}" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>`;
   }
 }
@@ -818,30 +968,41 @@ function tocar(i, autoplay = true){
 // Teclado (← →), Swipe (arrastar) e clique
 function ligarGaleria(){
   const dlg = $("#dlg"), palco = dlg.querySelector(".d-stage");
-  
+
   // Teclado
   dlg.addEventListener("keydown", e => {
     if (e.key === "ArrowRight") { e.preventDefault(); irMedia(1); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); irMedia(-1); }
   });
-  
+
+  // Garante parada de vídeo/3D e limpeza do hash ao fechar (botão, clique fora ou Esc)
+  dlg.addEventListener("close", () => {
+    thumbRun++;
+    $("#d-view").innerHTML = "";
+    $("#d-thumbs").innerHTML = "";
+    delete $("#d-thumbs").dataset.chave;
+    if (location.hash.includes("/")) {
+      try { history.replaceState(null, "", "#" + (area || AREAS[0]?.id || "")); } catch(err){}
+    }
+  });
+
   // Arrastar (Swipe)
   let x0 = null, y0 = null, dragging = false;
   let track = null, largura = 0, startTranslate = 0;
 
   palco.addEventListener("pointerdown", e => {
-    if (e.target.closest(".d-nav") || e.target.closest(".d-thumbs") || e.target.closest(".d-dots")) return;
-    
+    if (e.button > 0 || e.target.closest(".d-nav, .d-thumbs, .d-dots, iframe")) return;
+
     track = $("#d-track");
     if (!track) return;
-    largura = palco.offsetWidth;
+    largura = larguraDaJanela(track) || palco.offsetWidth;
     if (!largura) return;
 
     x0 = e.clientX;
     y0 = e.clientY;
     dragging = false;
     startTranslate = -deslocamento(track, mid);
-    
+
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
   });
@@ -850,7 +1011,7 @@ function ligarGaleria(){
     if (x0 === null || !track) return;
     const dx = e.clientX - x0;
     const dy = e.clientY - y0;
-    
+
     if (!dragging) {
       if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
         dragging = true;
@@ -860,7 +1021,7 @@ function ligarGaleria(){
         return;
       }
     }
-    
+
     track.style.transform = `translateX(${startTranslate + dx}px)`;
   });
 
@@ -868,17 +1029,17 @@ function ligarGaleria(){
     if (!track) return;
     document.body.style.userSelect = '';
     document.body.style.webkitUserSelect = '';
-    
+
     if (!dragging) { x0 = null; return; }
-    
+
     const dx = e.clientX - x0;
     x0 = null;
     dragging = false;
-    
+
     track.style.transition = '';
-    
+
     const limiar = largura * 0.15;
-    
+
     if (dx > limiar && mid > 0) {
       irMedia(-1);
     } else if (dx < -limiar && mid < track.children.length - 1) {
@@ -890,14 +1051,18 @@ function ligarGaleria(){
 
   palco.addEventListener("pointerup", finalizarArraste);
   palco.addEventListener("pointercancel", () => {
-      if (track) posicionarTrack(track);
-      x0 = null; dragging = false;
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
+    if (track) {
+      track.style.transition = '';
+      posicionarTrack(track);
+    }
+    x0 = null; dragging = false;
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
   });
 
   // janela mudou de tamanho: larguras e posição precisam ser recalculadas
   addEventListener("resize", () => {
+    if (!dlg.open) return;
     const t = $("#d-track");
     if (!t) return;
     ajustarJanela(t);
@@ -911,9 +1076,17 @@ document.addEventListener("click", e => {
   const t = e.target.closest(".tab");
   if (t) { pick(t.dataset.id, true); return; }
   const f = e.target.closest(".chip");
-  if (f) { filter = f.dataset.c; render(); const n = document.querySelector(`.chip[data-c="${filter}"]`); if (n) n.focus(); return; }
+  if (f) { filter = f.dataset.c; renderPainel(true); return; }
   const b = e.target.closest(".item");
-  if (b) { current = +b.dataset.i; fill(current); $("#dlg").showModal(); return; }
+  if (b) {
+    current = +b.dataset.i;
+    const p = PROJECTS[current];
+    fill(current);
+    $("#dlg").showModal();
+    const s = slugProj(p);
+    if (p) { try { history.replaceState(null, "", "#" + p.area + (s ? "/" + s : "")); } catch(err){} }
+    return;
+  }
   const th = e.target.closest("[data-thumb]");
   if (th) { mid = +th.dataset.thumb; pintarMidia(); return; }
   const dt = e.target.closest("[data-dot]");
@@ -923,8 +1096,8 @@ document.addEventListener("click", e => {
   const pl = e.target.closest("[data-play]");
   if (pl) { tocar(+pl.dataset.play); return; }
   if (e.target.closest("#close") || e.target.id === "dlg") {
-    $("#d-view").innerHTML = "";   // para o vídeo se estiver tocando
     $("#dlg").close();
+    return;
   }
   if (e.target.closest("#lang")) {
     lang = lang === "pt" ? "en" : "pt";
@@ -933,19 +1106,60 @@ document.addEventListener("click", e => {
   }
 });
 /* imagem que o navegador não consegue mostrar (formato errado ou arquivo faltando)
-   vira o placeholder em vez de ícone de imagem quebrada */
+   tenta o fallback (ex.: hqdefault no YouTube) ou vira placeholder */
 document.addEventListener("error", e => {
   const img = e.target;
-  if (!img || img.tagName !== "IMG" || img.dataset.fb || img.dataset.falhou) return;
+  if (!img || img.tagName !== "IMG" || img.closest(".fundo")) return;
+  if (img.dataset.fb) {
+    const fb = img.dataset.fb;
+    delete img.dataset.fb;
+    img.src = fb;
+    return;
+  }
+  if (img.closest(".d-thumb")) {
+    img.dataset.falhou = "1";
+    img.remove();
+    return;
+  }
+  if (img.dataset.falhou) return;
   img.dataset.falhou = "1";
   const ph = document.createElement("div");
   ph.className = "ph";
-  ph.style.setProperty("--h", "0");
+  ph.style.setProperty("--h", img.dataset.h || "0");
   ph.textContent = UI[lang].img;
   img.replaceWith(ph);
 }, true);
 
-window.addEventListener("hashchange", () => pick(location.hash.slice(1), false));
+function rotearHash(){
+  let raw = location.hash.slice(1);
+  try { raw = decodeURIComponent(raw); } catch(e) {}
+  raw = raw.trim();
+  if (!raw) {
+    pick(AREAS[0]?.id, false);
+    if ($("#dlg")?.open) $("#dlg").close();
+    return;
+  }
+  if (raw === "top" || raw === "sobre" || raw === "contato") {
+    if (!area && AREAS.length) pick(AREAS[0].id, false);
+    return;
+  }
+  const barra = raw.indexOf("/");
+  const areaId = barra >= 0 ? raw.slice(0, barra) : raw;
+  const projSlug = barra >= 0 ? raw.slice(barra + 1) : "";
+  pick(areaId, false);
+  if (projSlug) {
+    const idx = PROJECTS.findIndex(p => p.area === area && slugProj(p) === projSlug);
+    if (idx >= 0) {
+      current = idx;
+      fill(current);
+      if (!$("#dlg").open) $("#dlg").showModal();
+      return;
+    }
+  }
+  if ($("#dlg")?.open) $("#dlg").close();
+}
+
+window.addEventListener("hashchange", rotearHash);
 $("#tabs").addEventListener("keydown", e => {
   const k = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
   if (!k) return;
@@ -955,7 +1169,7 @@ $("#tabs").addEventListener("keydown", e => {
   $("#tab-" + AREAS[i].id).focus();
 });
 
-pick(location.hash.slice(1), false);
+rotearHash();
 
 
 /* aplica a cor de destaque do fundo sorteado (tabela PALETA, gerada por tools/paleta.js) */
@@ -968,8 +1182,12 @@ function aplicarDestaque(url){
 
 /* fundo aleatório: sorteia uma imagem, e se o arquivo não existir tenta outra */
 function sortear(cfg, el){
-  if (!el) return;
-  const ordem = Array.from({length: cfg.total}, (_, i) => i + 1).sort(() => Math.random() - .5);
+  if (!el || !cfg.total) return;
+  const ordem = Array.from({length: cfg.total}, (_, i) => i + 1);
+  for (let i = ordem.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ordem[i], ordem[j]] = [ordem[j], ordem[i]];
+  }
   const tentar = k => {
     if (k >= ordem.length) return;               // nenhum carregou: fica só o fundo escuro
     el.onload = () => {
@@ -992,7 +1210,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   fundo.style.willChange = "transform";
   let ticking = false;
   addEventListener("scroll", () => {
-    if (ticking) return;
+    if (ticking || scrollY * (1 - FUNDOS.parallax) > fundo.offsetHeight + 100) return;
     ticking = true;
     requestAnimationFrame(() => {
       fundo.style.transform = `translate3d(0,${scrollY * FUNDOS.parallax}px,0)`;

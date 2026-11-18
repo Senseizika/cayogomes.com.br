@@ -43,42 +43,10 @@ const AREAS = [
       "pt": "3D",
       "en": "3D"
     },
-    "cats": [
-      {
-        "id": "cat-1794926813556",
-        "name": {
-          "pt": "Arte",
-          "en": "Art"
-        }
-      }
-    ],
+    "cats": [],
     "lead": {
       "pt": "Arte 3D feita por um artista, seja estilizada ou realista.\nPersonagens, criaturas e props esculpidos à mão, prontos para jogos ou para impressão.",
       "en": "3D art made by an artist, whether stylized or realist.\nCharacters, creatures, and props sculpted by hand, ready for games or print on demand."
-    }
-  },
-  {
-    "id": "c",
-    "name": {
-      "pt": "Casa da Morte",
-      "en": "House of death"
-    },
-    "short": {
-      "pt": "CASA",
-      "en": "CASA"
-    },
-    "cats": [
-      {
-        "id": "cat-1794922461329",
-        "name": {
-          "pt": " Design de fases",
-          "en": "Level design"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "Teste 👈(ﾟヮﾟ👈)",
-      "en": "test ᓚᘏᗢ"
     }
   }
 ];

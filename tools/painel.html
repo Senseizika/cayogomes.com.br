@@ -135,6 +135,8 @@ input:focus,select:focus,textarea:focus{outline:1px solid var(--accent)}
 textarea{resize:vertical}
 .linha{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;text-transform:uppercase;color:var(--mute)}
+.toggle-webp{display:inline-flex;align-items:center;gap:.35rem;margin:0 0 0 auto;font:400 .72rem ui-monospace,Consolas,monospace;text-transform:none;letter-spacing:0;color:var(--mute);cursor:pointer}
+.toggle-webp input{width:auto;margin:0;accent-color:var(--accent)}
 .midia{border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-bottom:.6rem;background:#0e1013}
 .midia .topo{display:flex;gap:.35rem;align-items:center;margin-bottom:.5rem;cursor:grab}
 .midia .topo:active{cursor:grabbing}
@@ -153,7 +155,6 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .carrossel-opcao b{display:block;font:500 .84rem system-ui,sans-serif;margin-bottom:.15rem}
 .carrossel-opcao small{display:block;font:400 .75rem system-ui,sans-serif;color:var(--mute)}
 .carrossel-opcao:has(input:checked){border-color:var(--accent);background:rgba(239,43,49,.08)}
-.tag-carrossel{font:500 .62rem ui-monospace,Consolas,monospace;line-height:1;color:var(--accent);border:1px solid currentColor;border-radius:50%;width:1.15rem;height:1.15rem;display:grid;place-items:center;flex-shrink:0}
 
 .midia.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
 .midia.drag-over { border-top: 2px solid var(--accent); }
@@ -247,8 +248,34 @@ let buscaProjeto = '';
 let dragType = null;
 let dragData = null;
 
-let estadoAccordion = new Set();
-let estadoAccordionInicializado = false;
+const gruposFechados = new Set();
+
+function chaveDetails(d, modo = modoAtual) {
+  if (d.dataset.catId) return `${modo}:cat:${d.dataset.areaId}:${d.dataset.catId}`;
+  if (d.dataset.areaId) return `${modo}:area:${d.dataset.areaId}`;
+  return '';
+}
+
+function estaAberto(modo, tipo, areaId, catId) {
+  const k = tipo === 'cat' ? `${modo}:cat:${areaId}:${catId}` : `${modo}:area:${areaId}`;
+  return !gruposFechados.has(k);
+}
+
+function sincronizarAccordionsDOM(modo = modoAtual) {
+  if (modo === 'projetos' && buscaProjeto) return;
+  document.querySelectorAll('#lista details').forEach(d => {
+    const k = chaveDetails(d, modo);
+    if (!k) return;
+    if (d.open) gruposFechados.delete(k);
+    else gruposFechados.add(k);
+  });
+}
+
+function abrirGrupoDoProjeto(p) {
+  if (!p) return;
+  gruposFechados.delete(`projetos:area:${p.area}`);
+  gruposFechados.delete(`projetos:cat:${p.area}:${p.cat || 'sem-cat'}`);
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -408,6 +435,7 @@ function atualizarPreviewProjeto() {
 }
 
 function mudarModo(m) {
+  sincronizarAccordionsDOM(modoAtual);
   modoAtual = m;
   document.querySelectorAll('[data-modo]').forEach(b => b.classList.toggle('on', b.dataset.modo === m));
   const btnCarrossel = $('#novo-carrossel');
@@ -433,7 +461,7 @@ function mudarModo(m) {
     $('#preview-projeto').style.display = 'none';
   }
   
-  desenharLista();
+  desenharLista(true);
   
   if (m === 'projetos' && projetoSelecionado) {
     document.body.classList.add("editando");
@@ -461,17 +489,6 @@ function temProblema(p) {
   return avisos;
 }
 
-function salvarEstadoAccordions() {
-  estadoAccordionInicializado = true;
-  estadoAccordion.clear();
-  document.querySelectorAll('#lista details').forEach(d => {
-    if (d.open) {
-      if (d.dataset.catId) estadoAccordion.add('cat-' + d.dataset.areaId + '-' + d.dataset.catId);
-      else if (d.dataset.areaId) estadoAccordion.add('area-' + d.dataset.areaId);
-    }
-  });
-}
-
 function renderizarLinhasProjetos(lista) {
   return lista.map(p => {
     const i = projetos.indexOf(p);
@@ -481,7 +498,6 @@ function renderizarLinhasProjetos(lista) {
     return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, "0")}</b>
-      ${p.galeria === 'carrossel' ? '<span class="tag-carrossel" title="galeria em carrossel contínuo (Instagram)">C</span>' : ''}
       <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
       <em>${conta}</em>
     </li>`;
@@ -494,7 +510,7 @@ function desenharListaProjetos() {
   
   areasEditaveis.forEach(area => {
     const projetosDaArea = projetos.filter(p => p.area === area.id);
-    const abArea = !estadoAccordionInicializado || estadoAccordion.has('area-' + area.id) ? 'open' : '';
+    const abArea = (modoAtual === 'projetos' && buscaProjeto) || estaAberto('projetos', 'area', area.id) ? 'open' : '';
     
     html += `<details class="grupo" ${abArea} data-area-id="${area.id}">
       <summary>
@@ -516,7 +532,7 @@ function desenharListaProjetos() {
 
       if (termo && listaFiltrada.length === 0) return;
 
-      const abCat = !estadoAccordionInicializado || estadoAccordion.has('cat-' + area.id + '-' + cat.id) ? 'open' : '';
+      const abCat = (modoAtual === 'projetos' && buscaProjeto) || estaAberto('projetos', 'cat', area.id, cat.id) ? 'open' : '';
 
       html += `<details class="grupo-cat" ${abCat} data-area-id="${area.id}" data-cat-id="${cat.id}">
         <summary>
@@ -529,7 +545,8 @@ function desenharListaProjetos() {
       html += `</ol></details>`;
     });
 
-    const semCategoria = projetosDaArea.filter(p => !p.cat);
+    const catIds = new Set(cats.map(c => c.id));
+    const semCategoria = projetosDaArea.filter(p => !p.cat || !catIds.has(p.cat));
     const semCategoriaFiltrada = semCategoria.filter(p => {
       if (!termo) return true;
       return (p.title?.pt || "").toLowerCase().includes(termo) ||
@@ -538,7 +555,7 @@ function desenharListaProjetos() {
     });
     
     if (semCategoriaFiltrada.length) {
-      const abCat = !estadoAccordionInicializado || estadoAccordion.has('cat-' + area.id + '-sem-cat') ? 'open' : '';
+      const abCat = (modoAtual === 'projetos' && buscaProjeto) || estaAberto('projetos', 'cat', area.id, 'sem-cat') ? 'open' : '';
       html += `<details class="grupo-cat" ${abCat} data-area-id="${area.id}" data-cat-id="sem-cat">
         <summary>
           Sem categoria
@@ -555,7 +572,7 @@ function desenharListaProjetos() {
 
 function desenharListaAreas() {
   $('#lista').innerHTML = areasEditaveis.map((a, i) => {
-    const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + a.id) ? 'open' : '';
+    const aberto = estaAberto('areas', 'area', a.id) ? 'open' : '';
     const selecionado = a === areaSelecionada ? ' selecionado' : '';
     return `<details class="grupo${selecionado}" ${aberto} draggable="true" data-area-id="${esc(a.id)}" data-ai="${i}">
       <summary>
@@ -575,7 +592,7 @@ function desenharListaCategorias() {
     const cats = area.cats || [];
 
     // Mesma estrutura visual das outras abas: grupo com summary + ol de linhas.
-    const aberto = !estadoAccordionInicializado || estadoAccordion.has('area-' + area.id) ? 'open' : '';
+    const aberto = estaAberto('categorias', 'area', area.id) ? 'open' : '';
     const selecionado = area === areaSelecionada ? ' selecionado' : '';
     html += `<details class="grupo${selecionado}" ${aberto} draggable="true" data-area-id="${esc(area.id)}" data-ai="${ai}">
       <summary>
@@ -598,11 +615,25 @@ function desenharListaCategorias() {
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
 }
 
-function desenharLista() {
+function desenharLista(jaSincronizado = false) {
+  const lateral = $("#lateral-conteudo");
+  const rolagem = lateral ? lateral.scrollTop : 0;
+  if (!jaSincronizado) sincronizarAccordionsDOM(modoAtual);
   if (modoAtual === 'projetos') desenharListaProjetos();
   else if (modoAtual === 'areas') desenharListaAreas();
   else if (modoAtual === 'categorias') desenharListaCategorias();
+  if (lateral) lateral.scrollTop = rolagem;
 }
+
+$("#lista").addEventListener("toggle", e => {
+  if (modoAtual === 'projetos' && buscaProjeto) return;
+  const d = e.target;
+  if (!d || d.tagName !== "DETAILS") return;
+  const k = chaveDetails(d, modoAtual);
+  if (!k) return;
+  if (d.open) gruposFechados.delete(k);
+  else gruposFechados.add(k);
+}, true);
 
 $("#lista").addEventListener("dragstart", e => {
   if (buscaProjeto && modoAtual === 'projetos') {
@@ -611,7 +642,7 @@ $("#lista").addEventListener("dragstart", e => {
     return;
   }
 
-  salvarEstadoAccordions();
+  sincronizarAccordionsDOM(modoAtual);
 
   // A linha inteira é arrastável (não só o "☰"), então o tipo é deduzido
   // pelo elemento em que o arraste começou.
@@ -753,6 +784,7 @@ $("#lista").addEventListener("drop", e => {
           if (!dropAfter) insertIndex = targetIndex > data.index ? targetIndex - 1 : targetIndex;
           else insertIndex = targetIndex > data.index ? targetIndex : targetIndex + 1;
           projetos.splice(insertIndex, 0, proj);
+          abrirGrupoDoProjeto(proj);
           marcarSujo();
           projetoSelecionado = proj;
           setTimeout(() => { abrirFormulario(); status("Projeto reordenado!"); }, 10);
@@ -767,6 +799,7 @@ $("#lista").addEventListener("drop", e => {
           if (catId === 'sem-cat') delete proj.cat; else proj.cat = catId;
           projetos.splice(data.index, 1);
           projetos.push(proj);
+          abrirGrupoDoProjeto(proj);
           marcarSujo();
           projetoSelecionado = proj;
           setTimeout(() => { abrirFormulario(); status("Projeto movido de categoria!"); }, 10);
@@ -817,28 +850,40 @@ $("#lista").addEventListener("click", e => {
   const summaryCat = e.target.closest("details.grupo-cat > summary");
 
   if (summaryArea) {
-    const areaId = summaryArea.parentElement.dataset.areaId;
-    const area = areasEditaveis.find(a => a.id === areaId);
-    if (area) {
-      e.preventDefault();
-      summaryArea.parentElement.open = !summaryArea.parentElement.open;
-      salvarEstadoAccordions();
-      if (modoAtual === 'categorias') { areaSelecionada = area; atualizarSelecaoVisual(); }
-      else abrirArea(area);
+    e.preventDefault();
+    const details = summaryArea.parentElement;
+    const area = areasEditaveis.find(a => a.id === details.dataset.areaId);
+    if (modoAtual === 'projetos') {
+      details.open = !details.open;
+      sincronizarAccordionsDOM('projetos');
+    } else if (modoAtual === 'areas' && area) {
+      if (areaSelecionada === area && document.body.classList.contains('editando')) {
+        details.open = !details.open;
+        sincronizarAccordionsDOM('areas');
+      } else {
+        details.open = true;
+        sincronizarAccordionsDOM('areas');
+        abrirArea(area);
+      }
+    } else if (modoAtual === 'categorias' && area) {
+      if (areaSelecionada === area && !categoriaSelecionada) {
+        details.open = !details.open;
+        sincronizarAccordionsDOM('categorias');
+      } else {
+        details.open = true;
+        sincronizarAccordionsDOM('categorias');
+        areaSelecionada = area;
+        categoriaSelecionada = null;
+        atualizarSelecaoVisual();
+      }
     }
     return;
   }
-  if (summaryCat && modoAtual === 'projetos') {
-    const areaId = summaryCat.parentElement.dataset.areaId;
-    const catId = summaryCat.parentElement.dataset.catId;
-    const area = areasEditaveis.find(a => a.id === areaId);
-    const cat = area && (area.cats || []).find(c => c.id === catId);
-    if (area && cat) {
-      e.preventDefault();
-      summaryCat.parentElement.open = !summaryCat.parentElement.open;
-      salvarEstadoAccordions();
-      abrirCat(area, cat);
-    }
+  if (summaryCat) {
+    e.preventDefault();
+    const details = summaryCat.parentElement;
+    details.open = !details.open;
+    sincronizarAccordionsDOM(modoAtual);
     return;
   }
 
@@ -856,9 +901,10 @@ function novoProjeto(galeria) {
   const areaId = areasEditaveis[0]?.id || "";
   projetos.unshift({ area: areaId, cat: "", galeria: galeria || "slide", h: 0, tools: "",
     title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+  abrirGrupoDoProjeto(projetos[0]);
   marcarSujo();
   projetoSelecionado = projetos[0];
-  desenharListaProjetos();
+  desenharLista();
   abrir(projetoSelecionado);
   document.querySelector('[data-campo="title.pt"]')?.focus();
 }
@@ -873,7 +919,7 @@ $("#novo").onclick = () => {
     areasEditaveis.push({ id: tempId, name: { pt: "", en: "" }, short: { pt: "", en: "" }, cats: [], lead: { pt: "", en: "" } });
     marcarSujo();
     areaSelecionada = areasEditaveis[areasEditaveis.length - 1];
-    desenharListaAreas();
+    desenharLista();
     abrirArea(areaSelecionada);
     document.querySelector('[data-acampo="name.pt"]')?.focus();
   } else if (modoAtual === 'categorias') {
@@ -882,9 +928,10 @@ $("#novo").onclick = () => {
     const area = areaAtual() || areasEditaveis[0];
     area.cats = area.cats || [];
     area.cats.push({ id: "cat-" + Date.now(), name: { pt: "", en: "" } });
+    gruposFechados.delete('categorias:area:' + area.id);
     marcarSujo();
     categoriaSelecionada = area.cats[area.cats.length - 1];
-    desenharListaCategorias();
+    desenharLista();
     abrirCat(area, categoriaSelecionada);
     document.querySelector('[data-catcampo="name.pt"]')?.focus();
   }
@@ -907,6 +954,7 @@ async function salvar() {
       if (!p.area || !areasEditaveis.some(a => a.id === p.area)) p.area = areasEditaveis[0]?.id || "";
     });
 
+    const idxProjetoSel = projetoSelecionado ? projetos.indexOf(projetoSelecionado) : -1;
     const areaSelecionadaId = areaSelecionada?.id;
     const categoriaSelecionadaId = categoriaSelecionada?.id;
     const categoriaSelecionadaAreaId = areaDaCategoria(categoriaSelecionada)?.id;
@@ -915,6 +963,10 @@ async function salvar() {
     await api("/api/areas", { areas: areasEditaveis });
     
     const r = await api('/api/estado');
+    if (Array.isArray(r.projetos)) {
+      projetos = r.projetos;
+      projetoSelecionado = idxProjetoSel >= 0 ? (projetos[idxProjetoSel] || null) : null;
+    }
     areas = r.areas;
     areasEditaveis = r.areasCompletas || areasEditaveis;
     areaSelecionada = areasEditaveis.find(a => a.id === areaSelecionadaId) || null;
@@ -974,9 +1026,10 @@ $("#duplicar").onclick = () => {
   copia.title.en += " (copy)";
   const posicao = projetos.indexOf(p);
   projetos.splice(posicao + 1, 0, copia);
+  abrirGrupoDoProjeto(copia);
   marcarSujo();
   projetoSelecionado = copia;
-  desenharListaProjetos();
+  desenharLista();
   abrir(copia);
   status("Projeto duplicado!");
 };
@@ -1006,6 +1059,10 @@ function linhaMidia(m, i, total) {
       ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
     </div>
   </div>`;
+}
+
+function webpAtivo() {
+  try { return localStorage.getItem("painel_webp") !== "0"; } catch (e) { return true; }
 }
 
 function desenharForm() {
@@ -1050,7 +1107,11 @@ function desenharForm() {
       
       <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
       
-      <h3>mídias <button id="add-midia">+ mídia</button></h3>
+      <h3>mídias <button id="add-midia">+ mídia</button>
+        <label class="toggle-webp" title="Converte PNG, JPG e BMP para WebP na resolução original (só troca se ficar menor)">
+          <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}> otimizar p/ WebP
+        </label>
+      </h3>
       <div id="midias">
         ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
       </div>
@@ -1134,13 +1195,39 @@ function linhaCategoria(c, i, total) {
   </div>`;
 }
 
-function abrir(p) { projetoSelecionado = p && projetos.includes(p) ? p : null; document.body.classList.add("editando"); atualizarTudo(); }
-function abrirArea(a) { areaSelecionada = a && areasEditaveis.includes(a) ? a : null; idOriginalArea = areaSelecionada?.id || ''; document.body.classList.add('editando'); atualizarTudo(); }
-function abrirCat(a, c) { categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null; if (categoriaSelecionada) areaSelecionada = a; document.body.classList.add('editando'); atualizarTudo(); }
+function abrir(p) {
+  projetoSelecionado = p && projetos.includes(p) ? p : null;
+  areaSelecionada = null;
+  categoriaSelecionada = null;
+  document.body.classList.add("editando");
+  if (modoAtual !== 'projetos') { mudarModo('projetos'); return; }
+  if (!$("#lista").firstElementChild) desenharLista(true);
+  atualizarSelecaoVisual();
+  if (projetoAtual()) desenharForm();
+}
+function abrirArea(a) {
+  areaSelecionada = a && areasEditaveis.includes(a) ? a : null;
+  categoriaSelecionada = null;
+  idOriginalArea = areaSelecionada?.id || '';
+  document.body.classList.add('editando');
+  if (modoAtual !== 'areas') { mudarModo('areas'); return; }
+  if (!$("#lista").firstElementChild) desenharLista(true);
+  atualizarSelecaoVisual();
+  if (areaAtual()) desenharFormArea();
+}
+function abrirCat(a, c) {
+  categoriaSelecionada = a && c && (a.cats || []).includes(c) ? c : null;
+  if (categoriaSelecionada) areaSelecionada = a;
+  document.body.classList.add('editando');
+  if (modoAtual !== 'categorias') { mudarModo('categorias'); return; }
+  if (!$("#lista").firstElementChild) desenharLista(true);
+  atualizarSelecaoVisual();
+  if (categoriaAtual()) desenharFormCat();
+}
 function fechar() { document.body.classList.remove("editando"); }
 $("#fechar-drawer").onclick = fechar;
 
-$("#busca-projeto").addEventListener("input", e => { buscaProjeto = e.target.value; if (modoAtual === 'projetos') desenharListaProjetos(); });
+$("#busca-projeto").addEventListener("input", e => { buscaProjeto = e.target.value; if (modoAtual === 'projetos') desenharLista(true); });
 
 $("#form").addEventListener("input", e => {
   const c = e.target.closest("[data-campo]");
@@ -1153,7 +1240,7 @@ $("#form").addEventListener("input", e => {
     setCampo(projetoAtual(), c.dataset.campo, c.value);
     if (c.dataset.campo === "title.pt") {
       $("#drawer-titulo").textContent = String(indiceProjeto(projetoAtual()) + 1).padStart(2, "0") + " · " + (c.value || "sem título");
-      const li = document.querySelector(`li[data-i="${indiceProjeto(projetoAtual())}"] span`);
+      const li = document.querySelector(`li[data-i="${indiceProjeto(projetoAtual())}"] span:not(.handle)`);
       if (li) {
         const avisos = temProblema(projetoAtual());
         const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
@@ -1173,19 +1260,37 @@ $("#form").addEventListener("input", e => {
   }
   const ca = e.target.closest('[data-acampo]');
   if (ca) {
-    setCampo(areaAtual(), ca.dataset.acampo, ca.value);
+    const a = areaAtual();
+    if (!a) return;
+    if (ca.dataset.acampo === 'id') a._autoId = false;
+    setCampo(a, ca.dataset.acampo, ca.value);
     if (ca.dataset.acampo === 'name.pt') {
-      const a = areaAtual();
       $('#drawer-titulo').textContent = String(indiceArea(a) + 1).padStart(2, '0') + ' · ' + (ca.value || 'sem nome');
-      if (a.id.startsWith('area-')) {
+      if (a._autoId || /^area-\d+$/.test(a.id || '')) {
+        a._autoId = true;
         const novoSlug = slug(ca.value);
         if (novoSlug && novoSlug !== 'item') {
           const antigoId = a.id;
           a.id = novoSlug;
+          idOriginalArea = novoSlug;
           projetos.forEach(p => { if (p.area === antigoId) p.area = novoSlug; });
           const idInput = document.querySelector('[data-acampo="id"]');
           if (idInput) idInput.value = a.id;
+          const det = document.querySelector(`#lista details[data-area-id="${antigoId}"]`);
+          if (det) det.dataset.areaId = novoSlug;
+          if (gruposFechados.has(`areas:area:${antigoId}`)) {
+            gruposFechados.delete(`areas:area:${antigoId}`);
+            gruposFechados.add(`areas:area:${novoSlug}`);
+          }
         }
+      }
+      const det = document.querySelector(`#lista details[data-area-id="${a.id}"]`);
+      const sum = det && det.querySelector(':scope > summary');
+      if (sum) {
+        const handle = sum.querySelector('.handle');
+        sum.textContent = '';
+        if (handle) sum.appendChild(handle);
+        sum.append(' ' + (ca.value || '(sem nome)'));
       }
     }
     if (ca.dataset.acampo === 'id') {
@@ -1201,12 +1306,35 @@ $("#form").addEventListener("input", e => {
   }
   const cc = e.target.closest('[data-catcampo]');
   if (cc) {
+    let cat = null, area = null;
     if (modoAtual === 'categorias') {
-      setCampo(categoriaAtual(), cc.dataset.catcampo, cc.value);
-      if (cc.dataset.catcampo === 'name.pt') $('#drawer-titulo').textContent = 'Cat · ' + (cc.value || 'sem nome');
+      cat = categoriaAtual();
+      area = areaDaCategoria(cat);
     } else {
+      area = areaAtual();
       const ci = +cc.closest('[data-ci]').dataset.ci;
-      setCampo(areaAtual().cats[ci], cc.dataset.catcampo, cc.value);
+      cat = area?.cats?.[ci] || null;
+    }
+    if (!cat) return;
+    if (cc.dataset.catcampo === 'id') cat._autoId = false;
+    setCampo(cat, cc.dataset.catcampo, cc.value);
+    if (cc.dataset.catcampo === 'name.pt') {
+      if (modoAtual === 'categorias') $('#drawer-titulo').textContent = 'Cat · ' + (cc.value || 'sem nome');
+      if (area && (cat._autoId || /^cat-\d+$/.test(cat.id || ''))) {
+        cat._autoId = true;
+        const baseSlug = slug(cc.value);
+        if (baseSlug && baseSlug !== 'item') {
+          const usados = new Set((area.cats || []).filter(x => x !== cat).map(x => x.id));
+          let novoSlug = baseSlug, n = 2;
+          while (usados.has(novoSlug)) novoSlug = baseSlug + '-' + (n++);
+          const antigoId = cat.id;
+          cat.id = novoSlug;
+          projetos.forEach(p => { if (p.area === area.id && p.cat === antigoId) p.cat = novoSlug; });
+          const box = cc.closest('.cat[data-ci]') || $('#form');
+          const idInput = box.querySelector('[data-catcampo="id"]');
+          if (idInput) idInput.value = novoSlug;
+        }
+      }
     }
     marcarSujo();
     return;
@@ -1214,6 +1342,10 @@ $("#form").addEventListener("input", e => {
 });
 
 $("#form").addEventListener("change", async e => {
+  if (e.target.id === "opt-webp") {
+    try { localStorage.setItem("painel_webp", e.target.checked ? "1" : "0"); } catch (err) {}
+    return;
+  }
   const tipo = e.target.closest('[data-mcampo="type"]');
   if (tipo) {
     const mi = +tipo.closest("[data-mi]").dataset.mi;
@@ -1226,14 +1358,20 @@ $("#form").addEventListener("change", async e => {
   if (area) {
     projetoAtual().area = area.value;
     projetoAtual().cat = "";
+    abrirGrupoDoProjeto(projetoAtual());
     marcarSujo();
     desenharForm();
+    desenharLista();
+    atualizarSelecaoVisual();
     return;
   }
   const categoria = e.target.closest('[data-campo="cat"]');
   if (categoria) {
     projetoAtual().cat = categoria.value;
+    abrirGrupoDoProjeto(projetoAtual());
     marcarSujo();
+    desenharLista();
+    atualizarSelecaoVisual();
     return;
   }
   const catArea = e.target.closest('[data-cat-area]');
@@ -1246,8 +1384,11 @@ $("#form").addEventListener("change", async e => {
       destino.cats = destino.cats || [];
       destino.cats.push(catObj);
       categoriaSelecionada = catObj;
+      gruposFechados.delete('categorias:area:' + destino.id);
       marcarSujo();
       desenharFormCat();
+      desenharLista();
+      atualizarSelecaoVisual();
       status("Categoria movida de área!");
     }
     return;
@@ -1265,7 +1406,7 @@ $("#form").addEventListener("click", e => {
     idOriginalArea = novoId;
     marcarSujo();
     desenharFormArea();
-    desenharListaProjetos();
+    desenharLista();
     status("Projetos vinculados ao novo ID com sucesso!");
     return;
   }
@@ -1274,14 +1415,58 @@ $("#form").addEventListener("click", e => {
     if (confirm('Apagar esta categoria? Os projetos ficarão "Sem categoria".')) {
       const cat = categoriaAtual();
       const catArea = areaDaCategoria(cat);
-      if (catArea) catArea.cats.splice(catArea.cats.indexOf(cat), 1);
+      if (catArea) {
+        catArea.cats.splice(catArea.cats.indexOf(cat), 1);
+        projetos.forEach(p => { if (p.area === catArea.id && p.cat === cat.id) delete p.cat; });
+      }
       categoriaSelecionada = null;
       marcarSujo();
       fechar();
-      desenharListaCategorias();
+      desenharLista();
       status("Categoria apagada!");
     }
     return;
+  }
+
+  const caixaCat = b.closest(".cat[data-ci]");
+  if (caixaCat && areaAtual()) {
+    const ci = +caixaCat.dataset.ci;
+    const cats = areaAtual().cats || [];
+    if (b.hasAttribute("data-cat-subir") && ci > 0) {
+      [cats[ci - 1], cats[ci]] = [cats[ci], cats[ci - 1]];
+      marcarSujo();
+      const rolagem = $('#form').scrollTop;
+      desenharFormArea();
+      $('#form').scrollTop = rolagem;
+      desenharLista();
+      return;
+    }
+    if (b.hasAttribute("data-cat-descer") && ci < cats.length - 1) {
+      [cats[ci + 1], cats[ci]] = [cats[ci], cats[ci + 1]];
+      marcarSujo();
+      const rolagem = $('#form').scrollTop;
+      desenharFormArea();
+      $('#form').scrollTop = rolagem;
+      desenharLista();
+      return;
+    }
+    if (b.hasAttribute("data-cat-remover")) {
+      if (confirm('Apagar esta categoria? Os projetos ficarão "Sem categoria".')) {
+        const [removida] = cats.splice(ci, 1);
+        if (removida) {
+          const areaId = areaAtual().id;
+          projetos.forEach(p => { if (p.area === areaId && p.cat === removida.id) delete p.cat; });
+          if (categoriaSelecionada === removida) categoriaSelecionada = null;
+        }
+        marcarSujo();
+        const rolagem = $('#form').scrollTop;
+        desenharFormArea();
+        $('#form').scrollTop = rolagem;
+        desenharLista();
+        status("Categoria apagada!");
+      }
+      return;
+    }
   }
 
   if (b.id === 'add-cat') {
@@ -1330,7 +1515,6 @@ $("#form").addEventListener("click", e => {
       projetoSelecionado = projetos[Math.min(pi, projetos.length - 1)] || null;
       marcarSujo();
       if (!projetoSelecionado) fechar();
-      desenharLista();
       atualizarTudo();
     }
   }
@@ -1369,6 +1553,57 @@ seletor.addEventListener("change", () => {
   if (lista.length) enviarArquivos(lista, alvo, mi);
 });
 
+async function otimizarImagemWebP(file) {
+  if (!webpAtivo() || !/^image\/(png|jpeg|bmp)$/i.test(file.type || "")) return file;
+  let bmp = null, url = null;
+  try {
+    const canvas = document.createElement("canvas");
+    if (typeof createImageBitmap === "function") {
+      bmp = await createImageBitmap(file);
+      canvas.width = bmp.width;
+      canvas.height = bmp.height;
+      canvas.getContext("2d").drawImage(bmp, 0, 0);
+    } else {
+      url = URL.createObjectURL(file);
+      const img = await new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res(im);
+        im.onerror = rej;
+        im.src = url;
+      });
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+    }
+    const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.92));
+    if (blob && blob.size > 0 && blob.size < file.size) {
+      const base = file.name.replace(/\.[^.]+$/, "") || "imagem";
+      return new File([blob], base + ".webp", { type: "image/webp" });
+    }
+  } catch (e) {
+    // Se falhar a conversão no navegador, envia o arquivo original
+  } finally {
+    if (bmp && typeof bmp.close === "function") bmp.close();
+    if (url) URL.revokeObjectURL(url);
+  }
+  return file;
+}
+
+function pastaDoProjeto(p) {
+  for (const m of (p.media || [])) {
+    for (const campo of ["src", "poster"]) {
+      const val = m && m[campo];
+      if (!val) continue;
+      const match = /^img\/projetos\/([^/]+)\//.exec(val);
+      if (match && match[1] && match[1] !== "item") return match[1];
+    }
+  }
+  const titulo = String(p.title?.pt || p.title?.en || "").trim();
+  if (titulo) return slug(titulo);
+  p._pastaTemp = p._pastaTemp || ("novo-" + Date.now().toString(36));
+  return p._pastaTemp;
+}
+
 async function enviarArquivos(lista, alvo, mi0) {
   const p = projetoAtual();
   if (!p || !p.media || !lista.length) return;
@@ -1377,12 +1612,13 @@ async function enviarArquivos(lista, alvo, mi0) {
   const arquivos = [...lista];
   if (alvo !== "src") arquivos.length = 1;
 
-  const pasta = slug(p.title?.pt || "item");
+  const pasta = pastaDoProjeto(p);
   let destino = mi0, ultimo = null, foraDoSite = [];
 
   for (let k = 0; k < arquivos.length; k++) {
-    const f = arquivos[k];
+    const original = arquivos[k];
     try {
+      const f = await otimizarImagemWebP(original);
       status(arquivos.length > 1 ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name : "enviando " + f.name + "…");
       const dados = await lerBase64(f);
       const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
@@ -1399,7 +1635,7 @@ async function enviarArquivos(lista, alvo, mi0) {
       console.error(err);
       marcarSujo();
       desenharForm();
-      status("erro ao enviar " + f.name + ": " + (err && err.message ? err.message : String(err)), true);
+      status("erro ao enviar " + original.name + ": " + (err && err.message ? err.message : String(err)), true);
       return;
     }
   }
@@ -1410,7 +1646,32 @@ async function enviarArquivos(lista, alvo, mi0) {
   else status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
 }
 
+let midiaDragIdx = null;
+$("#form").addEventListener("dragstart", e => {
+  const topo = e.target.closest(".midia .topo");
+  if (!topo) return;
+  const caixa = topo.closest(".midia[data-mi]");
+  if (!caixa) return;
+  midiaDragIdx = +caixa.dataset.mi;
+  caixa.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", String(midiaDragIdx));
+});
+$("#form").addEventListener("dragend", () => {
+  midiaDragIdx = null;
+  document.querySelectorAll("#form .midia.dragging, #form .midia.drag-over").forEach(el => el.classList.remove("dragging", "drag-over"));
+});
 $("#form").addEventListener("dragover", e => {
+  if (midiaDragIdx !== null) {
+    const caixa = e.target.closest(".midia[data-mi]");
+    document.querySelectorAll("#form .midia.drag-over").forEach(el => { if (el !== caixa) el.classList.remove("drag-over"); });
+    if (caixa && +caixa.dataset.mi !== midiaDragIdx) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      caixa.classList.add("drag-over");
+    }
+    return;
+  }
   const alvo = e.target.closest("[data-escolher]");
   if (!alvo) return;
   e.preventDefault();
@@ -1418,10 +1679,35 @@ $("#form").addEventListener("dragover", e => {
   alvo.classList.add("recebendo");
 });
 $("#form").addEventListener("dragleave", e => {
+  if (midiaDragIdx !== null) {
+    const caixa = e.target.closest(".midia[data-mi]");
+    if (caixa && !caixa.contains(e.relatedTarget)) caixa.classList.remove("drag-over");
+    return;
+  }
   const alvo = e.target.closest("[data-escolher]");
   if (alvo) alvo.classList.remove("recebendo");
 });
 $("#form").addEventListener("drop", e => {
+  if (midiaDragIdx !== null) {
+    e.preventDefault();
+    const origem = midiaDragIdx;
+    midiaDragIdx = null;
+    document.querySelectorAll("#form .midia.dragging, #form .midia.drag-over").forEach(el => el.classList.remove("dragging", "drag-over"));
+    const caixa = e.target.closest(".midia[data-mi]");
+    const media = projetoAtual()?.media;
+    if (caixa && Array.isArray(media)) {
+      const destino = +caixa.dataset.mi;
+      if (destino !== origem && media[origem] && media[destino]) {
+        const [item] = media.splice(origem, 1);
+        media.splice(destino, 0, item);
+        marcarSujo();
+        const rolagem = $("#form").scrollTop;
+        desenharForm();
+        $("#form").scrollTop = rolagem;
+      }
+    }
+    return;
+  }
   const alvo = e.target.closest("[data-escolher]");
   if (!alvo) return;
   e.preventDefault();

@@ -33,6 +33,7 @@ const { pathToFileURL } = require('url');
 const ROOT = path.resolve(__dirname, '..');
 const INDEX = path.join(ROOT, 'index.html');
 const PASTA_FUNDOS = path.join(ROOT, 'img', 'Fundo');
+const PASTA_CAMADAS = path.join(ROOT, 'img', 'Fundo2');
 const DRY = process.argv.includes('--dry');
 
 const MIN_CONTRASTE = 4.5;    // WCAG AA para texto pequeno
@@ -86,10 +87,20 @@ function lerIndex(arquivos) {
   let html = fs.readFileSync(INDEX, 'utf8');
   const m = html.match(/base:\s*\{[^}]*total:\s*(\d+)/);
   const maior = Math.max(...arquivos.map(numeroDoArquivo));
-  if (m && maior > Number(m[1])) {
+  if (m && maior !== Number(m[1])) {
     const antes = Number(m[1]);
     html = html.replace(/(base:\s*\{[^}]*total:\s*)(\d+)/, (s, ini) => ini + maior);
     console.log(`\n  FUNDOS.base.total ${DRY ? 'seria' : 'foi'} atualizado de ${antes} para ${maior}.`);
+  }
+  if (fs.existsSync(PASTA_CAMADAS)) {
+    const camadas = fs.readdirSync(PASTA_CAMADAS).filter(f => /\.(webp|png|jpe?g|avif)$/i.test(f));
+    const mc = html.match(/camada:\s*\{[^}]*total:\s*(\d+)/);
+    const maiorCamada = camadas.length ? Math.max(...camadas.map(numeroDoArquivo)) : 0;
+    if (mc && maiorCamada !== Number(mc[1])) {
+      const antes = Number(mc[1]);
+      html = html.replace(/(camada:\s*\{[^}]*total:\s*)(\d+)/, (s, ini) => ini + maiorCamada);
+      console.log(`  FUNDOS.camada.total ${DRY ? 'seria' : 'foi'} atualizado de ${antes} para ${maiorCamada}.`);
+    }
   }
   return html;
 }
@@ -307,7 +318,13 @@ const EXPRESSAO = `(async () => {
     console.log('');
   } finally {
     try { ws && ws.close(); } catch (e) {}
-    try { proc.kill(); } catch (e) {}
+    try {
+      if (proc.exitCode === null) {
+        proc.kill();
+        await new Promise(r => { proc.once('exit', r); setTimeout(r, 400); });
+      }
+    } catch (e) {}
+    try { fs.rmSync(perfil, { recursive: true, force: true }); } catch (e) {}
     try { fs.unlinkSync(tmp); } catch (e) {}
   }
   process.exit(0);

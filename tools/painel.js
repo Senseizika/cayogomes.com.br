@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
-const { exec } = require('child_process');
+const { exec, execFile } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const DIR_CONTEUDO = path.join(ROOT, 'conteudo');
@@ -62,24 +62,28 @@ function lerAreasCompletas() {
   }
 }
 
+const slugify = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
 function normalizarAreas(lista) {
   if (!Array.isArray(lista)) throw new Error('formato inválido: esperava lista');
   if (lista.length > 30) throw new Error('máximo de 30 áreas');
-  const slugify = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   return lista.map((a, idx) => {
     const id = slugify(a.id) || slugify(a.name?.pt) || ('area-' + (idx + 1));
     if (!id) throw new Error('área ' + (idx + 1) + ' sem id');
     const cats = (Array.isArray(a.cats) ? a.cats : []).map((c, ci) => {
       const cid = slugify(c.id) || slugify(c.name?.pt) || ('cat-' + (ci + 1));
-      return { id: cid, name: { pt: String(c.name?.pt || cid), en: String(c.name?.en || cid) } };
+      const pt = String(c.name?.pt || cid);
+      return { id: cid, name: { pt, en: String(c.name?.en || c.name?.pt || cid) } };
     }).filter(c => c.id);
+    const ptNome = String(a.name?.pt || id);
+    const ptShort = String(a.short?.pt || '');
     return {
       id,
-      name:  { pt: String(a.name?.pt  || id),                en: String(a.name?.en  || id) },
-      short: { pt: String(a.short?.pt || a.name?.pt || id),  en: String(a.short?.en || a.name?.en || id) },
+      name:  { pt: ptNome, en: String(a.name?.en || a.name?.pt || id) },
+      short: { pt: ptShort, en: String(a.short?.en || ptShort || '') },
       cats,
-      lead:  { pt: String(a.lead?.pt  || ''),                en: String(a.lead?.en  || '') }
+      lead:  { pt: String(a.lead?.pt || ''), en: String(a.lead?.en || '') }
     };
   });
 }
@@ -127,10 +131,67 @@ function normalizar(lista) {
   });
 }
 
+function proximoNomeArquivo(dir, ext) {
+  fs.mkdirSync(dir, { recursive: true });
+  const usados = new Set(fs.readdirSync(dir));
+  let n = 1;
+  while (usados.has(String(n).padStart(2, '0') + '.' + ext)) n++;
+  return String(n).padStart(2, '0') + '.' + ext;
+}
+
+function realocarPastasTemporarias(lista) {
+  const movidos = new Map();
+  const dirsOrigem = new Set();
+
+  for (const p of lista) {
+    const segDestino = slugify(p.title?.pt || p.title?.en);
+    if (!segDestino || segDestino.startsWith('novo-')) continue;
+    const dirDestino = path.join(DIR_IMG, segDestino);
+
+    for (const m of (p.media || [])) {
+      for (const campo of ['src', 'poster']) {
+        const val = m[campo];
+        if (!val || typeof val !== 'string') continue;
+        const match = /^img\/projetos\/(novo-[^/]+)\/([^/]+)$/.exec(val);
+        if (!match) continue;
+
+        if (movidos.has(val)) {
+          m[campo] = movidos.get(val);
+          continue;
+        }
+
+        const dirOrig = path.resolve(DIR_IMG, match[1]);
+        const arqOrig = path.resolve(dirOrig, match[2]);
+        if (!arqOrig.startsWith(DIR_IMG + path.sep) || !fs.existsSync(arqOrig)) continue;
+
+        const ext = String(path.extname(match[2]).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+        const nomeDestino = proximoNomeArquivo(dirDestino, ext);
+        const arqDestino = path.join(dirDestino, nomeDestino);
+        try {
+          fs.renameSync(arqOrig, arqDestino);
+        } catch (err) {
+          fs.copyFileSync(arqOrig, arqDestino);
+          fs.unlinkSync(arqOrig);
+        }
+        const novoCaminho = 'img/projetos/' + segDestino + '/' + nomeDestino;
+        movidos.set(val, novoCaminho);
+        m[campo] = novoCaminho;
+        dirsOrigem.add(dirOrig);
+      }
+    }
+  }
+
+  for (const d of dirsOrigem) {
+    try {
+      if (fs.existsSync(d) && fs.readdirSync(d).length === 0) fs.rmdirSync(d);
+    } catch (e) {}
+  }
+}
+
 function gravar(lista) {
   fs.mkdirSync(DIR_CONTEUDO, { recursive: true });
   fs.writeFileSync(ARQ_JSON, JSON.stringify(lista, null, 2) + '\n', 'utf8');
-  fs.writeFileSync(ARQ_JS, CABECALHO_JS + 'const PROJECTS = ' + JSON.stringify(lista, null, 2) + ';\n', 'utf8');
+  fs.writeFileSync(ARQ_JS, CABECALHO_JS + 'const PROJECTS = ' + JSON.stringify(lista) + ';\n', 'utf8');
 }
 
 function salvarArquivo(pasta, nomeOriginal, dataUrl) {
@@ -145,17 +206,11 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
   let ext = String(path.extname(String(nomeOriginal || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
   if (!ext || ext.length > 10) ext = 'bin';
 
-  const seg = String(pasta || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const seg = slugify(pasta);
   if (!seg) throw new Error('pasta inválida');
 
   const dir = path.join(DIR_IMG, seg);
-  fs.mkdirSync(dir, { recursive: true });
-
-  const usados = new Set(fs.readdirSync(dir));
-  let n = 1;
-  while (usados.has(String(n).padStart(2, '0') + '.' + ext)) n++;
-  const arq = String(n).padStart(2, '0') + '.' + ext;
+  const arq = proximoNomeArquivo(dir, ext);
 
   fs.writeFileSync(path.join(dir, arq), buf);
   return { caminho: 'img/projetos/' + seg + '/' + arq, bytes: buf.length };
@@ -173,14 +228,31 @@ const MIME = {
   '.pdf': 'application/pdf', '.woff2': 'font/woff2'
 };
 
-function servirArquivo(res, abs) {
+function servirArquivo(res, abs, soCabecalho = false) {
   const rel = path.relative(ROOT, abs);
   if (rel.startsWith('..') || path.isAbsolute(rel)) return json(res, 403, { erro: 'fora do projeto' });
   if (/^(tools|\.git|backup)([\\/]|$)/i.test(rel)) return json(res, 404, { erro: 'não encontrado' });
   fs.readFile(abs, (e, buf) => {
     if (e) return json(res, 404, { erro: 'não encontrado' });
-    res.writeHead(200, { 'content-type': MIME[path.extname(abs).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' });
-    res.end(buf);
+    res.writeHead(200, {
+      'content-type': MIME[path.extname(abs).toLowerCase()] || 'application/octet-stream',
+      'content-length': buf.length,
+      'cache-control': 'no-store'
+    });
+    res.end(soCabecalho ? undefined : buf);
+  });
+}
+
+function rodarGit(args) {
+  return new Promise((resolve, reject) => {
+    execFile('git', args, { cwd: ROOT }, (err, stdout, stderr) => {
+      if (err) {
+        err.stdout = stdout;
+        err.stderr = stderr;
+        return reject(err);
+      }
+      resolve({ stdout, stderr });
+    });
   });
 }
 
@@ -201,15 +273,22 @@ function corpo(req) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1');
   const rota = url.pathname;
+  const ehLeitura = req.method === 'GET' || req.method === 'HEAD';
+  const ehHead = req.method === 'HEAD';
 
   try {
-    if (req.method === 'GET' && (rota === '/' || rota === '/painel.html')) {
+    if (ehLeitura && (rota === '/' || rota === '/painel.html')) {
       const html = fs.readFileSync(PAINEL_HTML, 'utf8').replace('__PAINEL_TOKEN__', TOKEN);
-      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-      return res.end(html);
+      res.writeHead(200, {
+        'content-type': 'text/html; charset=utf-8',
+        'content-length': Buffer.byteLength(html),
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff'
+      });
+      return res.end(ehHead ? undefined : html);
     }
-    if (req.method === 'GET' && rota === '/site') {
-      return servirArquivo(res, path.join(ROOT, 'index.html'));
+    if (ehLeitura && rota === '/site') {
+      return servirArquivo(res, path.join(ROOT, 'index.html'), ehHead);
     }
 
     if (rota.startsWith('/api/')) {
@@ -221,9 +300,10 @@ const server = http.createServer(async (req, res) => {
       if (rota === '/api/projetos' && req.method === 'POST') {
         const dados = await corpo(req);
         const lista = normalizar(dados.projetos);
+        realocarPastasTemporarias(lista);
         gravar(lista);
         console.log(`  salvo: ${lista.length} projeto(s)`);
-        return json(res, 200, { ok: true, total: lista.length });
+        return json(res, 200, { ok: true, total: lista.length, projetos: lista });
       }
       if (rota === '/api/areas' && req.method === 'POST') {
         const dados = await corpo(req);
@@ -240,23 +320,30 @@ const server = http.createServer(async (req, res) => {
       }
       if (rota === '/api/git/push' && req.method === 'POST') {
         const dados = await corpo(req);
-        const msg = String(dados.mensagem || 'Atualização via painel').replace(/"/g, '\\"');
-        return new Promise((resolve) => {
-          exec(`git add . && git commit -m "${msg}" && git push`, { cwd: ROOT }, (err, stdout, stderr) => {
-            if (err) {
-              if (stdout.includes('nothing to commit') || stderr.includes('nothing to commit')) {
-                return resolve(json(res, 200, { ok: true, log: 'Nenhuma alteração para enviar.' }));
-              }
-              return resolve(json(res, 400, { erro: 'Falha no Git', log: stderr || stdout || err.message }));
+        const msg = String(dados.mensagem || 'Atualização via painel').trim() || 'Atualização via painel';
+        try {
+          await rodarGit(['add', '-A']);
+          let commitOut = '';
+          try {
+            const c = await rodarGit(['commit', '-m', msg]);
+            commitOut = c.stdout || '';
+          } catch (err) {
+            const txt = (err.stdout || '') + '\n' + (err.stderr || '');
+            if (/nothing to commit|no changes added/i.test(txt)) {
+              return json(res, 200, { ok: true, log: 'Nenhuma alteração para enviar.' });
             }
-            resolve(json(res, 200, { ok: true, log: stdout || 'Enviado para o GitHub com sucesso!' }));
-          });
-        });
+            return json(res, 400, { erro: 'Falha no Git', log: err.stderr || err.stdout || err.message });
+          }
+          const p = await rodarGit(['push']);
+          return json(res, 200, { ok: true, log: p.stdout || commitOut || 'Enviado para o GitHub com sucesso!' });
+        } catch (err) {
+          return json(res, 400, { erro: 'Falha no Git', log: err.stderr || err.stdout || err.message });
+        }
       }
       return json(res, 404, { erro: 'rota não encontrada' });
     }
 
-    if (req.method === 'GET') return servirArquivo(res, path.join(ROOT, decodeURIComponent(rota)));
+    if (ehLeitura) return servirArquivo(res, path.join(ROOT, decodeURIComponent(rota)), ehHead);
     json(res, 405, { erro: 'método não permitido' });
   } catch (e) {
     json(res, 400, { erro: e.message });
