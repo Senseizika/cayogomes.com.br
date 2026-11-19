@@ -473,16 +473,6 @@ dialog[open]{animation:in .22s ease-out}
 .d-count{position:absolute;right:calc(50% - var(--janela) / 2 + .7rem);bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
-.d-ig{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:.5rem clamp(1.2rem,3vw,2.2rem) .8rem;border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 1px 0 rgba(255,255,255,.16);color:var(--white)}
-.d-ig-left{display:flex;align-items:flex-end;gap:1.1rem}
-.d-ig-btn{display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:32px;background:none;border:0;color:var(--white);padding:.2rem;cursor:pointer;opacity:.9;transition:opacity .2s,transform .2s,color .2s}
-.d-ig-btn:hover{opacity:1;transform:scale(1.1)}
-.d-ig-btn svg{width:26px;height:26px;display:block}
-.d-ig-count{font:500 .8rem var(--mono);color:var(--white);line-height:1}
-.d-ig-save{margin-left:auto}
-.d-ig-btn.curtido{color:var(--accent)}
-.d-ig-btn.curtido svg{fill:var(--accent)}
-.d-ig-btn.salvo svg{fill:var(--white)}
 .d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.8rem .6rem;scrollbar-width:none}
 /* barra de miniaturas com botões de rolagem (desktop) */
 .d-thumbs-wrap{position:relative;display:block;border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 1px 0 rgba(255,255,255,.16)}
@@ -775,15 +765,6 @@ function capaHTML(p, eager){
 
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id="d-scroll"><header class="d-header"><div class="d-header-copy"><span id="d-bar"></span><h3 id="d-title"></h3></div><button id="close" type="button"></button></header>
 <div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
-<div class="d-ig" id="d-ig" hidden>
-  <div class="d-ig-left">
-    <button type="button" class="d-ig-btn" aria-label="curtir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-    <button type="button" class="d-ig-btn d-ig-count-btn" aria-label="comentar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="d-ig-count">32</span></button>
-    <button type="button" class="d-ig-btn d-ig-count-btn" aria-label="repostar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v-1a4 4 0 0 1-4 4H3"/></svg><span class="d-ig-count">21</span></button>
-    <button type="button" class="d-ig-btn" aria-label="compartilhar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-  </div>
-  <button type="button" class="d-ig-btn d-ig-save" aria-label="salvar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
-</div>
 <div class="d-thumbs-wrap" id="d-thumbs-wrap" hidden><button class="d-thumbs-nav d-thumbs-prev" id="d-thumbs-prev" type="button" aria-label="Miniaturas anteriores">&#8249;</button><div class="d-thumbs" id="d-thumbs"></div><button class="d-thumbs-nav d-thumbs-next" id="d-thumbs-next" type="button" aria-label="Próximas miniaturas">&#8250;</button></div>
 <div class="d-body"><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div><span class="d-desc-label" id="d-desc-label"></span><p id="d-desc"></p></div></div></dialog>`;
 let area = null;
@@ -1023,7 +1004,6 @@ function fill(i){
   $("#d-title").textContent = tr(p.title);
   $("#d-meta").textContent = p.tools || "";
   $("#d-tools").hidden = !String(p.tools || "").trim();
-  $("#d-ig").hidden = !p.instagram;
   $("#d-desc").textContent = tr(p.desc);
   $("#d-scroll").scrollTop = 0;
   mid = 0;
@@ -1671,14 +1651,6 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
 })();
 
 setupOverlayScrollbar(document.documentElement, true, false, 80);
-
-/* ações simuladas do post do Instagram */
-document.addEventListener("click", e => {
-  const b = e.target.closest(".d-ig-btn");
-  if (!b) return;
-  if (b.getAttribute("aria-label") === "curtir") b.classList.toggle("curtido");
-  else if (b.classList.contains("d-ig-save")) b.classList.toggle("salvo");
-});
 
 
 </script>
