@@ -97,16 +97,16 @@ a{color:inherit}
     0 2px 8px rgba(0,0,0,.52),
     inset 0 0 3px rgba(0,0,0,.28);
 }
-.win::before,.win::after{content:"";position:absolute;border-radius:inherit;pointer-events:none}
+.win::before,.win::after,dialog::before,dialog::after{content:"";position:absolute;border-radius:inherit;pointer-events:none}
 /* respiro mínimo atrás do reflexo (só pra o brilho não parecer recortado) */
-.win::before{
+.win::before,dialog::before{
   inset:0;z-index:3;mix-blend-mode:screen;
   background:
     radial-gradient(20px 48px at 1px 14px,rgba(255,255,255,.08),transparent 76%),
     radial-gradient(16px 32px at 1px calc(100% - 14px),rgba(255,255,255,.06),transparent 76%);
 }
 /* crista especular fina e dura (superfície lisa, roughness ~0): a luz nasce em cima da própria borda */
-.win::after{
+.win::after,dialog::after{
   /* banda a mesma distância da borda nas retas e nas curvas (evita degrau na junção) */
   --bvr:#0000 13.1px,rgba(0,0,0,.40) 13.7px,#000 14.4px 15.5px,rgba(0,0,0,.60) 16px;
   --bvl:rgba(0,0,0,.60) 0,#000 .5px 1.6px,rgba(0,0,0,.40) 2.3px,#0000 2.9px;
@@ -146,7 +146,7 @@ a{color:inherit}
     linear-gradient(90deg,var(--bvl)) 0 16px/16px calc(100% - 32px) no-repeat,
     linear-gradient(270deg,var(--bvl)) 100% 16px/16px calc(100% - 32px) no-repeat;
 }
-.win > *{position:relative;z-index:2}
+.win > *,dialog > *{position:relative;z-index:2}
 @media (min-width: 768px){ .win{ backdrop-filter:blur(15px) saturate(135%); -webkit-backdrop-filter:blur(15px) saturate(135%); } }
 @media (max-width: 767px){ .win{ background-color:rgba(6,8,12,.93); } }
 .bar{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1.15rem .65rem;font:400 .85rem var(--mono);letter-spacing:.08em;color:var(--mute);
@@ -177,10 +177,10 @@ a{color:inherit}
 .hero-row{position:relative;display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.8vw,24px);width:fit-content;max-width:100%;margin-inline:auto}
 .hero-logo{display:block;margin:0;line-height:0;flex:0 1 auto;min-width:0}
 .hero-logo img{display:block;width:auto;height:auto;max-width:100%;max-height:var(--logo-max-h);object-fit:contain}
-/* código de barras: travado proporcionalmente com a logo (30% da altura da logo),
+/* código de barras: travado proporcionalmente com a logo (33% da altura da logo),
    aumentado em 10% e alinhado verticalmente à direita dela. Escala junto com a tela.
    --bc-h manda no tamanho de tudo. */
-.hero-barcode{--bc-h:clamp(46px,min(calc(var(--logo-max-h)*.30),12.5vw),165px);flex:0 0 auto;height:var(--bc-h);width:auto;display:flex;align-items:stretch;gap:calc(var(--bc-h)*.052);color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
+.hero-barcode{--bc-h:clamp(46px,min(calc(var(--logo-max-h)*.33),12.5vw),165px);flex:0 0 auto;height:var(--bc-h);width:auto;display:flex;align-items:stretch;gap:calc(var(--bc-h)*.052);color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
 .bc-bars{flex:0 0 calc(var(--bc-h)*.206);height:100%;width:calc(var(--bc-h)*.206);display:block}
 .bc-txt{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 calc(var(--bc-h)*.093)/1 var(--mono);letter-spacing:.1em;white-space:nowrap}
 /* fundo em duas camadas: ocupa a largura da tela, começa no topo da página e sobe
@@ -325,7 +325,7 @@ a{color:inherit}
 }
 
 /* projeto aberto */
-dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-color:rgba(7,9,13,.93);color:var(--white);border:0;border-radius:16px;padding:0;margin:auto;
+dialog{--dlg-max-h:96vh;isolation:isolate;width:min(1200px,100% - 1.5rem);max-height:var(--dlg-max-h);overflow:hidden;background-color:#06080c;color:var(--white);border:0;border-radius:16px;padding:0;margin:auto;
   background-image:
     var(--scan),
     var(--ruido),
@@ -340,8 +340,25 @@ dialog{width:min(1200px,100% - 1.5rem);max-height:96vh;overflow:auto;background-
 dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-#close{background:none;border:0;color:var(--white);font:500 .85rem var(--mono);letter-spacing:.1em;cursor:pointer}
-#close:hover{color:var(--accent)}
+/* A rolagem fica dentro do modal: o recorte externo preserva todas as quinas arredondadas. */
+.d-scroll{max-height:var(--dlg-max-h);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:rgba(244,244,242,.30) transparent}
+.d-scroll::-webkit-scrollbar{width:8px}
+.d-scroll::-webkit-scrollbar-track{margin:16px 2px 16px 0;background:transparent}
+.d-scroll::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:999px;background:rgba(244,244,242,.30);background-clip:padding-box}
+.d-scroll::-webkit-scrollbar-thumb:hover{background-color:rgba(244,244,242,.48)}
+/* Cabeçalho do modal: repete o vidro, o grão e o vinco dos painéis do site. */
+.d-header{position:sticky;top:0;z-index:3;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem clamp(1.2rem,3vw,2.2rem);
+  background-color:#07090d;
+  background-image:var(--scan),var(--ruido),linear-gradient(102deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.022) 26%,transparent 48%),linear-gradient(118deg,rgba(18,22,30,.12),rgba(4,5,8,.46) 72%),var(--grao);
+  background-size:auto,90px 90px,auto,auto,140px 140px;
+  background-blend-mode:normal,overlay,screen,normal,overlay;
+  border-bottom:1px solid rgba(0,0,0,.92);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 0 rgba(255,255,255,.12),0 10px 22px rgba(0,0,0,.22)}
+.d-header-copy{min-width:0}
+.d-header #d-bar{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em}
+.d-header #d-title{margin:.35rem 0 0;font:400 clamp(2rem,4vw,3rem)/.95 var(--big);letter-spacing:.02em;overflow-wrap:anywhere}
+#close{flex:0 0 auto;min-height:40px;background:rgba(5,5,6,.32);border:1px solid var(--line);border-radius:6px;color:var(--white);font:500 .78rem var(--mono);letter-spacing:.1em;padding:.35rem .7rem;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+#close:hover{color:var(--accent);border-color:var(--accent);background:rgba(5,5,6,.64)}
 /* ---- galeria do projeto aberto ---- */
 .d-stage{
   position: relative;
@@ -442,7 +459,11 @@ dialog[open]{animation:in .22s ease-out}
 .d-count{position:absolute;right:calc(50% - var(--janela) / 2 + .7rem);bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
-.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line)}
+.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line);scrollbar-width:thin;scrollbar-color:rgba(244,244,242,.28) transparent}
+.d-thumbs::-webkit-scrollbar{height:7px}
+.d-thumbs::-webkit-scrollbar-track{background:transparent}
+.d-thumbs::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:999px;background:rgba(244,244,242,.28);background-clip:padding-box}
+.d-thumbs::-webkit-scrollbar-thumb:hover{background-color:rgba(244,244,242,.45)}
 .d-thumb{flex:0 0 auto;position:relative;height:56px;min-width:76px;width:auto;aspect-ratio:auto;padding:0;border:1px solid var(--line);border-radius:6px;
   overflow:hidden;background:#0c0d10;cursor:pointer}
 .d-thumb img{width:auto;height:100%;max-width:none;object-fit:contain;display:block}
@@ -460,10 +481,11 @@ dialog[open]{animation:in .22s ease-out}
 .d-rotulo{position:absolute;bottom:2.2rem;left:50%;transform:translateX(-50%);font:500 .72rem var(--mono);
   letter-spacing:.2em;color:var(--mute)}
 .d-body{padding:1.4rem clamp(1.2rem,3vw,2.2rem) 2rem}
-.d-body h3{font:400 2.8rem/1 var(--big);letter-spacing:.02em}
-.d-body .meta{font:400 .9rem var(--mono);color:var(--accent);margin:.6rem 0 1rem;letter-spacing:.05em}
 .d-body p{max-width:62ch}
 #d-desc{white-space:pre-line}
+.d-tools{margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(0,0,0,.92);box-shadow:0 -1px 0 rgba(255,255,255,.16)}
+.d-tools-label{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em}
+.d-tools .meta{font:400 .9rem var(--mono);color:var(--accent);margin:.35rem 0 0;letter-spacing:.05em}
 /* mensagem quando a área ainda não tem projeto */
 .vazio{padding:2.4rem 1.2rem;margin:0;color:var(--mute);font:400 .95rem var(--mono);letter-spacing:.06em}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
@@ -508,11 +530,12 @@ dialog[open]{animation:in .22s ease-out}
   .about{padding:1.1rem .9rem}
   .contact-body{padding:1.1rem .9rem}
   .svc li{font-size:1rem}
-  dialog{width:calc(100% - 1rem);max-height:94dvh}
+  dialog{--dlg-max-h:94dvh;width:calc(100% - 1rem)}
   .d-stage{height: 70vh; min-height: 260px; }
   .d-nav{width:40px;height:40px}
   .d-thumb{height:48px;min-width:64px}
-  .d-body h3{font-size:2.2rem}
+  .d-header{padding:.8rem .9rem;gap:.75rem}
+  .d-header #d-title{font-size:clamp(1.8rem,9vw,2.2rem)}
 }
 </style>
 </head>
@@ -721,10 +744,10 @@ function capaHTML(p, eager){
   return `<img src="${esc(src)}" alt="${esc(tr(p.title))}" width="600" height="450" decoding="async"${eager ? "" : ' loading="lazy"'} data-h="${p.h || 0}"${fb ? ` data-fb="${esc(fb)}"` : ""}>`;
 }
 
-const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="bar"><span id="d-bar"></span><button id="close" type="button"></button></div>
+const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id="d-scroll"><header class="d-header"><div class="d-header-copy"><span id="d-bar"></span><h3 id="d-title"></h3></div><button id="close" type="button"></button></header>
 <div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
 <div class="d-thumbs" id="d-thumbs" hidden></div>
-<div class="d-body"><h3 id="d-title"></h3><p class="meta" id="d-meta"></p><p id="d-desc"></p></div></dialog>`;
+<div class="d-body"><p id="d-desc"></p><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div></div></div></dialog>`;
 let area = null;
 
 function garantirDialogo(){
@@ -759,6 +782,7 @@ function aplicarIdioma(){
   document.documentElement.lang = u.lang;
   garantirDialogo();
   $("#close").textContent = u.close;
+  $("#d-tools-label").textContent = lang === "pt" ? "SOFTWARES / TÉCNICA" : "SOFTWARE / TECHNIQUE";
   $("#lang").textContent = u.btn;
   $("#d-prev").setAttribute("aria-label", u.prev);
   $("#d-next").setAttribute("aria-label", u.next);
@@ -853,8 +877,9 @@ function fill(i){
   $("#d-bar").textContent = (a ? tr(a.name).toUpperCase() : "") + " / " + pad(i + 1);
   $("#d-title").textContent = tr(p.title);
   $("#d-meta").textContent = p.tools || "";
-  $("#d-meta").hidden = !p.tools;
+  $("#d-tools").hidden = !String(p.tools || "").trim();
   $("#d-desc").textContent = tr(p.desc);
+  $("#d-scroll").scrollTop = 0;
   mid = 0;
   thumbRun++;
   delete $("#d-thumbs").dataset.chave;
@@ -1290,6 +1315,7 @@ document.addEventListener("click", e => {
     const p = PROJECTS[current];
     fill(current);
     $("#dlg").showModal();
+    $("#d-scroll").scrollTop = 0;
     const s = slugProj(p);
     if (p) { try { history.replaceState(null, "", "#" + p.area + (s ? "/" + s : "")); } catch(err){} }
     return;
@@ -1392,6 +1418,7 @@ function rotearHash(){
       current = idx;
       fill(current);
       if (!$("#dlg").open) $("#dlg").showModal();
+      $("#d-scroll").scrollTop = 0;
       return;
     }
   }
@@ -1458,7 +1485,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   }, { passive: true });
 })();
 
-/* sincroniza a altura do código de barras proporcionalmente com a logo (30% da altura) */
+/* sincroniza a altura do código de barras proporcionalmente com a logo (33% da altura) */
 (function(){
   const logo = $(".hero-logo img");
   const barcode = $(".hero-barcode");
@@ -1467,7 +1494,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   const sync = () => {
     const h = logo.getBoundingClientRect().height;
     if (h > 0) {
-      const target = Math.round(h * 0.30);
+      const target = Math.round(h * 0.33);
       if (target !== lastH && target >= 36) {
         lastH = target;
         barcode.style.setProperty("--bc-h", target + "px");
