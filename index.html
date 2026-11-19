@@ -75,11 +75,11 @@ html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100
 /* barras de rolagem customizadas (overlay, sem gutter, somem sozinhas) */
 .ov-sb-track{position:absolute;opacity:0;pointer-events:auto;z-index:50;transition:opacity .7s ease}
 .ov-sb-track.show{opacity:1;transition:opacity .15s ease}
-.ov-sb-track.v{right:4px;top:0;width:8px}
-.ov-sb-track.h{left:0;bottom:4px;height:8px;width:100%}
+.ov-sb-track.v{right:4px;top:0;width:12px}
+.ov-sb-track.h{left:0;bottom:4px;height:12px;width:100%}
 .ov-sb-thumb{position:absolute;background:rgba(244,244,242,.45);border-radius:999px}
-.v .ov-sb-thumb{left:1px;width:6px;top:0}
-.h .ov-sb-thumb{top:1px;height:6px;left:0}
+.v .ov-sb-thumb{left:2px;width:10px;top:0}
+.h .ov-sb-thumb{top:2px;height:10px;left:0}
 .d-scroll{position:relative}
 .d-thumbs{position:relative}
 /* fundo e fonte padrão do site */
@@ -786,7 +786,7 @@ function setupOverlayScrollbar(container, vertical, short, topOffset = 0){
     track.style.display = "";
     const ratio = clientSize / scrollSize;
     const available = clientSize - (vertical ? topOffset : 0);
-    const trackSize = (vertical && short) ? Math.max(60, Math.min(available * 0.35, 160)) : available;
+    const trackSize = available;
     const thumbSize = Math.max(24, Math.min(trackSize * 0.9, trackSize * ratio));
     const maxScroll = scrollSize - clientSize;
     const maxThumb = trackSize - thumbSize;
