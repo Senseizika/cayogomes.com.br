@@ -456,9 +456,9 @@ dialog[open]{animation:in .22s ease-out}
   border: 0;
 }
 /* botões ‹ › (só aparecem quando há mais de uma mídia) */
-.d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:44px;height:44px;display:grid;place-items:center;
-  border:1px solid var(--line);border-radius:50%;background:rgba(5,5,6,.72);color:var(--white);font:400 1.5rem/1 var(--mono);cursor:pointer}
-.d-nav:hover{border-color:var(--accent);color:var(--accent)}
+.d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;display:grid;place-items:center;padding:.2rem;
+  background:none;border:0;color:var(--white);font:400 2rem/1 var(--mono);cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.d-nav:hover{color:var(--accent)}
 .d-prev{left:calc(50% - var(--janela) / 2 + .6rem)} .d-next{right:calc(50% - var(--janela) / 2 + .6rem)}
 .d-nav[hidden],.d-thumbs[hidden],.d-thumbs-wrap[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
 /* bolinhas do carrossel (como no Instagram) */
@@ -548,7 +548,7 @@ dialog[open]{animation:in .22s ease-out}
   .svc li{font-size:1rem}
   dialog{--dlg-max-h:94dvh;width:calc(100% - 1rem)}
   .d-stage{height: 70vh; min-height: 260px; }
-  .d-nav{width:40px;height:40px}
+  .d-nav{width:auto;height:auto}
   .d-thumb{height:48px;min-width:64px}
   .d-header{padding:.8rem .9rem;gap:.75rem}
   .d-header #d-title{font-size:clamp(1.8rem,9vw,2.2rem)}
@@ -1264,10 +1264,8 @@ function pintarMidia(){
       );
     }
     hidratarThumbs();
-  } else {
-    thumbRun++;
-    delete thumbs.dataset.chave;
-    thumbs.innerHTML = "";
+    const thumbAtivo = thumbs.querySelector(`[data-thumb="${mid}"]`);
+    if (thumbAtivo) thumbs.scrollTo({ left: thumbAtivo.offsetLeft - thumbs.clientWidth / 2 + thumbAtivo.offsetWidth / 2, behavior: "smooth" });
   }
 
   const dots = $("#d-dots");
