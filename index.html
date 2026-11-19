@@ -793,7 +793,7 @@ function setupOverlayScrollbar(container, vertical, short, topOffset = 0){
     const thumbPos = maxScroll > 0 ? (scrollPos / maxScroll) * maxThumb : 0;
     if (vertical){
       track.style.height = trackSize + "px";
-      track.style.top = (isPage ? topOffset : scrollPos) + (available - trackSize) / 2 + "px";
+      track.style.top = (isPage ? topOffset : scrollPos) + "px";
       thumb.style.height = thumbSize + "px";
       thumb.style.transform = "translateY(" + thumbPos + "px)";
     } else {
