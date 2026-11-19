@@ -73,7 +73,7 @@ html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100
 ::-webkit-scrollbar{display:none;width:0;height:0}
 ::-webkit-scrollbar-corner{background:transparent}
 /* barras de rolagem customizadas (overlay, sem gutter, somem sozinhas) */
-.ov-sb-track{position:absolute;opacity:0;pointer-events:auto;z-index:6;transition:opacity .7s ease}
+.ov-sb-track{position:absolute;opacity:0;pointer-events:auto;z-index:50;transition:opacity .7s ease}
 .ov-sb-track.show{opacity:1;transition:opacity .15s ease}
 .ov-sb-track.v{right:4px;top:0;width:8px}
 .ov-sb-track.h{left:0;bottom:4px;height:8px;width:100%}
@@ -1324,6 +1324,8 @@ function ligarGaleria(){
     $("#d-view").innerHTML = "";
     $("#d-thumbs").innerHTML = "";
     delete $("#d-thumbs").dataset.chave;
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
     if (location.hash.includes("/")) {
       try { history.replaceState(null, "", "#" + (area || AREAS[0]?.id || "")); } catch(err){}
     }
@@ -1427,6 +1429,8 @@ document.addEventListener("click", e => {
     fill(current);
     $("#dlg").showModal();
     $("#d-scroll").scrollTop = 0;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
     const s = slugProj(p);
     if (p) { try { history.replaceState(null, "", "#" + p.area + (s ? "/" + s : "")); } catch(err){} }
     return;
@@ -1530,6 +1534,8 @@ function rotearHash(){
       fill(current);
       if (!$("#dlg").open) $("#dlg").showModal();
       $("#d-scroll").scrollTop = 0;
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
       return;
     }
   }
