@@ -67,24 +67,21 @@
 }
 @supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
 *{box-sizing:border-box;margin:0}
-/* permite animar a opacidade do polegar das barras de rolagem */
-@property --sb-opacity{syntax:"<number>";inherits:true;initial-value:0}
-/* distância que o menu fixo ocupa ao pular para uma âncora */
-html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%;--sb-opacity:0}
-/* barras de rolagem: trilho transparente, polegar afastado da borda e sem setas nas pontas */
-html::-webkit-scrollbar{width:17px;height:17px}
-html::-webkit-scrollbar-track{background:transparent}
-/* o polegar só aparece enquanto a página rola e some parado (como no mobile) */
-html::-webkit-scrollbar-thumb{border:5px solid transparent;border-radius:999px;background-color:rgba(244,244,242,.28);background-clip:padding-box;opacity:var(--sb-opacity);transition:--sb-opacity .7s ease}
-html.rolou{--sb-opacity:1}
-html.rolou::-webkit-scrollbar-thumb{transition:--sb-opacity .15s ease}
-html::-webkit-scrollbar-thumb:hover{--sb-opacity:1}
+/* barras de rolagem: overlay discreta (sem trilho/gutter), some sozinha como no mobile */
+html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%;scrollbar-width:none}
 ::-webkit-scrollbar-button{display:none;width:0;height:0}
+::-webkit-scrollbar{display:none;width:0;height:0}
 ::-webkit-scrollbar-corner{background:transparent}
-/* Firefox não entende ::-webkit-scrollbar: mantém a barra fina e discreta */
-@supports not selector(::-webkit-scrollbar){
-  html,.d-scroll,.d-thumbs{scrollbar-width:thin;scrollbar-color:rgba(244,244,242,.34) transparent}
-}
+/* barras de rolagem customizadas (overlay, sem gutter, somem sozinhas) */
+.ov-sb-track{position:absolute;opacity:0;pointer-events:auto;z-index:6;transition:opacity .7s ease}
+.ov-sb-track.show{opacity:1;transition:opacity .15s ease}
+.ov-sb-track.v{right:4px;top:0;width:8px}
+.ov-sb-track.h{left:0;bottom:4px;height:8px;width:100%}
+.ov-sb-thumb{position:absolute;background:rgba(244,244,242,.45);border-radius:999px}
+.v .ov-sb-thumb{left:1px;width:6px;top:0}
+.h .ov-sb-thumb{top:1px;height:6px;left:0}
+.d-scroll{position:relative}
+.d-thumbs{position:relative}
 /* fundo e fonte padrão do site */
 body{background:var(--ink);color:var(--white);font:400 1.0625rem/1.6 var(--tech);-webkit-font-smoothing:antialiased;position:relative}
 a{color:inherit}
@@ -357,13 +354,7 @@ dialog::backdrop{background:rgba(0,0,0,.82)}
 dialog[open]{animation:in .22s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 /* A rolagem fica dentro do modal: o recorte externo preserva todas as quinas arredondadas. */
-.d-scroll{max-height:var(--dlg-max-h);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;--sb-opacity:0}
-.d-scroll::-webkit-scrollbar{width:16px}
-.d-scroll::-webkit-scrollbar-track{margin:16px 0;background:transparent}
-.d-scroll::-webkit-scrollbar-thumb{border:5px solid transparent;border-radius:999px;background-color:rgba(244,244,242,.30);background-clip:padding-box;opacity:var(--sb-opacity);transition:--sb-opacity .7s ease}
-.d-scroll.rolou{--sb-opacity:1}
-.d-scroll.rolou::-webkit-scrollbar-thumb{transition:--sb-opacity .15s ease}
-.d-scroll::-webkit-scrollbar-thumb:hover{--sb-opacity:1}
+.d-scroll{max-height:var(--dlg-max-h);overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 /* Cabeçalho do modal: repete o vidro, o grão e o vinco dos painéis do site. */
 .d-header{position:sticky;top:0;z-index:3;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem clamp(1.2rem,3vw,2.2rem);
   background-color:#07090d;
@@ -477,13 +468,7 @@ dialog[open]{animation:in .22s ease-out}
 .d-count{position:absolute;right:calc(50% - var(--janela) / 2 + .7rem);bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
-.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line);--sb-opacity:0}
-.d-thumbs::-webkit-scrollbar{height:14px}
-.d-thumbs::-webkit-scrollbar-track{background:transparent}
-.d-thumbs::-webkit-scrollbar-thumb{border:4px solid transparent;border-radius:999px;background-color:rgba(244,244,242,.28);background-clip:padding-box;opacity:var(--sb-opacity);transition:--sb-opacity .7s ease}
-.d-thumbs.rolou{--sb-opacity:1}
-.d-thumbs.rolou::-webkit-scrollbar-thumb{transition:--sb-opacity .15s ease}
-.d-thumbs::-webkit-scrollbar-thumb:hover{--sb-opacity:1}
+.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line);scrollbar-width:none}
 .d-thumb{flex:0 0 auto;position:relative;height:56px;min-width:76px;width:auto;aspect-ratio:auto;padding:0;border:1px solid var(--line);border-radius:6px;
   overflow:hidden;background:#0c0d10;cursor:pointer}
 .d-thumb img{width:auto;height:100%;max-width:none;object-fit:contain;display:block}
@@ -770,10 +755,110 @@ const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id
 <div class="d-body"><p id="d-desc"></p><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div></div></div></dialog>`;
 let area = null;
 
+const overlaySetups = new WeakSet();
+function setupOverlayScrollbar(container, vertical){
+  if (!container || overlaySetups.has(container)) return;
+  overlaySetups.add(container);
+  const isPage = (container === document.documentElement || container === document.scrollingElement);
+  const scrollEl = isPage ? (document.scrollingElement || document.documentElement) : container;
+  if (!isPage && getComputedStyle(container).position === "static") container.style.position = "relative";
+
+  const track = document.createElement("div");
+  track.className = "ov-sb-track " + (vertical ? "v" : "h");
+  const thumb = document.createElement("div");
+  thumb.className = "ov-sb-thumb";
+  track.appendChild(thumb);
+  const parent = isPage ? document.body : container;
+  parent.appendChild(track);
+  if (isPage){ track.style.position = "fixed"; track.style.right = "6px"; track.style.top = "0"; }
+
+  let idleTimer = null;
+  const show = () => {
+    track.classList.add("show");
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => track.classList.remove("show"), 1500);
+  };
+  const sync = () => {
+    const scrollSize = vertical ? scrollEl.scrollHeight : scrollEl.scrollWidth;
+    const clientSize = vertical ? scrollEl.clientHeight : scrollEl.clientWidth;
+    const scrollPos = vertical ? scrollEl.scrollTop : scrollEl.scrollLeft;
+    if (scrollSize <= clientSize + 1){ track.style.display = "none"; return; }
+    track.style.display = "";
+    const ratio = clientSize / scrollSize;
+    const thumbSize = Math.max(24, clientSize * ratio);
+    const maxScroll = scrollSize - clientSize;
+    const maxThumb = clientSize - thumbSize;
+    const thumbPos = maxScroll > 0 ? (scrollPos / maxScroll) * maxThumb : 0;
+    if (vertical){
+      track.style.height = clientSize + "px";
+      thumb.style.height = thumbSize + "px";
+      thumb.style.transform = "translateY(" + thumbPos + "px)";
+    } else {
+      track.style.width = clientSize + "px";
+      thumb.style.width = thumbSize + "px";
+      thumb.style.transform = "translateX(" + thumbPos + "px)";
+    }
+  };
+
+  const onScroll = () => { sync(); show(); };
+  if (isPage) window.addEventListener("scroll", onScroll, { passive: true });
+  else scrollEl.addEventListener("scroll", onScroll, { passive: true });
+  if (typeof ResizeObserver !== "undefined"){
+    const ro = new ResizeObserver(() => sync());
+    ro.observe(scrollEl);
+    if (scrollEl !== container) ro.observe(container);
+  }
+  window.addEventListener("resize", sync, { passive: true });
+
+  let dragging = false, start = 0, startPos = 0;
+  thumb.addEventListener("mousedown", e => {
+    dragging = true;
+    start = vertical ? e.clientY : e.clientX;
+    startPos = vertical ? scrollEl.scrollTop : scrollEl.scrollLeft;
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  });
+  document.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    const delta = (vertical ? e.clientY : e.clientX) - start;
+    const scrollSize = vertical ? scrollEl.scrollHeight : scrollEl.scrollWidth;
+    const clientSize = vertical ? scrollEl.clientHeight : scrollEl.clientWidth;
+    const maxScroll = scrollSize - clientSize;
+    const thumbSize = parseFloat(vertical ? thumb.style.height : thumb.style.width);
+    const maxThumb = clientSize - thumbSize;
+    if (maxThumb <= 0) return;
+    const newScroll = startPos + (delta / maxThumb) * maxScroll;
+    if (vertical) scrollEl.scrollTop = newScroll; else scrollEl.scrollLeft = newScroll;
+  });
+  document.addEventListener("mouseup", () => {
+    if (!dragging) return;
+    dragging = false;
+    document.body.style.userSelect = "";
+  });
+
+  track.addEventListener("mousedown", e => {
+    if (e.target !== track) return;
+    const rect = track.getBoundingClientRect();
+    const clickPos = vertical ? (e.clientY - rect.top) : (e.clientX - rect.left);
+    const thumbSize = parseFloat(vertical ? thumb.style.height : thumb.style.width);
+    const clientSize = vertical ? scrollEl.clientHeight : scrollEl.clientWidth;
+    const scrollSize = vertical ? scrollEl.scrollHeight : scrollEl.scrollWidth;
+    const maxScroll = scrollSize - clientSize;
+    const maxThumb = clientSize - thumbSize;
+    if (maxThumb <= 0) return;
+    const ratio = Math.max(0, Math.min(1, (clickPos - thumbSize / 2) / maxThumb));
+    if (vertical) scrollEl.scrollTop = ratio * maxScroll; else scrollEl.scrollLeft = ratio * maxScroll;
+  });
+
+  sync();
+}
+
 function garantirDialogo(){
   if ($("#dlg")) return;
   document.body.insertAdjacentHTML("beforeend", DLG);
   ligarGaleria();
+  setupOverlayScrollbar($("#d-scroll"), true);
+  setupOverlayScrollbar($("#d-thumbs"), false);
 }
 
 function pick(id, push){
@@ -1536,23 +1621,8 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   else logo.addEventListener("load", sync, { once: true });
 })();
 
-/* barras de rolagem: aparecem só enquanto rolam (como no mobile) e somem paradas */
-(function(){
-  const IDLE = 1500;
-  const timers = new WeakMap();
-  const acender = el => {
-    clearTimeout(timers.get(el));
-    el.classList.add("rolou");
-    timers.set(el, setTimeout(() => {
-      el.classList.remove("rolou");
-      timers.delete(el);
-    }, IDLE));
-  };
-  addEventListener("scroll", e => {
-    const el = e.target === document ? document.documentElement : e.target;
-    if (el && el.matches && el.matches("html, .d-scroll, .d-thumbs")) acender(el);
-  }, { capture: true, passive: true });
-})();
+setupOverlayScrollbar(document.documentElement, true);
+
 
 </script>
 </body>
