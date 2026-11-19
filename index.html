@@ -458,7 +458,7 @@ dialog[open]{animation:in .22s ease-out}
   border:1px solid var(--line);border-radius:50%;background:rgba(5,5,6,.72);color:var(--white);font:400 1.5rem/1 var(--mono);cursor:pointer}
 .d-nav:hover{border-color:var(--accent);color:var(--accent)}
 .d-prev{left:calc(50% - var(--janela) / 2 + .6rem)} .d-next{right:calc(50% - var(--janela) / 2 + .6rem)}
-.d-nav[hidden],.d-thumbs[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
+.d-nav[hidden],.d-thumbs[hidden],.d-thumbs-wrap[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
 /* bolinhas do carrossel (como no Instagram) */
 .d-dots{position:absolute;left:50%;bottom:.7rem;transform:translateX(-50%);z-index:2;display:flex;gap:.4rem;
   background:rgba(5,5,6,.62);padding:.3rem .5rem;border-radius:999px}
@@ -469,6 +469,14 @@ dialog[open]{animation:in .22s ease-out}
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
 .d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid var(--line);scrollbar-width:none}
+/* barra de miniaturas com botões de rolagem (desktop) */
+.d-thumbs-wrap{position:relative;display:block}
+.d-thumbs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(5,5,6,.75);color:var(--white);font:500 1.1rem var(--mono);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,opacity .2s}
+.d-thumbs-nav:hover{background:rgba(5,5,6,.95);border-color:var(--accent);color:var(--accent)}
+.d-thumbs-prev{left:.35rem}
+.d-thumbs-next{right:.35rem}
+/* esconde os botões em telas de toque (arrastar com o dedo) */
+@media (hover: none){.d-thumbs-nav{display:none}}
 .d-thumb{flex:0 0 auto;position:relative;height:56px;min-width:76px;width:auto;aspect-ratio:auto;padding:0;border:1px solid var(--line);border-radius:6px;
   overflow:hidden;background:#0c0d10;cursor:pointer}
 .d-thumb img{width:auto;height:100%;max-width:none;object-fit:contain;display:block}
@@ -751,8 +759,8 @@ function capaHTML(p, eager){
 
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id="d-scroll"><header class="d-header"><div class="d-header-copy"><span id="d-bar"></span><h3 id="d-title"></h3></div><button id="close" type="button"></button></header>
 <div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
-<div class="d-thumbs" id="d-thumbs" hidden></div>
-<div class="d-body"><p id="d-desc"></p><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div></div></div></dialog>`;
+<div class="d-thumbs-wrap" id="d-thumbs-wrap" hidden><button class="d-thumbs-nav d-thumbs-prev" id="d-thumbs-prev" type="button" aria-label="Miniaturas anteriores">&#8249;</button><div class="d-thumbs" id="d-thumbs"></div><button class="d-thumbs-nav d-thumbs-next" id="d-thumbs-next" type="button" aria-label="Próximas miniaturas">&#8250;</button></div>
+<div class="d-body"><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div><p id="d-desc"></p></div></div></dialog>`;
 let area = null;
 
 const overlaySetups = new WeakSet();
@@ -1186,6 +1194,7 @@ function pintarMidia(){
     $("#d-next").hidden = true;
     $("#d-count").hidden = true;
     $("#d-thumbs").hidden = true;
+    $("#d-thumbs-wrap").hidden = true;
     $("#d-thumbs").innerHTML = "";
     $("#d-dots").hidden = true;
     $("#d-dots").innerHTML = "";
@@ -1239,6 +1248,7 @@ function pintarMidia(){
   const thumbs = $("#d-thumbs");
   const mostraThumbs = varias && !ehCarrossel;
   thumbs.hidden = !mostraThumbs;
+  $("#d-thumbs-wrap").hidden = !mostraThumbs;
   if (mostraThumbs) {
     const chave = current + ":" + total + ":" + lang;
     if (thumbs.dataset.chave !== chave) {
@@ -1443,6 +1453,8 @@ document.addEventListener("click", e => {
   if (nv) { irMedia(+nv.dataset.step); return; }
   const pl = e.target.closest("[data-play]");
   if (pl) { tocar(+pl.dataset.play); return; }
+  if (e.target.closest("#d-thumbs-prev")) { $("#d-thumbs").scrollBy({ left: -220, behavior: "smooth" }); return; }
+  if (e.target.closest("#d-thumbs-next")) { $("#d-thumbs").scrollBy({ left: 220, behavior: "smooth" }); return; }
   if (e.target.closest("#close") || e.target.id === "dlg") {
     $("#dlg").close();
     return;
