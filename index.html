@@ -468,7 +468,7 @@ dialog[open]{animation:in .22s ease-out}
 .d-count{position:absolute;right:calc(50% - var(--janela) / 2 + .7rem);bottom:.7rem;z-index:2;font:400 .8rem var(--mono);letter-spacing:.08em;
   color:var(--mute);background:rgba(5,5,6,.7);padding:.15rem .5rem;border-radius:4px}
 /* miniaturas */
-.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem clamp(1.2rem,3vw,2.2rem);border-top:1px solid rgba(0,0,0,.92);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 -1px 0 rgba(255,255,255,.16),0 1px 0 rgba(255,255,255,.16);scrollbar-width:none}
+.d-thumbs{display:flex;gap:.5rem;overflow-x:auto;margin:0 calc(-1*clamp(1.2rem,3vw,2.2rem));padding:.7rem clamp(1.2rem,3vw,2.2rem);border-top:1px solid rgba(0,0,0,.92);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 -1px 0 rgba(255,255,255,.16),0 1px 0 rgba(255,255,255,.16);scrollbar-width:none}
 /* barra de miniaturas com botões de rolagem (desktop) */
 .d-thumbs-wrap{position:relative;display:block}
 .d-thumbs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(5,5,6,.75);color:var(--white);font:500 1.1rem var(--mono);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,opacity .2s}
@@ -495,9 +495,10 @@ dialog[open]{animation:in .22s ease-out}
   letter-spacing:.2em;color:var(--mute)}
 .d-body{padding:1.4rem clamp(1.2rem,3vw,2.2rem) 2rem}
 .d-body p{max-width:90ch}
-#d-desc{margin-top:1.5rem;white-space:pre-line;overflow-wrap:anywhere;word-break:break-word}
-.d-tools{margin-top:1.5rem;padding:1rem 0;border-top:1px solid rgba(0,0,0,.92);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 -1px 0 rgba(255,255,255,.16),0 1px 0 rgba(255,255,255,.16)}
+#d-desc{white-space:pre-line;overflow-wrap:anywhere;word-break:break-word}
+.d-tools{margin:1.5rem calc(-1*clamp(1.2rem,3vw,2.2rem)) 0;padding:1rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 1px 0 rgba(255,255,255,.16)}
 .d-tools-label{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em}
+.d-desc-label{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em;margin-top:1.5rem;margin-bottom:.5rem}
 .d-tools .meta{font:400 .9rem var(--mono);color:var(--accent);margin:.35rem 0 0;letter-spacing:.05em}
 /* mensagem quando a área ainda não tem projeto */
 .vazio{padding:2.4rem 1.2rem;margin:0;color:var(--mute);font:400 .95rem var(--mono);letter-spacing:.06em}
@@ -760,7 +761,7 @@ function capaHTML(p, eager){
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id="d-scroll"><header class="d-header"><div class="d-header-copy"><span id="d-bar"></span><h3 id="d-title"></h3></div><button id="close" type="button"></button></header>
 <div class="d-stage"><div class="d-stage-view" id="d-view"></div><button class="d-nav d-prev" id="d-prev" type="button" data-step="-1"><span aria-hidden="true">&#8249;</span></button><button class="d-nav d-next" id="d-next" type="button" data-step="1"><span aria-hidden="true">&#8250;</span></button><span class="d-count" id="d-count" hidden></span><div class="d-dots" id="d-dots" hidden></div></div>
 <div class="d-thumbs-wrap" id="d-thumbs-wrap" hidden><button class="d-thumbs-nav d-thumbs-prev" id="d-thumbs-prev" type="button" aria-label="Miniaturas anteriores">&#8249;</button><div class="d-thumbs" id="d-thumbs"></div><button class="d-thumbs-nav d-thumbs-next" id="d-thumbs-next" type="button" aria-label="Próximas miniaturas">&#8250;</button></div>
-<div class="d-body"><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div><p id="d-desc"></p></div></div></dialog>`;
+<div class="d-body"><div class="d-tools" id="d-tools"><span class="d-tools-label" id="d-tools-label"></span><p class="meta" id="d-meta"></p></div><span class="d-desc-label" id="d-desc-label"></span><p id="d-desc"></p></div></div></dialog>`;
 let area = null;
 
 const overlaySetups = new WeakSet();
@@ -902,6 +903,7 @@ function aplicarIdioma(){
   garantirDialogo();
   $("#close").textContent = u.close;
   $("#d-tools-label").textContent = lang === "pt" ? "SOFTWARES / TÉCNICA" : "SOFTWARE / TECHNIQUE";
+  $("#d-desc-label").textContent = lang === "pt" ? "DESCRIÇÃO" : "DESCRIPTION";
   $("#lang").textContent = u.btn;
   $("#d-prev").setAttribute("aria-label", u.prev);
   $("#d-next").setAttribute("aria-label", u.next);
