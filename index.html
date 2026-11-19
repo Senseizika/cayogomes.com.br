@@ -56,7 +56,7 @@
   /* ---------- TEXTURA DO VIDRO + MEDIDAS DO FUNDO E HERO ---------- */
   --grao:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='.055'/></svg>");
   /* SCAN LINES do vidro: onda suave de 5px (transições em rampa, sem aresta) */
-  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.03) 0,rgba(255,255,255,0) 1.25px,rgba(0,0,0,.12) 2.5px,rgba(0,0,0,0) 3.75px,rgba(255,255,255,.03) 5px);
+  --scan:repeating-linear-gradient(180deg,rgba(255,255,255,.01) 0,rgba(255,255,255,0) 1.25px,rgba(0,0,0,.2) 2.5px,rgba(0,0,0,0) 3.75px,rgba(255,255,255,.01) 5px);
   /* ruído fino do CRT (grão menor e mais denso que o --grao) */
   --ruido:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='90' height='90' filter='url(%23n)' opacity='.22'/></svg>");
   --fundo-h:133.34vw;          /* altura das camadas de fundo */
@@ -102,7 +102,7 @@ a{color:inherit}
 .win::before{
   inset:0;z-index:3;mix-blend-mode:screen;
   background:
-    radial-gradient(20px 48px at 1px 14px,rgba(255,255,255,.12),transparent 76%),
+    radial-gradient(20px 48px at 1px 14px,rgba(255,255,255,.08),transparent 76%),
     radial-gradient(16px 32px at 1px calc(100% - 14px),rgba(255,255,255,.06),transparent 76%);
 }
 /* crista especular fina e dura (superfície lisa, roughness ~0): a luz nasce em cima da própria borda */
@@ -115,9 +115,9 @@ a{color:inherit}
   transform:translateX(.4px);
   background:
     /* lateral esquerda: foco na aresta lateral + rastro longo descendo pelo lado */
-    radial-gradient(8px 14px at 1px 14px,#fff 0 58%,rgba(255,255,255,.55) 76%,transparent 94%),
-    radial-gradient(24px 140px at 1px 14px,#fff 0 16%,rgba(255,255,255,.75) 38%,rgba(255,255,255,.18) 68%,transparent 88%),
-    radial-gradient(48px 16px at 12px 1px,rgba(255,255,255,.45),rgba(255,255,255,.12) 55%,transparent 84%),
+    radial-gradient(8px 14px at 1px 14px,rgba(255,255,255,.70) 0 58%,rgba(255,255,255,.05) 76%,transparent 94%),
+    radial-gradient(24px 140px at 1px 14px,rgba(255,255,255,.55) 0 16%,rgba(255,255,255,.04) 38%,rgba(255,255,255,.08) 68%,transparent 88%),
+    radial-gradient(48px 16px at 12px 1px,rgba(255,255,255,.22),rgba(255,255,255,0) 55%,transparent 84%),
     /* quina TR: suave e reduzida (luz não é mais de cima) */
     radial-gradient(36px 14px at calc(100% - 8px) 1px,rgba(255,255,255,.18),transparent 84%),
     radial-gradient(14px 48px at calc(100% - 1px) 12px,rgba(255,255,255,.20),transparent 84%),
