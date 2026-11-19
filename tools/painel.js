@@ -188,6 +188,35 @@ function realocarPastasTemporarias(lista) {
   }
 }
 
+function limparPastasRemovidas(listaAntiga, listaNova) {
+  const slugsNovos = new Set((listaNova || []).map(p => slugify(p.title?.pt || p.title?.en)).filter(Boolean));
+  const pastasUsadas = new Set();
+  for (const p of (listaNova || [])) {
+    for (const m of (p.media || [])) {
+      for (const campo of ['src', 'poster']) {
+        const v = m[campo];
+        if (typeof v !== 'string') continue;
+        const mm = /^img\/projetos\/([^/]+)\//.exec(v);
+        if (mm) pastasUsadas.add(mm[1]);
+      }
+    }
+  }
+  for (const p of (listaAntiga || [])) {
+    const slug = slugify(p.title?.pt || p.title?.en);
+    if (!slug) continue;
+    if (slugsNovos.has(slug)) continue;
+    if (pastasUsadas.has(slug)) continue;
+    const dir = path.join(DIR_IMG, slug);
+    try {
+      if (fs.existsSync(dir)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+        console.log('  pasta removida (projeto excluido): ' + slug);
+      }
+    } catch (e) {
+      console.log('  erro ao remover pasta ' + slug + ': ' + e.message);
+    }
+  }
+}
 function gravar(lista) {
   fs.mkdirSync(DIR_CONTEUDO, { recursive: true });
   fs.writeFileSync(ARQ_JSON, JSON.stringify(lista, null, 2) + '\n', 'utf8');
@@ -299,9 +328,11 @@ const server = http.createServer(async (req, res) => {
       }
       if (rota === '/api/projetos' && req.method === 'POST') {
         const dados = await corpo(req);
+        const listaAntiga = lerProjetos();
         const lista = normalizar(dados.projetos);
         realocarPastasTemporarias(lista);
         gravar(lista);
+        limparPastasRemovidas(listaAntiga, lista);
         console.log(`  salvo: ${lista.length} projeto(s)`);
         return json(res, 200, { ok: true, total: lista.length, projetos: lista });
       }
