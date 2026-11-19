@@ -1116,7 +1116,26 @@ function renderSoftwares() {
     return `<button type="button" class="sw-btn${ativo}" data-sw="${esc(s)}">${esc(s)}</button>`;
   }).join("");
 }
-$("#softwares").addEventListener("click", e => {
+$("#form").addEventListener("click", e => {
+  if (e.target.closest("#add-software")) {
+    const nome = prompt("Nome do software:");
+    if (!nome || !nome.trim()) return;
+    const n = nome.trim();
+    const custom = softwaresCustom();
+    if (![...SOFTWARES_BASE, ...custom].includes(n)) {
+      custom.push(n);
+      salvarSoftwaresCustom(custom);
+    }
+    const p = projetoAtual();
+    if (p) {
+      const selecionados = parseTools(p.tools || "");
+      selecionados.add(n);
+      p.tools = [...selecionados].join(" · ");
+      marcarSujo();
+    }
+    renderSoftwares();
+    return;
+  }
   const b = e.target.closest(".sw-btn");
   if (!b) return;
   const p = projetoAtual();
@@ -1128,24 +1147,6 @@ $("#softwares").addEventListener("click", e => {
   marcarSujo();
   renderSoftwares();
 });
-$("#add-software").onclick = () => {
-  const nome = prompt("Nome do software:");
-  if (!nome || !nome.trim()) return;
-  const n = nome.trim();
-  const custom = softwaresCustom();
-  if (![...SOFTWARES_BASE, ...custom].includes(n)) {
-    custom.push(n);
-    salvarSoftwaresCustom(custom);
-  }
-  const p = projetoAtual();
-  if (p) {
-    const selecionados = parseTools(p.tools || "");
-    selecionados.add(n);
-    p.tools = [...selecionados].join(" · ");
-    marcarSujo();
-  }
-  renderSoftwares();
-};
 
 function linhaMidia(m, i, total) {
   if (!m) return '';
