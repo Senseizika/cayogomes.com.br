@@ -197,7 +197,7 @@ a{color:inherit}
 .hero .wrap{position:relative;z-index:2}
 
 /* linha de função + botão EN */
-.sub{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:nowrap;margin-top:.2rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
+.sub{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:nowrap;margin-bottom:.2rem;font:400 .95rem var(--mono);color:var(--mute);letter-spacing:.04em}
 .sub > span[data-i18n]{flex:1 1 auto;min-width:0}
 .sub .right{flex:0 0 auto;display:flex;align-items:center;gap:1rem}
 /* em telas estreitas o "CG / 001" sai para o EN não cair para a linha de baixo */
@@ -541,16 +541,16 @@ dialog[open]{animation:in .22s ease-out}
 <!-- HERO (capa do topo): logo + código de barras vertical da mesma altura + linha de função -->
 <header class="hero" id="top">
   <div class="wrap">
+    <div class="sub">
+      <span data-i18n="role"></span>
+      <span class="right"><span>CG / 001</span><button id="lang" type="button" aria-label="Mudar idioma / Change language">EN</button></span>
+    </div>
     <div class="hero-row">
       <h1 class="hero-logo"><img src="img/cayo_gomes.webp" width="1920" height="842" alt="Cayo Gomes" fetchpriority="high" decoding="async"></h1>
       <div class="hero-barcode" aria-hidden="true">
         <span class="bc-bars"></span>
         <span class="bc-txt" data-i18n="soul"></span>
       </div>
-    </div>
-    <div class="sub">
-      <span data-i18n="role"></span>
-      <span class="right"><span>CG / 001</span><button id="lang" type="button" aria-label="Mudar idioma / Change language">EN</button></span>
     </div>
   </div>
 </header>
