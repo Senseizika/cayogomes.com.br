@@ -75,7 +75,7 @@ html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100
 /* barras de rolagem customizadas (overlay, sem gutter, somem sozinhas) */
 .ov-sb-track{position:absolute;opacity:0;pointer-events:auto;z-index:6;transition:opacity .7s ease}
 .ov-sb-track.show{opacity:1;transition:opacity .15s ease}
-.ov-sb-track.v{right:4px;top:50%;transform:translateY(-50%);width:8px}
+.ov-sb-track.v{right:4px;top:0;width:8px}
 .ov-sb-track.h{left:0;bottom:4px;height:8px;width:100%}
 .ov-sb-thumb{position:absolute;background:rgba(244,244,242,.45);border-radius:999px}
 .v .ov-sb-thumb{left:1px;width:6px;top:0}
@@ -756,11 +756,11 @@ const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id
 let area = null;
 
 const overlaySetups = new WeakSet();
-function setupOverlayScrollbar(container, vertical, short){
+function setupOverlayScrollbar(container, vertical, short, topOffset = 0){
   if (!container || overlaySetups.has(container)) return;
   overlaySetups.add(container);
   const isPage = (container === document.documentElement || container === document.scrollingElement);
-  const scrollEl = isPage ? (document.scrollingElement || document.documentElement) : container;
+  const scrollEl = isPage ? document.documentElement : container;
   if (!isPage && getComputedStyle(container).position === "static") container.style.position = "relative";
 
   const track = document.createElement("div");
@@ -785,13 +785,15 @@ function setupOverlayScrollbar(container, vertical, short){
     if (scrollSize <= clientSize + 1){ track.style.display = "none"; return; }
     track.style.display = "";
     const ratio = clientSize / scrollSize;
-    const trackSize = (vertical && short) ? Math.max(60, Math.min(clientSize * 0.35, 160)) : clientSize;
+    const available = clientSize - (vertical ? topOffset : 0);
+    const trackSize = (vertical && short) ? Math.max(60, Math.min(available * 0.35, 160)) : available;
     const thumbSize = Math.max(24, Math.min(trackSize * 0.9, trackSize * ratio));
     const maxScroll = scrollSize - clientSize;
     const maxThumb = trackSize - thumbSize;
     const thumbPos = maxScroll > 0 ? (scrollPos / maxScroll) * maxThumb : 0;
     if (vertical){
       track.style.height = trackSize + "px";
+      track.style.top = (isPage ? topOffset : scrollPos) + (available - trackSize) / 2 + "px";
       thumb.style.height = thumbSize + "px";
       thumb.style.transform = "translateY(" + thumbPos + "px)";
     } else {
@@ -810,6 +812,9 @@ function setupOverlayScrollbar(container, vertical, short){
     if (scrollEl !== container) ro.observe(container);
   }
   window.addEventListener("resize", sync, { passive: true });
+  window.addEventListener("load", sync, { passive: true });
+  setTimeout(sync, 500);
+  setTimeout(sync, 2000);
 
   let dragging = false, start = 0, startPos = 0;
   thumb.addEventListener("mousedown", e => {
@@ -1622,7 +1627,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   else logo.addEventListener("load", sync, { once: true });
 })();
 
-setupOverlayScrollbar(document.documentElement, true);
+setupOverlayScrollbar(document.documentElement, true, false, 80);
 
 
 </script>
