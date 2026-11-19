@@ -245,7 +245,7 @@ function servirArquivo(res, abs, soCabecalho = false) {
 
 function rodarGit(args) {
   return new Promise((resolve, reject) => {
-    execFile('git', args, { cwd: ROOT }, (err, stdout, stderr) => {
+    execFile('git', args, { cwd: ROOT, env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }, (err, stdout, stderr) => {
       if (err) {
         err.stdout = stdout;
         err.stderr = stderr;
@@ -317,6 +317,44 @@ const server = http.createServer(async (req, res) => {
         const r = salvarArquivo(dados.pasta, dados.nome, dados.dados);
         console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
+      }
+      if (rota === '/api/git/pull' && req.method === 'POST') {
+        const head = async () => (await rodarGit(['rev-parse', 'HEAD'])).stdout.trim();
+        try {
+          try {
+            await rodarGit(['fetch', '--prune']);
+          } catch (err) {
+            return json(res, 400, {
+              erro: 'Falha ao buscar do GitHub',
+              log: ((err.stderr || '') + '\n' + (err.stdout || '')).trim() || err.message
+            });
+          }
+          const antes = await head().catch(() => '');
+          let saida = '';
+          try {
+            const p = await rodarGit(['pull', '--ff-only']);
+            saida = ((p.stdout || '') + (p.stderr || '')).trim();
+          } catch (err) {
+            return json(res, 409, {
+              erro: 'Não deu para baixar',
+              log: ((err.stdout || '') + '\n' + (err.stderr || '')).trim() || err.message
+            });
+          }
+          const depois = await head().catch(() => '');
+          let novos = 0;
+          if (antes && depois && antes !== depois) {
+            const c = await rodarGit(['rev-list', '--count', antes + '..' + depois]).catch(() => null);
+            novos = c ? (Number(String(c.stdout).trim()) || 1) : 1;
+          }
+          const ultimo = ((await rodarGit(['log', '-1', '--pretty=%h %s'])).stdout || '').trim();
+          if (novos) console.log(`  pull: ${novos} commit(s) novo(s) — ${ultimo}`);
+          return json(res, 200, { ok: true, novos, ultimo, log: saida || 'Já estava atualizado.' });
+        } catch (err) {
+          return json(res, 400, {
+            erro: 'Falha ao baixar',
+            log: ((err.stderr || '') + '\n' + (err.stdout || '')).trim() || err.message
+          });
+        }
       }
       if (rota === '/api/git/push' && req.method === 'POST') {
         const dados = await corpo(req);

@@ -194,6 +194,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <span id="status"></span>
   <div class="acoes">
     <a href="/site" target="_blank">abrir site ↗</a>
+    <button id="git-pull" class="git" title="Baixar as últimas alterações do GitHub">☁️ GitHub ↓</button>
     <button id="git-push" class="git" title="Salvar e enviar para o GitHub">☁️ GitHub ↑</button>
     <button id="novo">+ projeto</button>
     <button id="novo-carrossel" title="novo projeto com as imagens em sequência contínua">+ carrossel</button>
@@ -349,7 +350,11 @@ async function api(rota, corpo) {
     body: corpo === undefined ? undefined : JSON.stringify(corpo)
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.erro || ("HTTP " + r.status));
+  if (!r.ok) {
+    const err = new Error(j.erro || ("HTTP " + r.status));
+    err.log = j.log || "";
+    throw err;
+  }
   return j;
 }
 
@@ -985,6 +990,41 @@ async function salvar() {
 }
 
 $("#salvar").onclick = salvar;
+
+$("#git-pull").onclick = async () => {
+  if (sujo) {
+    if (!confirm("O painel tem alterações não salvas.\n\nBaixar do GitHub recarrega o painel e essas alterações serão perdidas.\n\nContinuar?")) return;
+  } else if (!confirm("Baixar as últimas alterações do GitHub?\n\nO painel vai recarregar com o conteúdo novo.")) return;
+
+  const btn = $("#git-pull");
+  btn.disabled = true;
+  status("Baixando do GitHub…");
+  try {
+    const r = await api("/api/git/pull");
+    console.log(r.log);
+    if (r.novos) {
+      status(`Baixado: ${r.novos} commit(s) novo(s) — ${r.ultimo}`);
+      setTimeout(() => location.reload(), 900);
+    } else {
+      status("Já estava atualizado");
+    }
+  } catch (e) {
+    const log = e.log || "";
+    if (log) console.error(log);
+    let dica = "";
+    if (/local changes|would be overwritten|unstaged|untracked/i.test(log))
+      dica = " — envie (ou descarte) suas alterações locais antes de baixar.";
+    else if (/fast-forward|non-fast-forward|diverged/i.test(log))
+      dica = " — você tem commits locais não enviados.";
+    else if (/couldn't find remote|no remote|does not appear to be a git/i.test(log))
+      dica = " — confira o remote do repositório.";
+    else if (/authentication|could not read Username|terminal prompts disabled/i.test(log))
+      dica = " — o Git não está autenticado nesta máquina.";
+    status("Erro ao baixar: " + e.message + dica, true);
+  } finally {
+    btn.disabled = false;
+  }
+};
 
 $("#git-push").onclick = async () => {
   const msg = prompt("Mensagem do commit:", "Atualização via painel");
