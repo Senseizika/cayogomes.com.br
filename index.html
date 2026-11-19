@@ -172,19 +172,17 @@ a{color:inherit}
 /* o preenchimento do hover só em aparelhos com mouse: no toque ele ficaria aceso */
 @media(hover:hover){#lang:hover{background:var(--accent);color:var(--ink)}} /* texto escuro: o destaque é claro */
 
-/* hero = logo + código de barras vertical na altura exata da logo + linha de função */
+/* hero = linha de função + logo + código de barras no canto (tamanho próprio) */
 .hero{position:relative;overflow:hidden;padding:clamp(.25rem,.8vw,.6rem) 0 clamp(.8rem,2vw,1.2rem)}
 .hero-row{position:relative;width:fit-content;max-width:100%;margin-inline:auto;padding-right:clamp(28px,3.4vw,46px)}
 .hero-logo{display:block;margin:0;line-height:0}
 .hero-logo img{display:block;width:auto;height:auto;max-width:100%;max-height:var(--logo-max-h);object-fit:contain}
-.hero-barcode{position:absolute;right:0;top:13.9%;bottom:9.5%;width:clamp(24px,3vw,42px);display:flex;align-items:stretch;gap:clamp(3px,.35vw,5px);color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
-.bc-bars{flex:1;height:100%;background:repeating-linear-gradient(180deg,currentColor 0 2px,transparent 2px 5px,currentColor 5px 6px,transparent 6px 9px,currentColor 9px 13px,transparent 13px 16px,currentColor 16px 17px,transparent 17px 21px)}
-.bc-txt{--ls:.32em;flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 .68rem/1 var(--mono);letter-spacing:var(--ls);white-space:nowrap}
-@supports (font-size:1cqh){
-  .hero-barcode{container-type:size}
-  .bc-txt{--ls:4.4cqh;height:100%;font-size:4.2cqh}
-  :lang(en) .bc-txt{--ls:5.55cqh}
-}
+/* código de barras: bloco de tamanho próprio (nas medidas do SVG original, 97px de
+   altura por 735 de largura = 7,54:1) no canto sup. direito da logo. Não estica
+   junto com a logo, então a letra não deforma. */
+.hero-barcode{position:absolute;right:0;top:0;height:97px;width:auto;display:flex;align-items:stretch;gap:5px;color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
+.bc-bars{flex:0 0 20px;height:100%;background:repeating-linear-gradient(180deg,currentColor 0 2px,transparent 2px 5px,currentColor 5px 6px,transparent 6px 9px,currentColor 9px 13px,transparent 13px 16px,currentColor 16px 17px,transparent 17px 21px)}
+.bc-txt{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 9px/1 var(--mono);letter-spacing:.1em;white-space:nowrap}
 /* fundo em duas camadas: ocupa a largura da tela, começa no topo da página e sobe
    mais devagar que ela (parallax). As duas camadas têm sempre o mesmo tamanho. */
 .fundo-clip{position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
