@@ -756,7 +756,7 @@ const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id
 let area = null;
 
 const overlaySetups = new WeakSet();
-function setupOverlayScrollbar(container, vertical, short, topOffset = 0){
+function setupOverlayScrollbar(container, vertical, short, topOffset = 0, bottomOffset = 0){
   if (!container || overlaySetups.has(container)) return;
   overlaySetups.add(container);
   const isPage = (container === document.documentElement || container === document.scrollingElement);
@@ -785,7 +785,7 @@ function setupOverlayScrollbar(container, vertical, short, topOffset = 0){
     if (scrollSize <= clientSize + 1){ track.style.display = "none"; return; }
     track.style.display = "";
     const ratio = clientSize / scrollSize;
-    const available = clientSize - (vertical ? topOffset : 0);
+    const available = clientSize - (vertical ? (topOffset + bottomOffset) : 0);
     const trackSize = available;
     const thumbSize = Math.max(24, Math.min(trackSize * 0.9, trackSize * ratio));
     const maxScroll = scrollSize - clientSize;
@@ -863,7 +863,7 @@ function garantirDialogo(){
   if ($("#dlg")) return;
   document.body.insertAdjacentHTML("beforeend", DLG);
   ligarGaleria();
-  setupOverlayScrollbar($("#d-scroll"), true, true, 20);
+  setupOverlayScrollbar($("#d-scroll"), true, true, 20, 20);
   setupOverlayScrollbar($("#d-thumbs"), false);
 }
 
