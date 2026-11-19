@@ -116,6 +116,7 @@ function normalizar(lista) {
     const item = {
       area: String(p.area || ''),
       galeria: p.galeria === 'carrossel' ? 'carrossel' : 'slide', /* <--- NOVA OPÇÃO AQUI */
+      instagram: p.instagram === true,
       h: Math.max(0, Math.min(360, Number(p.h) || 0)),
       tools: String(p.tools || ''),
       title: { pt: String(p.title?.pt || ''), en: String(p.title?.en || '') },

@@ -1220,6 +1220,11 @@ function desenharForm() {
         <span><b>Carrossel do Instagram</b>
           <small>as imagens aparecem coladas, em sequência contínua, como no Instagram — envie na ordem</small></span>
       </label>
+      <label class="carrossel-opcao">
+        <input type="checkbox" data-campo="instagram" ${p.instagram ? 'checked' : ''}>
+        <span><b>Post do Instagram</b>
+          <small>simula um post do Instagram no modal, com botões de curtir, comentar, compartilhar e salvar</small></span>
+      </label>
       
       <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
       
@@ -1350,6 +1355,11 @@ $("#form").addEventListener("input", e => {
   if (c) {
     if (c.dataset.campo === "carrossel") {
       projetoAtual().galeria = c.checked ? "carrossel" : "slide";
+      marcarSujo();
+      return;
+    }
+    if (c.dataset.campo === "instagram") {
+      projetoAtual().instagram = !!c.checked;
       marcarSujo();
       return;
     }
