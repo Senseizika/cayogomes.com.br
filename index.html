@@ -457,8 +457,11 @@ dialog[open]{animation:in .22s ease-out}
 }
 /* botões ‹ › (só aparecem quando há mais de uma mídia) */
 .d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;display:grid;place-items:center;padding:.2rem;
-  background:none;border:0;color:var(--white);font:400 2rem/1 var(--mono);cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+  background:none;border:0;color:var(--white);font:400 2rem/1 var(--mono);cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.85);
+  opacity:0;pointer-events:none;transition:opacity .25s ease}
 .d-nav:hover{color:var(--accent)}
+.d-stage:hover .d-nav{opacity:1;pointer-events:auto}
+@media (hover: none){.d-nav{opacity:1;pointer-events:auto}}
 .d-prev{left:calc(50% - var(--janela) / 2 + .6rem)} .d-next{right:calc(50% - var(--janela) / 2 + .6rem)}
 .d-nav[hidden],.d-thumbs[hidden],.d-thumbs-wrap[hidden],.d-count[hidden],.d-dots[hidden]{display:none}
 /* bolinhas do carrossel (como no Instagram) */
@@ -473,11 +476,11 @@ dialog[open]{animation:in .22s ease-out}
 .d-thumbs{display:flex;gap:.5rem;overflow-x:auto;margin:0 calc(-1*clamp(1.2rem,3vw,2.2rem));padding:.7rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 1px 0 rgba(255,255,255,.16);scrollbar-width:none}
 /* barra de miniaturas com botões de rolagem (desktop) */
 .d-thumbs-wrap{position:relative;display:block}
-.d-thumbs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(5,5,6,.75);color:var(--white);font:500 1.1rem var(--mono);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,opacity .2s}
-.d-thumbs-nav:hover{background:rgba(5,5,6,.95);border-color:var(--accent);color:var(--accent)}
+.d-thumbs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:rgba(5,5,6,.6);color:var(--white);font:500 .9rem var(--mono);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:background .2s,border-color .2s,opacity .25s ease}
+.d-thumbs-nav:hover{background:rgba(5,5,6,.9);border-color:var(--accent);color:var(--accent)}
 .d-thumbs-prev{left:.35rem}
 .d-thumbs-next{right:.35rem}
-/* esconde os botões em telas de toque (arrastar com o dedo) */
+.d-thumbs-wrap:hover .d-thumbs-nav{opacity:1;pointer-events:auto}
 @media (hover: none){.d-thumbs-nav{display:none}}
 .d-thumb{flex:0 0 auto;position:relative;height:56px;min-width:76px;width:auto;aspect-ratio:auto;padding:0;border:1px solid var(--line);border-radius:6px;
   overflow:hidden;background:#0c0d10;cursor:pointer}
