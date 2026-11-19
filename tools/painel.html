@@ -145,7 +145,12 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .midia .topo select{width:auto;margin:0;padding:.3rem .4rem;font-size:.8rem}
 .midia .topo .empurra{margin-left:auto}
 .midia .topo button{padding:.2rem .45rem;font-size:.8rem}
-.midia .corpo{display:grid;gap:.45rem}
+.softwares{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem}
+.sw-btn{padding:.3rem .6rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);color:var(--mute);font:500 .78rem var(--mono);letter-spacing:.04em;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.sw-btn:hover{border-color:var(--accent);color:var(--white)}
+.sw-btn.ativo{background:var(--accent);border-color:var(--accent);color:#050506}
+.sw-add{margin-top:.35rem;padding:.25rem .55rem;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--mute);font:500 .75rem var(--mono);cursor:pointer}
+.sw-add:hover{border-color:var(--accent);color:var(--accent)}
 .mini{max-width:100%;max-height:160px;object-fit:contain;border-radius:6px;border:1px solid var(--line);display:block;margin-top:.2rem;cursor:zoom-in;background:#000}
 .mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
@@ -1082,6 +1087,66 @@ $("#duplicar").onclick = () => {
 
 $("#preview-projeto").onclick = atualizarPreviewProjeto;
 
+// ---------- softwares (botões toggle) ----------
+const SOFTWARES_BASE = ["ZBrush", "Blender", "Substance Painter"];
+function softwaresCustom() {
+  try { return JSON.parse(localStorage.getItem("painel_softwares") || "[]"); } catch (e) { return []; }
+}
+function salvarSoftwaresCustom(lista) {
+  try { localStorage.setItem("painel_softwares", JSON.stringify(lista)); } catch (e) {}
+}
+function softwaresDisponiveis() {
+  const custom = softwaresCustom();
+  const set = new Set([...SOFTWARES_BASE, ...custom]);
+  return [...set];
+}
+function parseTools(str) {
+  return new Set(String(str || "").split(/[·,;]/).map(s => s.trim()).filter(Boolean));
+}
+function renderSoftwares() {
+  const box = $("#softwares");
+  if (!box) return;
+  const p = projetoAtual();
+  const selecionados = parseTools(p?.tools || "");
+  // garante que softwares já salvos mas fora da lista apareçam
+  const disponiveis = softwaresDisponiveis();
+  for (const t of selecionados) if (!disponiveis.includes(t)) disponiveis.push(t);
+  box.innerHTML = disponiveis.map(s => {
+    const ativo = selecionados.has(s) ? " ativo" : "";
+    return `<button type="button" class="sw-btn${ativo}" data-sw="${esc(s)}">${esc(s)}</button>`;
+  }).join("");
+}
+$("#softwares").addEventListener("click", e => {
+  const b = e.target.closest(".sw-btn");
+  if (!b) return;
+  const p = projetoAtual();
+  if (!p) return;
+  const nome = b.dataset.sw;
+  const selecionados = parseTools(p.tools || "");
+  if (selecionados.has(nome)) selecionados.delete(nome); else selecionados.add(nome);
+  p.tools = [...selecionados].join(" · ");
+  marcarSujo();
+  renderSoftwares();
+});
+$("#add-software").onclick = () => {
+  const nome = prompt("Nome do software:");
+  if (!nome || !nome.trim()) return;
+  const n = nome.trim();
+  const custom = softwaresCustom();
+  if (![...SOFTWARES_BASE, ...custom].includes(n)) {
+    custom.push(n);
+    salvarSoftwaresCustom(custom);
+  }
+  const p = projetoAtual();
+  if (p) {
+    const selecionados = parseTools(p.tools || "");
+    selecionados.add(n);
+    p.tools = [...selecionados].join(" · ");
+    marcarSujo();
+  }
+  renderSoftwares();
+};
+
 function linhaMidia(m, i, total) {
   if (!m) return '';
   const tipo = m.type || "image";
@@ -1144,7 +1209,10 @@ function desenharForm() {
       <label>descrição EN <textarea rows="3" data-campo="desc.en">${esc(p.desc?.en)}</textarea></label>
       
       <!-- NOVO CAMPO AQUI -->
-      <label>softwares <input data-campo="tools" value="${esc(p.tools)}" placeholder="Blender · ZBrush"></label>
+      <label>softwares
+  <div class="softwares" id="softwares"></div>
+  <button type="button" id="add-software" class="sw-add" title="adicionar software">+ software</button>
+</label>
 
       <label class="carrossel-opcao">
         <input type="checkbox" data-campo="carrossel" ${p.galeria === 'carrossel' ? 'checked' : ''}>
@@ -1166,6 +1234,7 @@ function desenharForm() {
     console.error("Erro ao renderizar projeto:", err);
     $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar o projeto. Verifique os dados.</p>`;
   }
+  renderSoftwares();
 }
 
 function desenharFormArea() {
