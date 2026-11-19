@@ -23,6 +23,8 @@ button:hover{border-color:var(--mute)}
 button.pri{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:600}
 button.git{color:#39d98a;border-color:rgba(57,217,138,.4)}
 button.git:hover{background:rgba(57,217,138,.1);border-color:#39d98a}
+button.git.pull{color:var(--mute);border-color:var(--line)}
+button.git.pull:hover{color:var(--white);background:rgba(255,255,255,.06);border-color:var(--mute)}
 button.perigo{color:#ff5a5f;border-color:rgba(255,90,95,.4)}
 button:disabled{opacity:.35;cursor:default}
 a{color:var(--mute);text-decoration:none;font-size:.82rem}
@@ -194,8 +196,8 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
   <span id="status"></span>
   <div class="acoes">
     <a href="/site" target="_blank">abrir site ↗</a>
-    <button id="git-pull" class="git" title="Baixar as últimas alterações do GitHub">☁️ GitHub ↓</button>
-    <button id="git-push" class="git" title="Salvar e enviar para o GitHub">☁️ GitHub ↑</button>
+    <button id="git-pull" class="git pull" title="Baixar as últimas alterações do GitHub (git pull)">↓ pull</button>
+    <button id="git-push" class="git push" title="Salvar e enviar para o GitHub (git push)">↑ push</button>
     <button id="novo">+ projeto</button>
     <button id="novo-carrossel" title="novo projeto com as imagens em sequência contínua">+ carrossel</button>
     <button id="salvar" class="pri">salvar</button>
