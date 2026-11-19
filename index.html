@@ -117,7 +117,7 @@ a{color:inherit}
     /* lateral esquerda: foco na aresta lateral + rastro longo descendo pelo lado */
     radial-gradient(8px 14px at 1px 14px,rgba(255,255,255,.70) 0 58%,rgba(255,255,255,.05) 76%,transparent 94%),
     radial-gradient(24px 140px at 1px 14px,rgba(255,255,255,.55) 0 16%,rgba(255,255,255,.04) 38%,rgba(255,255,255,.08) 68%,transparent 88%),
-    radial-gradient(48px 16px at 12px 1px,rgba(255,255,255,.22),rgba(255,255,255,0) 55%,transparent 84%),
+    radial-gradient(48px 16px at 12px 1px,rgba(255,255,255,.35),rgba(255,255,255,0) 55%,transparent 84%),
     /* quina TR: suave e reduzida (luz não é mais de cima) */
     radial-gradient(36px 14px at calc(100% - 8px) 1px,rgba(255,255,255,.18),transparent 84%),
     radial-gradient(14px 48px at calc(100% - 1px) 12px,rgba(255,255,255,.20),transparent 84%),
@@ -150,8 +150,8 @@ a{color:inherit}
 @media (min-width: 768px){ .win{ backdrop-filter:blur(15px) saturate(135%); -webkit-backdrop-filter:blur(15px) saturate(135%); } }
 @media (max-width: 767px){ .win{ background-color:rgba(6,8,12,.93); } }
 .bar{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1.15rem .65rem;font:400 .85rem var(--mono);letter-spacing:.08em;color:var(--mute);
-  /* entalhe: a faixa escurece até a ranhura, 1px de sombra e um lábio claro embaixo */
-  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 50%,rgba(0,0,0,.42));
+  /* entalhe: só o fio escuro da ranhura + lábio claro embaixo (sem sombra em cima) */
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 50%,transparent);
   border-bottom:1px solid rgba(0,0,0,.92);
   box-shadow:0 1px 0 rgba(255,255,255,.16)}
 .win-ctl{display:inline-flex;align-items:center;gap:.85rem;opacity:.72;flex:0 0 auto}
