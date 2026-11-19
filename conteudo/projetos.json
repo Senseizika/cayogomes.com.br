@@ -1,65 +1,33 @@
 [
   {
     "area": "design",
-    "galeria": "slide",
+    "galeria": "carrossel",
     "h": 0,
-    "tools": "",
+    "tools": "asdadadasd",
     "title": {
-      "pt": "asda",
-      "en": "sdadsa"
+      "pt": "dadada",
+      "en": "dasda"
     },
     "desc": {
-      "pt": "dasd",
-      "en": "asdada"
+      "pt": "dasdasd",
+      "en": "asdads"
     },
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/asda/01.webp"
+        "src": "img/projetos/dadada/01.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/asda/02.webp"
+        "src": "img/projetos/dadada/02.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/asda/03.webp"
+        "src": "img/projetos/dadada/03.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/asda/04.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/05.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/06.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/07.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/08.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/09.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/10.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/11.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/12.webp"
+        "src": "img/projetos/dadada/04.webp"
       }
     ]
   },
@@ -67,31 +35,76 @@
     "area": "design",
     "galeria": "slide",
     "h": 0,
-    "tools": "",
+    "tools": "adsdad",
     "title": {
-      "pt": "3rw",
-      "en": "w343wwf"
+      "pt": "asdasd",
+      "en": "asdasd"
     },
     "desc": {
-      "pt": "sfsef",
-      "en": "sfdfsef"
+      "pt": "asda",
+      "en": "sdasda"
     },
     "media": [
       {
-        "type": "image",
-        "src": "img/projetos/3rw/01.webp"
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/asdasd/15.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/3rw/02.webp"
+        "src": "img/projetos/asdasd/01.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/3rw/03.webp"
+        "src": "img/projetos/asdasd/02.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/3rw/04.webp"
+        "src": "img/projetos/asdasd/03.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/05.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/06.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/07.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/08.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/09.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/10.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/11.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/12.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/13.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/asdasd/14.webp"
       }
     ]
   }
