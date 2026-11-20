@@ -1087,6 +1087,21 @@ $("#duplicar").onclick = () => {
 
 $("#preview-projeto").onclick = atualizarPreviewProjeto;
 
+$("#apagar").onclick = apagarProjetoAtual;
+function apagarProjetoAtual() {
+  const removido = projetoAtual();
+  if (!removido) return;
+  const nome = removido.title?.pt || removido.title?.en || "este projeto";
+  if (!confirm(`Apagar "${nome}" da lista? A pasta de imagens será removida ao salvar.`)) return;
+  const pi = projetos.indexOf(removido);
+  if (pi >= 0) projetos.splice(pi, 1);
+  projetoSelecionado = projetos[Math.min(pi, projetos.length - 1)] || null;
+  marcarSujo();
+  if (!projetoSelecionado) fechar();
+  atualizarTudo();
+  status(`"${nome}" apagado — clique em salvar para confirmar.`);
+}
+
 // ---------- softwares (botões toggle) ----------
 const SOFTWARES_BASE = ["ZBrush", "Blender", "Substance Painter"];
 function softwaresCustom() {
@@ -1622,17 +1637,6 @@ $("#form").addEventListener("click", e => {
     projetoAtual().media.push({ type: "image", src: "" });
     marcarSujo();
     desenharForm();
-  }
-  else if (b.id === "apagar") {
-    if (confirm("Apagar este projeto da lista?")) {
-      const removido = projetoAtual();
-      const pi = projetos.indexOf(removido);
-      if (pi >= 0) projetos.splice(pi, 1);
-      projetoSelecionado = projetos[Math.min(pi, projetos.length - 1)] || null;
-      marcarSujo();
-      if (!projetoSelecionado) fechar();
-      atualizarTudo();
-    }
   }
   else if (b.hasAttribute("data-subir") && mi > 0) {
     [media[mi - 1], media[mi]] = [media[mi], media[mi - 1]];
