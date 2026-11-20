@@ -463,9 +463,10 @@ dialog[open]{animation:in .22s ease-out}
 }
 /* botões ‹ › (só aparecem quando há mais de uma mídia) */
 .d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;display:grid;place-items:center;padding:.2rem;
-.d-fs{position:absolute;top:.6rem;right:.6rem;z-index:3;background:rgba(0,0,0,.55);color:var(--white);border:0;border-radius:8px;padding:.35rem;cursor:pointer;opacity:0;transition:opacity .2s,background .2s;display:flex;align-items:center;justify-content:center}
-.d-slide:hover .d-fs{opacity:1}
+.d-fs{position:absolute;top:.6rem;right:.6rem;z-index:3;background:rgba(0,0,0,.55);color:var(--white);border:0;border-radius:8px;padding:.35rem;cursor:pointer;opacity:.75;transition:opacity .2s,background .2s;display:flex;align-items:center;justify-content:center}
+.d-slide:hover .d-fs,.d-fs:focus{opacity:1}
 .d-fs:hover{background:rgba(0,0,0,.8)}
+@media (hover:none){.d-fs{opacity:1}}
   background:none;border:0;color:var(--white);font:400 2rem/1 var(--mono);cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.85);
   opacity:0;pointer-events:none;transition:opacity .25s ease}
 .d-nav:hover{color:var(--accent)}
@@ -1379,9 +1380,12 @@ function abrirFullscreen(i){
 }
 function fecharFullscreen(){
   const fsEl = $("#fs");
-  fsEl.hidden = true;
-  fsEl.classList.remove("rotado");
-  $("#fs .fs-img").src = "";
+  if (fsEl) {
+    fsEl.hidden = true;
+    fsEl.classList.remove("rotado");
+  }
+  const img = $("#fs .fs-img");
+  if (img) img.src = "";
   document.documentElement.style.overflow = "";
   document.body.style.overflow = "";
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e){}
@@ -1556,8 +1560,8 @@ document.addEventListener("click", e => {
   if (e.target.closest("#d-thumbs-prev")) { $("#d-thumbs").scrollBy({ left: -220, behavior: "smooth" }); return; }
   if (e.target.closest("#d-thumbs-next")) { $("#d-thumbs").scrollBy({ left: 220, behavior: "smooth" }); return; }
   if (e.target.closest("#close") || e.target.id === "dlg") {
-    fecharFullscreen();
     $("#dlg").close();
+    fecharFullscreen();
     return;
   }
   if (e.target.closest("#lang")) {
