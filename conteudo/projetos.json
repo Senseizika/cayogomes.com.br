@@ -16,47 +16,58 @@
     "media": [
       {
         "type": "video",
-        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8"
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/o-piromante/09.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/01.webp"
+        "src": "img/projetos/o-piromante/01.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/02.webp"
+        "src": "img/projetos/o-piromante/02.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/03.webp"
+        "src": "img/projetos/o-piromante/03.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/04.webp"
+        "src": "img/projetos/o-piromante/04.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/05.webp"
+        "src": "img/projetos/o-piromante/05.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/06.webp"
+        "src": "img/projetos/o-piromante/06.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/07.webp"
+        "src": "img/projetos/o-piromante/07.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/08.webp"
+        "src": "img/projetos/o-piromante/08.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/09.webp"
+        "src": "img/projetos/o-piromante/09.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/10.webp"
+        "src": "img/projetos/o-piromante/10.webp",
+        "fullscreen": true
       }
     ]
   },
@@ -93,7 +104,8 @@
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/05.webp"
+        "src": "img/projetos/flamengo/05.webp",
+        "fullscreen": true
       }
     ]
   },
@@ -130,7 +142,8 @@
       },
       {
         "type": "image",
-        "src": "img/projetos/sua-temporada-rubro-negra/05.webp"
+        "src": "img/projetos/sua-temporada-rubro-negra/05.webp",
+        "fullscreen": true
       }
     ]
   },
