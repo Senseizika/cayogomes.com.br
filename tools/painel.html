@@ -1136,8 +1136,10 @@ function renderSoftwares() {
   const p = projetoAtual();
   const selecionados = parseTools(p?.tools || "");
   // garante que softwares já salvos mas fora da lista apareçam
+  // (exceto softwares base desativados pelo usuário)
+  const desativados = new Set(softwaresDesativados());
   const disponiveis = softwaresDisponiveis();
-  for (const t of selecionados) if (!disponiveis.includes(t)) disponiveis.push(t);
+  for (const t of selecionados) if (!disponiveis.includes(t) && !desativados.has(t)) disponiveis.push(t);
   box.innerHTML = disponiveis.map(s => {
     const ativo = selecionados.has(s) ? " ativo" : "";
     const remove = `<span class="sw-remove" data-sw-remove="${esc(s)}" title="remover software">×</span>`;
