@@ -461,12 +461,13 @@ dialog[open]{animation:in .22s ease-out}
   height: 100%;
   border: 0;
 }
-/* botões ‹ › (só aparecem quando há mais de uma mídia) */
-.d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;display:grid;place-items:center;padding:.2rem;
+/* botão ⛶ tela cheia por imagem */
 .d-fs{position:absolute;top:.6rem;right:.6rem;z-index:3;background:rgba(0,0,0,.55);color:var(--white);border:0;border-radius:8px;padding:.35rem;cursor:pointer;opacity:.75;transition:opacity .2s,background .2s;display:flex;align-items:center;justify-content:center}
 .d-slide:hover .d-fs,.d-fs:focus{opacity:1}
 .d-fs:hover{background:rgba(0,0,0,.8)}
 @media (hover:none){.d-fs{opacity:1}}
+/* botões ‹ › (só aparecem quando há mais de uma mídia) */
+.d-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;display:grid;place-items:center;padding:.2rem;
   background:none;border:0;color:var(--white);font:400 2rem/1 var(--mono);cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.85);
   opacity:0;pointer-events:none;transition:opacity .25s ease}
 .d-nav:hover{color:var(--accent)}
@@ -1212,6 +1213,34 @@ function posicionarTrack(track){
     : "translateX(-" + (mid * 100) + "%)";
 }
 
+// SVG do ícone de tela cheia (reutilizado em vários lugares)
+const FS_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+
+// Cria e retorna um botão .d-fs para o slide de índice i
+function criarBtnFs(i) {
+  const b = document.createElement("button");
+  b.className = "d-fs";
+  b.type = "button";
+  b.dataset.fs = String(i);
+  b.setAttribute("aria-label", "tela cheia");
+  b.title = "tela cheia";
+  b.innerHTML = FS_SVG;
+  return b;
+}
+
+// Garante que cada slide com fullscreen:true tem um .d-fs e os sem não têm
+function sincronizarBtnFs(track, lista) {
+  [...track.children].forEach((slide, i) => {
+    const m = lista[i];
+    const btn = slide.querySelector(".d-fs");
+    if (m && m.type === "image" && m.fullscreen) {
+      if (!btn) slide.appendChild(criarBtnFs(i));
+    } else {
+      if (btn) btn.remove();
+    }
+  });
+}
+
 // Renderiza o track inteiro ou atualiza a posição
 function pintarMidia(){
   const p = PROJECTS[current];
@@ -1240,7 +1269,7 @@ function pintarMidia(){
   // Recria quando muda o projeto/modo de galeria ou o número de itens
   if (!track || !track.classList.contains(modo) || track.children.length !== total) {
     $("#d-view").innerHTML = `<div class="d-track ${modo}" id="d-track">
-      ${lista.map((m, i) => `<div class="d-slide${m.type === "image" ? "" : " is-video"}" data-index="${i}">${midiaHTML(m, i, iniciais.has(i))}${m.type === "image" && m.fullscreen ? `<button class="d-fs" type="button" data-fs="${i}" aria-label="tela cheia" title="tela cheia"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>` : ""}</div>`).join('')}
+      ${lista.map((m, i) => `<div class="d-slide${m.type === "image" ? "" : " is-video"}" data-index="${i}">${midiaHTML(m, i, iniciais.has(i))}${m.type === "image" && m.fullscreen ? `<button class="d-fs" type="button" data-fs="${i}" aria-label="tela cheia" title="tela cheia">${FS_SVG}</button>` : ""}</div>`).join('')}
     </div>`;
     track = $("#d-track");
 
@@ -1260,43 +1289,17 @@ function pintarMidia(){
     posicionarTrack(track);
   }
 
-  // Sincroniza botões de tela cheia (imagens marcadas no painel)
-  [...track.children].forEach((slide, i) => {
-    const m = lista[i];
-    let btn = slide.querySelector(".d-fs");
-    if (m && m.type === "image" && m.fullscreen) {
-      if (!btn) {
-        btn = document.createElement("button");
-        btn.className = "d-fs";
-        btn.type = "button";
-        btn.dataset.fs = i;
-        btn.setAttribute("aria-label", "tela cheia");
-        btn.title = "tela cheia";
-        btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
-        slide.appendChild(btn);
-      }
-    } else {
-      if (btn) btn.remove();
-    }
-  });
+  // Garante botões de tela cheia em todos os slides marcados
+  sincronizarBtnFs(track, lista);
 
   // Limpa iframes de vídeos que não estão ativos para não ficarem rodando
   [...track.children].forEach((slide, i) => {
     if (i !== mid && slide.querySelector('iframe')) {
       slide.innerHTML = midiaHTML(lista[i], i, iniciais.has(i));
-      // re-adiciona botão de tela cheia se necessário (innerHTML limpou)
+      // re-adiciona botão se necessário (innerHTML limpou) — imagem não vira iframe,
+      // mas mantemos a guarda por segurança
       const m = lista[i];
-      if (m && m.type === "image" && m.fullscreen) {
-        const s = slide;
-        const b = document.createElement("button");
-        b.className = "d-fs";
-        b.type = "button";
-        b.dataset.fs = i;
-        b.setAttribute("aria-label", "tela cheia");
-        b.title = "tela cheia";
-        b.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
-        s.appendChild(b);
-      }
+      if (m && m.type === "image" && m.fullscreen) slide.appendChild(criarBtnFs(i));
     }
   });
 
@@ -1384,8 +1387,8 @@ function fecharFullscreen(){
     fsEl.hidden = true;
     fsEl.classList.remove("rotado");
   }
-  const img = $("#fs .fs-img");
-  if (img) img.src = "";
+  // NÃO limpar img.src: src vazio dispara o handler global de erro de imagem,
+  // que substitui o <img> por .ph e quebra a próxima abertura.
   document.documentElement.style.overflow = "";
   document.body.style.overflow = "";
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e){}
@@ -1606,7 +1609,7 @@ document.addEventListener("click", e => {
    tenta o fallback (ex.: hqdefault no YouTube) ou vira placeholder */
 document.addEventListener("error", e => {
   const img = e.target;
-  if (!img || img.tagName !== "IMG" || img.closest(".fundo")) return;
+  if (!img || img.tagName !== "IMG" || img.closest(".fundo") || img.closest("#fs")) return;
   if (img.dataset.fb) {
     const fb = img.dataset.fb;
     delete img.dataset.fb;
