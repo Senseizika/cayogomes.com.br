@@ -1733,11 +1733,13 @@ async function otimizarImagemWebP(file) {
   let bmp = null, url = null;
   try {
     const canvas = document.createElement("canvas");
+    const QUAD_W = 2560, QUAD_H = 1440;
     if (typeof createImageBitmap === "function") {
       bmp = await createImageBitmap(file);
-      canvas.width = bmp.width;
-      canvas.height = bmp.height;
-      canvas.getContext("2d").drawImage(bmp, 0, 0);
+      const scale = Math.min(1, QUAD_W / bmp.width, QUAD_H / bmp.height);
+      canvas.width = Math.round(bmp.width * scale);
+      canvas.height = Math.round(bmp.height * scale);
+      canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
     } else {
       url = URL.createObjectURL(file);
       const img = await new Promise((res, rej) => {
@@ -1746,9 +1748,12 @@ async function otimizarImagemWebP(file) {
         im.onerror = rej;
         im.src = url;
       });
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
-      canvas.getContext("2d").drawImage(img, 0, 0);
+      const srcW = img.naturalWidth || img.width;
+      const srcH = img.naturalHeight || img.height;
+      const scale = Math.min(1, QUAD_W / srcW, QUAD_H / srcH);
+      canvas.width = Math.round(srcW * scale);
+      canvas.height = Math.round(srcH * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
     }
     const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.92));
     if (blob && blob.size > 0 && blob.size < file.size) {
