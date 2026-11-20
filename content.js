@@ -27,7 +27,36 @@ const AREAS = [
       "pt": "Design",
       "en": "Design"
     },
-    "cats": [],
+    "cats": [
+      {
+        "id": "impresso",
+        "name": {
+          "pt": "Impresso",
+          "en": "Print"
+        }
+      },
+      {
+        "id": "estampa",
+        "name": {
+          "pt": "Estampa",
+          "en": "Screen Print"
+        }
+      },
+      {
+        "id": "social",
+        "name": {
+          "pt": "Redes Sociais",
+          "en": "Social Media"
+        }
+      },
+      {
+        "id": "ilustracao",
+        "name": {
+          "pt": "Ilustração",
+          "en": "Illustration"
+        }
+      }
+    ],
     "lead": {
       "pt": "Arte feita por um humano, nada é artificial.\nCartazes, panfletos, estampas para serigrafia e posts para redes sociais, com identidade visual do físico ao digital.",
       "en": "Art made by a human, never a machine.\nPosters, flyers, screen prints, social posts, and visual identity, from the page to the screen."
