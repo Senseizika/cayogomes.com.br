@@ -111,6 +111,7 @@ function normalizar(lista) {
       .map(m => {
         const o = { type: m.type, src: String(m.src) };
         if (m.type !== 'image' && m.poster) o.poster = String(m.poster);
+        if (m.fullscreen) o.fullscreen = true;
         return o;
       });
     const item = {
