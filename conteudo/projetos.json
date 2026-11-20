@@ -1,5 +1,133 @@
 [
   {
+    "area": "design",
+    "galeria": "carrossel",
+    "cat": "social",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Petrópolis, Chegamos!",
+      "en": "Petrópolis, We're Here!"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/02.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/03.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/05.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "carrossel",
+    "cat": "social",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Sua Temporada Rubro-Negra",
+      "en": "Your Rubro-Negra Season"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/sua-temporada-rubro-negra/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sua-temporada-rubro-negra/02.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sua-temporada-rubro-negra/03.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sua-temporada-rubro-negra/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/sua-temporada-rubro-negra/05.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "carrossel",
+    "cat": "social",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Você no Maracanã",
+      "en": "You at the Maracanã"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/06.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/07.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/08.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/09.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "impresso",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Labirinto dos Horrores",
+      "en": "Maze of Horrors"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/labirinto-dos-horrores/02.webp"
+      }
+    ]
+  },
+  {
     "area": "3d",
     "galeria": "slide",
     "cat": "personagem",

@@ -29,6 +29,13 @@ const AREAS = [
     },
     "cats": [
       {
+        "id": "social",
+        "name": {
+          "pt": "Redes Sociais",
+          "en": "Social Media"
+        }
+      },
+      {
         "id": "impresso",
         "name": {
           "pt": "Impresso",
@@ -40,13 +47,6 @@ const AREAS = [
         "name": {
           "pt": "Estampa",
           "en": "Screen Print"
-        }
-      },
-      {
-        "id": "social",
-        "name": {
-          "pt": "Redes Sociais",
-          "en": "Social Media"
         }
       },
       {

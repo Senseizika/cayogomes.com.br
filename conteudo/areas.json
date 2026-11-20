@@ -11,6 +11,13 @@
     },
     "cats": [
       {
+        "id": "social",
+        "name": {
+          "pt": "Redes Sociais",
+          "en": "Social Media"
+        }
+      },
+      {
         "id": "impresso",
         "name": {
           "pt": "Impresso",
@@ -22,13 +29,6 @@
         "name": {
           "pt": "Estampa",
           "en": "Screen Print"
-        }
-      },
-      {
-        "id": "social",
-        "name": {
-          "pt": "Redes Sociais",
-          "en": "Social Media"
         }
       },
       {
