@@ -1404,7 +1404,11 @@ function abrirFullscreen(i){
     .filter(idx => idx >= 0);
   fsPos = Math.max(0, fsIndices.indexOf(i));
 
-  const fsEl = $("#fs");
+  const fsEl = $("#fs"), dlg = $("#dlg");
+  // Um <dialog> aberto com showModal() fica numa top layer acima de qualquer z-index.
+  // Por isso o overlay precisa viver DENTRO do dialog enquanto está aberto:
+  // se ficar no <body>, os cliques atravessam e caem no modal (fechando tudo).
+  if (dlg && fsEl.parentNode !== dlg) dlg.appendChild(fsEl);
   fsEl.hidden = false;                 // mostra antes de pedir fullscreen
   fsMostrar();
   document.documentElement.style.overflow = "hidden";
