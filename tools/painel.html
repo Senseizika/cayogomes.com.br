@@ -149,6 +149,10 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .sw-btn{padding:.3rem .6rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);color:var(--mute);font:500 .78rem var(--mono);letter-spacing:.04em;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
 .sw-btn:hover{border-color:var(--accent);color:var(--white)}
 .sw-btn.ativo{background:var(--accent);border-color:var(--accent);color:#050506}
+.sw-btn{position:relative;padding-right:1.5rem}
+.sw-remove{position:absolute;right:.35rem;top:50%;transform:translateY(-50%);font:700 .9rem var(--mono);color:var(--mute);cursor:pointer;line-height:1;opacity:.6;transition:opacity .15s,color .15s}
+.sw-btn:hover .sw-remove{opacity:1}
+.sw-remove:hover{color:var(--accent)}
 .sw-add{margin-top:.35rem;padding:.25rem .55rem;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--mute);font:500 .75rem var(--mono);cursor:pointer}
 .sw-add:hover{border-color:var(--accent);color:var(--accent)}
 .mini{max-width:100%;max-height:160px;object-fit:contain;border-radius:6px;border:1px solid var(--line);display:block;margin-top:.2rem;cursor:zoom-in;background:#000}
@@ -1128,7 +1132,9 @@ function renderSoftwares() {
   for (const t of selecionados) if (!disponiveis.includes(t)) disponiveis.push(t);
   box.innerHTML = disponiveis.map(s => {
     const ativo = selecionados.has(s) ? " ativo" : "";
-    return `<button type="button" class="sw-btn${ativo}" data-sw="${esc(s)}">${esc(s)}</button>`;
+    const ehCustom = !SOFTWARES_BASE.includes(s);
+    const remove = ehCustom ? `<span class="sw-remove" data-sw-remove="${esc(s)}" title="remover software">×</span>` : "";
+    return `<button type="button" class="sw-btn${ativo}" data-sw="${esc(s)}">${esc(s)}${remove}</button>`;
   }).join("");
 }
 $("#form").addEventListener("click", e => {
@@ -1151,6 +1157,21 @@ $("#form").addEventListener("click", e => {
     renderSoftwares();
     return;
   }
+  const rm = e.target.closest("[data-sw-remove]");
+  if (rm) {
+    const nome = rm.dataset.swRemove;
+    if (!confirm(`Remover o software "${nome}" da lista?`)) return;
+    const custom = softwaresCustom().filter(x => x !== nome);
+    salvarSoftwaresCustom(custom);
+    projetos.forEach(p => {
+      const sel = parseTools(p.tools || "");
+      if (sel.has(nome)) { sel.delete(nome); p.tools = [...sel].join(" · "); }
+    });
+    marcarSujo();
+    renderSoftwares();
+    desenharForm();
+    return;
+  }
   const b = e.target.closest(".sw-btn");
   if (!b) return;
   const p = projetoAtual();
@@ -1167,6 +1188,8 @@ function linhaMidia(m, i, total) {
   if (!m) return '';
   const tipo = m.type || "image";
   const ehImg = tipo === "image";
+  const pAtual = projetoAtual();
+  const imagensDoProjeto = (pAtual?.media || []).filter(mm => (mm.type || "image") === "image" && mm.src);
   const preview = ehImg ? m.src : m.poster;
   return `<div class="midia" data-mi="${i}">
     <div class="topo" draggable="true" title="Arraste para reordenar">
@@ -1184,6 +1207,12 @@ function linhaMidia(m, i, total) {
       </label>
       ${ehImg ? "" : `<label>capa (opcional) <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa"></label>`}
       <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
+      ${!ehImg && imagensDoProjeto.length ? `<label>ou usar imagem do projeto
+        <select data-mcampo="poster-pick">
+          <option value="">— nenhuma —</option>
+          ${imagensDoProjeto.map(im => `<option value="${esc(im.src)}" ${im.src === (m.poster || "") ? "selected" : ""}>${esc(im.src.split("/").pop())}</option>`).join("")}
+        </select>
+      </label>` : ""}
       ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
     </div>
   </div>`;
@@ -1481,6 +1510,14 @@ $("#form").addEventListener("change", async e => {
   if (tipo) {
     const mi = +tipo.closest("[data-mi]").dataset.mi;
     projetoAtual().media[mi].type = tipo.value;
+    marcarSujo();
+    desenharForm();
+    return;
+  }
+  const pp = e.target.closest('[data-mcampo="poster-pick"]');
+  if (pp) {
+    const mi = +pp.closest("[data-mi]").dataset.mi;
+    projetoAtual().media[mi].poster = pp.value;
     marcarSujo();
     desenharForm();
     return;
