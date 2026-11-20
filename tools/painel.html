@@ -157,6 +157,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .sw-add:hover{border-color:var(--accent);color:var(--accent)}
 .mini{max-width:100%;max-height:160px;object-fit:contain;border-radius:6px;border:1px solid var(--line);display:block;margin-top:.2rem;cursor:zoom-in;background:#000}
 .mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.img-info{display:block;margin-top:.25rem;font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);letter-spacing:.02em}
 .arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
@@ -1232,8 +1233,48 @@ function linhaMidia(m, i, total) {
         </select>
       </label>` : ""}
       ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
+      ${ehImg && m.src ? `<span class="img-info" data-src="${esc(m.src)}">carregando…</span>` : ""}
     </div>
   </div>`;
+}
+
+const _imgInfoCache = new Map();
+function formatBytesImg(b) {
+  if (b < 1024) return b + " B";
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
+  return (b / 1024 / 1024).toFixed(2) + " MB";
+}
+async function atualizarDetalhesImagens() {
+  const spans = document.querySelectorAll(".img-info[data-src]");
+  for (const span of spans) {
+    const src = span.dataset.src;
+    if (!src) { span.textContent = ""; continue; }
+    if (_imgInfoCache.has(src)) { span.textContent = _imgInfoCache.get(src); continue; }
+    span.textContent = "carregando…";
+    let dims = null;
+    try {
+      dims = await new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight });
+        im.onerror = rej;
+        im.src = "/" + src;
+      });
+    } catch (e) { dims = null; }
+    let size = null;
+    try {
+      const r = await fetch("/" + src, { method: "HEAD" });
+      const cl = r.headers.get("content-length");
+      if (cl) size = parseInt(cl, 10);
+    } catch (e) {}
+    const ext = src.split(".").pop().toLowerCase();
+    let txt = "";
+    if (dims) txt += dims.w + "×" + dims.h;
+    if (size) txt += (txt ? " · " : "") + formatBytesImg(size);
+    txt += (txt ? " · " : "") + ext;
+    if (!dims && !size) txt = src.split("/").pop();
+    _imgInfoCache.set(src, txt);
+    span.textContent = txt;
+  }
 }
 
 function webpAtivo() {
@@ -1298,6 +1339,7 @@ function desenharForm() {
     $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar o projeto. Verifique os dados.</p>`;
   }
   renderSoftwares();
+  atualizarDetalhesImagens();
 }
 
 function desenharFormArea() {
