@@ -193,7 +193,7 @@
     "galeria": "slide",
     "cat": "personagem",
     "h": 0,
-    "tools": "",
+    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag",
     "title": {
       "pt": "Punk Alien Concept (W.I.P) ",
       "en": "Punk Alien Concept (W.I.P) "
@@ -246,16 +246,21 @@
     "galeria": "slide",
     "cat": "game-ready",
     "h": 0,
-    "tools": "",
+    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag",
     "title": {
       "pt": "Checkpoint de Corrida sci-fi",
       "en": "sci-fi Racing Checkpoint"
     },
     "desc": {
       "pt": "",
-      "en": ""
+      "en": "I aimed to design a checkpoint that was not\nonly functional but also visually appealing, slightly distorting the idea of a stationary\ncheckpoint into something more fluid and interactive, almost like its own character.\nI started the process by searching for reference images and organizing them in a PureRef\ndocument. Then, I began sketching the initial ideas. It didn't take long to find a silhouette that\nwas easily distinguishable from the game's environment and visually pleasing. I developed\nthe idea of a checkpoint-ship that moves to the race points, opens like a fan, and projects a\nhologram to signal the way. Despite its distinct and unique shape, it's possible to freely\ncustomize the colors of this concept so that it can be used in various terrain conditions\nwithout blending into the environment.\nAfter establishing the concept, I started modeling; After modeling in ZBrush, I\ndid the retopology and created the UV map in Blender. The texturing was done in Substance\nPainter, where I tried to vary the materials significantly, adding racing stripes and some\ndanger warnings. The renders were done in Marmoset Toolbag.\nThis model was designed, modeled, textured, and rendered in approximately two days smiley"
     },
     "media": [
+      {
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
+        "poster": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp"
+      },
       {
         "type": "image",
         "src": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp"
