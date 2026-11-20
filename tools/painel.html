@@ -1114,9 +1114,17 @@ function softwaresCustom() {
 function salvarSoftwaresCustom(lista) {
   try { localStorage.setItem("painel_softwares", JSON.stringify(lista)); } catch (e) {}
 }
+function softwaresDesativados() {
+  try { return JSON.parse(localStorage.getItem("painel_softwares_desativados") || "[]"); } catch (e) { return []; }
+}
+function salvarSoftwaresDesativados(lista) {
+  try { localStorage.setItem("painel_softwares_desativados", JSON.stringify(lista)); } catch (e) {}
+}
 function softwaresDisponiveis() {
+  const desativados = new Set(softwaresDesativados());
   const custom = softwaresCustom();
-  const set = new Set([...SOFTWARES_BASE, ...custom]);
+  const base = SOFTWARES_BASE.filter(s => !desativados.has(s));
+  const set = new Set([...base, ...custom]);
   return [...set];
 }
 function parseTools(str) {
@@ -1132,8 +1140,7 @@ function renderSoftwares() {
   for (const t of selecionados) if (!disponiveis.includes(t)) disponiveis.push(t);
   box.innerHTML = disponiveis.map(s => {
     const ativo = selecionados.has(s) ? " ativo" : "";
-    const ehCustom = !SOFTWARES_BASE.includes(s);
-    const remove = ehCustom ? `<span class="sw-remove" data-sw-remove="${esc(s)}" title="remover software">×</span>` : "";
+    const remove = `<span class="sw-remove" data-sw-remove="${esc(s)}" title="remover software">×</span>`;
     return `<button type="button" class="sw-btn${ativo}" data-sw="${esc(s)}">${esc(s)}${remove}</button>`;
   }).join("");
 }
@@ -1143,7 +1150,11 @@ $("#form").addEventListener("click", e => {
     if (!nome || !nome.trim()) return;
     const n = nome.trim();
     const custom = softwaresCustom();
-    if (![...SOFTWARES_BASE, ...custom].includes(n)) {
+    // reativa software base desativado, se for o caso
+    const desativados = softwaresDesativados();
+    const di = desativados.indexOf(n);
+    if (di >= 0) { desativados.splice(di, 1); salvarSoftwaresDesativados(desativados); }
+    if (!SOFTWARES_BASE.includes(n) && !custom.includes(n)) {
       custom.push(n);
       salvarSoftwaresCustom(custom);
     }
@@ -1161,8 +1172,13 @@ $("#form").addEventListener("click", e => {
   if (rm) {
     const nome = rm.dataset.swRemove;
     if (!confirm(`Remover o software "${nome}" da lista?`)) return;
-    const custom = softwaresCustom().filter(x => x !== nome);
-    salvarSoftwaresCustom(custom);
+    if (SOFTWARES_BASE.includes(nome)) {
+      const desativados = softwaresDesativados();
+      if (!desativados.includes(nome)) { desativados.push(nome); salvarSoftwaresDesativados(desativados); }
+    } else {
+      const custom = softwaresCustom().filter(x => x !== nome);
+      salvarSoftwaresCustom(custom);
+    }
     projetos.forEach(p => {
       const sel = parseTools(p.tools || "");
       if (sel.has(nome)) { sel.delete(nome); p.tools = [...sel].join(" · "); }
