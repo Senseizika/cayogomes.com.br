@@ -1,5 +1,66 @@
 [
   {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "game-ready",
+    "h": 0,
+    "tools": "Blender · ZBrush · Substance 3D Designer · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "title": {
+      "pt": "O Piromante",
+      "en": "The Pyromancer"
+    },
+    "desc": {
+      "pt": "O Piromante é um projeto pessoal para estudar um pouco sobre edição de vídeo e áudio, além de renderização e animação. O foco foi contar uma história por meio do áudio, então é melhor ouvir com fones de ouvido. Mas também é uma demonstração do trabalho de modelagem e texturização para jogos, pois fiz tudo do zero, com qualidade suficiente para uma renderização realista, mas escalável para um asset game ready.",
+      "en": "The Pyromancer is a personal project to study a little about video and audio editing, as well as rendering and animation. The focus was to tell a story through audio, so it’s best to listen with headphones. But it is also a demonstration of modeling and texturing work for games, since I made everything from scratch, with enough quality for realistic rendering, yet scalable for a game-ready asset."
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/02.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/03.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/05.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/06.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/07.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/08.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/09.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/10.webp"
+      }
+    ]
+  },
+  {
     "area": "design",
     "galeria": "carrossel",
     "cat": "social",
