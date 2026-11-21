@@ -312,39 +312,48 @@
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/09.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/09.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/01.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/01.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/02.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/02.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/03.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/03.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/04.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/04.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/05.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/05.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/06.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/06.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/07.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/07.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/punk-alien-concept-w-i-p/08.webp"
+        "src": "img/projetos/punk-alien-concept-w-i-p/08.webp",
+        "fullscreen": true
       }
     ]
   },
