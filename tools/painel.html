@@ -135,6 +135,9 @@ label{display:block;margin-bottom:.7rem;font:400 .68rem ui-monospace,Consolas,mo
 input,select,textarea{display:block;width:100%;margin-top:.22rem;background:#0f1114;border:1px solid var(--line);color:var(--white);padding:.45rem .55rem;border-radius:6px;font:400 .92rem system-ui,sans-serif}
 input:focus,select:focus,textarea:focus{outline:1px solid var(--accent)}
 textarea{resize:vertical}
+.rotulo-linha{display:flex;align-items:center;gap:.4rem}
+.btn-expandir{margin-left:auto;padding:.1rem .35rem;font:400 .85rem ui-monospace,Consolas,monospace;line-height:1;border-color:transparent;color:var(--mute)}
+.btn-expandir:hover{border-color:var(--line);color:var(--accent)}
 .linha{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;text-transform:uppercase;color:var(--mute)}
 .toggle-webp{display:inline-flex;align-items:center;gap:.35rem;margin:0 0 0 auto;font:400 .72rem ui-monospace,Consolas,monospace;text-transform:none;letter-spacing:0;color:var(--mute);cursor:pointer}
@@ -155,6 +158,15 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .sw-remove:hover{color:var(--accent)}
 .sw-add{margin-top:.35rem;padding:.25rem .55rem;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--mute);font:500 .75rem var(--mono);cursor:pointer}
 .sw-add:hover{border-color:var(--accent);color:var(--accent)}
+#editor-texto{width:min(1000px,94vw);max-width:none;height:min(86vh,900px);max-height:none;border:1px solid var(--line);border-radius:10px;padding:0;background:var(--panel);color:var(--white);box-shadow:0 30px 80px rgba(0,0,0,.7)}
+#editor-texto::backdrop{background:rgba(0,0,0,.72)}
+#editor-texto form{display:flex;flex-direction:column;height:100%;padding:0}
+.et-topo{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line);font:400 .78rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute)}
+.et-topo strong{color:var(--white)}
+.et-dica{margin-left:auto;opacity:.7;text-align:right}
+#editor-texto-campo{flex:1;min-height:0;margin:0;border:0;border-radius:0;padding:1rem;background:#08090b;font:400 1rem/1.6 ui-monospace,Consolas,monospace;color:var(--white);resize:none}
+#editor-texto-campo:focus{outline:1px solid var(--accent);outline-offset:-1px}
+.et-acoes{display:flex;justify-content:flex-end;gap:.5rem;padding:.6rem 1rem;border-top:1px solid var(--line)}
 .mini{max-width:100%;max-height:160px;object-fit:contain;border-radius:6px;border:1px solid var(--line);display:block;margin-top:.2rem;cursor:zoom-in;background:#000}
 .mini-nao-imagem{display:inline-block;max-width:100%;margin-top:.2rem;padding:.3rem .5rem;border:1px dashed var(--line);border-radius:4px;font:400 .74rem ui-monospace,Consolas,monospace;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .img-info{display:block;margin-top:.25rem;font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);letter-spacing:.02em}
@@ -256,11 +268,26 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 
 <input type="file" id="seletor" multiple tabindex="-1" aria-hidden="true">
 
+<dialog id="editor-texto" aria-label="Editor de texto grande">
+  <form id="editor-texto-form">
+    <div class="et-topo">
+      <strong id="editor-texto-titulo">DESCRIÇÃO</strong>
+      <span class="et-dica">Markdown: **negrito**, # título, - lista, &gt; citação</span>
+    </div>
+    <textarea id="editor-texto-campo" spellcheck="true"></textarea>
+    <div class="et-acoes">
+      <button type="button" id="editor-texto-cancelar">Cancelar</button>
+      <button type="button" class="pri" id="editor-texto-aplicar">Aplicar</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 const token = "__PAINEL_TOKEN__";
 let projetos = [], areas = [], areasEditaveis = [];
 let projetoSelecionado = null, areaSelecionada = null, categoriaSelecionada = null;
 let sujo = false, modoAtual = 'projetos';
+let editorOrigem = null;
 let idOriginalArea = '';
 
 let buscaProjeto = '';
@@ -1168,6 +1195,17 @@ function renderSoftwares() {
   }).join("");
 }
 $("#form").addEventListener("click", e => {
+  const expandir = e.target.closest("[data-expandir]");
+  if (expandir) {
+    const origem = document.querySelector(`#form textarea[data-campo="${expandir.dataset.expandir}"]`);
+    if (!origem) return;
+    editorOrigem = origem;
+    $("#editor-texto-titulo").textContent = expandir.dataset.titulo || "TEXTO";
+    $("#editor-texto-campo").value = origem.value;
+    $("#editor-texto").showModal();
+    $("#editor-texto-campo").focus();
+    return;
+  }
   if (e.target.closest("#add-software")) {
     const nome = prompt("Nome do software:");
     if (!nome || !nome.trim()) return;
@@ -1222,6 +1260,15 @@ $("#form").addEventListener("click", e => {
   marcarSujo();
   renderSoftwares();
 });
+
+$("#editor-texto-aplicar").addEventListener("click", () => {
+  if (!editorOrigem) return;
+  editorOrigem.value = $("#editor-texto-campo").value;
+  editorOrigem.dispatchEvent(new Event("input", { bubbles: true }));
+  $("#editor-texto").close();
+});
+$("#editor-texto-cancelar").addEventListener("click", () => $("#editor-texto").close());
+$("#editor-texto").addEventListener("close", () => { editorOrigem = null; });
 
 function linhaMidia(m, i, total) {
   if (!m) return '';
@@ -1330,8 +1377,8 @@ function desenharForm() {
         <label>título PT <input data-campo="title.pt" value="${esc(p.title?.pt)}"></label>
         <label>título EN <input data-campo="title.en" value="${esc(p.title?.en)}"></label>
       </div>
-      <label>descrição PT <textarea rows="8" data-campo="desc.pt" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.pt)}</textarea></label>
-      <label>descrição EN <textarea rows="8" data-campo="desc.en" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.en)}</textarea></label>
+      <label><span class="rotulo-linha">descrição PT <button type="button" class="btn-expandir" data-expandir="desc.pt" data-titulo="DESCRIÇÃO PT" title="abrir editor grande">⤢</button></span><textarea rows="8" data-campo="desc.pt" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.pt)}</textarea></label>
+      <label><span class="rotulo-linha">descrição EN <button type="button" class="btn-expandir" data-expandir="desc.en" data-titulo="DESCRIÇÃO EN" title="abrir editor grande">⤢</button></span><textarea rows="8" data-campo="desc.en" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.en)}</textarea></label>
       <p class="dica" style="margin:-.2rem 0 .6rem">markdown: **negrito** / __negrito__, *itálico* / _itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)</p>
       
       <!-- NOVO CAMPO AQUI -->
@@ -1981,10 +2028,14 @@ $("#form").addEventListener("drop", e => {
 });
 
 document.addEventListener("keydown", e => {
+  const editorAberto = $("#editor-texto")?.open;
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
     e.preventDefault();
-    $("#salvar").click();
+    if (editorAberto) $("#editor-texto-aplicar").click();
+    else $("#salvar").click();
+    return;
   }
+  if (e.key === "Escape" && editorAberto) return; // o próprio dialog fecha
   if (e.key === "Escape" && document.body.classList.contains("editando")) fechar();
 });
 window.addEventListener("beforeunload", e => {
