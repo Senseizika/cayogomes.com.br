@@ -64,7 +64,7 @@
   --hero-h:max(200px,35vh);    /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
   --logo-max-h:40vh;           /* tamanho da logo mantido (independe da altura do hero) */
   --logo-sobe:1vh;             /* 0 = logo centralizada. Para subir, use ex.: 1vh */
-  --thumb-h:clamp(169px,13vw,177px); /* miniaturas: altura igual (169px no mobile, 177px no PC); largura segue a imagem */
+  --thumb-h:clamp(220px,24vw,320px); /* miniaturas: altura igual (220px no mobile, 320px no PC); largura segue a imagem */
 }
 @supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent} /* sem flash azul ao tocar no mobile */
@@ -241,12 +241,12 @@ a{color:inherit}
 #panel .cat-separator{margin-left:2rem;margin-right:2rem}
 .item{flex:0 0 auto;display:block;width:auto;max-width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
 /* Miniaturas com a MESMA altura; a largura segue a proporção original da imagem (sem corte). */
-.thumb{width:fit-content;max-width:100%;overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
+.thumb{width:fit-content;max-width:none;overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
 /* fio de luz na aresta superior da miniatura (mesma linguagem do vidro) */
 .thumb::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.03)}
 .item:hover .thumb{border-color:var(--accent)}
-.thumb img{height:var(--thumb-h);width:auto;max-width:100%;object-fit:contain;display:block;transition:transform .5s}
+.thumb img{height:var(--thumb-h);width:auto;max-width:none;object-fit:contain;display:block;transition:transform .5s}
 .thumb:has(.ph){height:var(--thumb-h);width:calc(var(--thumb-h) * 4 / 3)}
 .item:hover .thumb img{transform:scale(1.015)}
 .ph{position:absolute;inset:0;display:grid;place-items:center;font:400 .85rem var(--mono);color:var(--mute);letter-spacing:.08em;
@@ -560,7 +560,10 @@ dialog[open]{animation:in .22s ease-out}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
   .cat-separator{margin:1.1rem .9rem 0}
-  .grid{gap:1rem;padding:1rem .9rem}
+  /* no mobile a tira é mais larga que o vidro: deslize lateral para ver os outros cards */
+  .grid{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none}
+  .grid::-webkit-scrollbar{display:none}
+  .item{max-width:none;scroll-snap-align:start}
   .item h3{font-size:1rem}
   .about{padding:1.1rem .9rem}
   .contact-body{padding:1.1rem .9rem}
