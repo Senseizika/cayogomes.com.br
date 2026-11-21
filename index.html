@@ -560,10 +560,10 @@ dialog[open]{animation:in .22s ease-out}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
   .cat-separator{margin:1.1rem .9rem 0}
-  /* no mobile a tira é mais larga que o vidro: deslize lateral para ver os outros cards */
-  .grid{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none}
-  .grid::-webkit-scrollbar{display:none}
-  .item{max-width:none;scroll-snap-align:start}
+  /* no mobile os projetos vêm em coluna (feed): um em cima do outro, sem swipe */
+  :root{--thumb-h:169px}
+  .grid{flex-direction:column;align-items:flex-start;overflow-x:visible;scroll-snap-type:none;gap:1.5rem}
+  .item,.thumb,.thumb img{max-width:100%}
   .item h3{font-size:1rem}
   .about{padding:1.1rem .9rem}
   .contact-body{padding:1.1rem .9rem}
