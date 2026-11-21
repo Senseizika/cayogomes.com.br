@@ -570,6 +570,7 @@ dialog[open]{animation:in .22s ease-out}
 #fs{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem;touch-action:none}
 #fs[hidden]{display:none}
 #fs .fs-img,#fs .fs-img-peer{max-width:95vw;max-height:90vh;object-fit:contain;touch-action:none;transform-origin:center center;user-select:none;-webkit-user-select:none}
+#fs.fs-deslizando .fs-img,#fs.fs-deslizando .fs-img-peer{transition:transform .35s cubic-bezier(.25,1,.5,1)}
 #fs .fs-img-peer{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 #fs .fs-close{position:absolute;top:1rem;right:1.2rem;background:none;border:0;color:#fff;font:700 2rem/1 system-ui,sans-serif;cursor:pointer;opacity:.8}
 #fs .fs-close:hover{opacity:1}
@@ -766,6 +767,7 @@ let fsIndices = [], fsPos = 0;
 let fsZoom = 1, fsPanX = 0, fsPanY = 0, fsSwipeDx = 0;
 let fsPeerDir = 0, fsPeerLargura = 0; // prévia da imagem vizinha durante o arraste
 let fsPontos = new Map(), fsGesto = null;
+let fsAnimTimer = null, fsAnimando = false;
 
 const YT = s => {
   s = String(s || "").trim();
@@ -1450,15 +1452,52 @@ function abrirFullscreen(i){
   } catch(e){}
 }
 
-// Anda entre as imagens do overlay (não mexe no slide do modal).
-function fsMover(n){
+// Troca imediata, sem animação (usada no fim do deslize).
+function fsTrocar(n){
   if (fsIndices.length < 2) return;
+  $("#fs").classList.remove("fs-deslizando");
   fsPos = (fsPos + n + fsIndices.length) % fsIndices.length;
   fsMostrar();
 }
 
+// Anda entre as imagens com deslizamento suave (botões, teclado e arraste).
+function fsMover(n){
+  if (fsIndices.length < 2 || fsAnimando) return;
+  const dir = n > 0 ? 1 : -1;
+  const viz = (PROJECTS[current]?.media || [])[fsIndices[fsPos + dir]];
+  if (!viz || !viz.src) { fsTrocar(n); return; }
+
+  const fsEl = $("#fs"), img = $("#fs .fs-img"), peer = $("#fs .fs-img-peer");
+  fsAnimando = true;
+  clearTimeout(fsAnimTimer);
+
+  // posição inicial sem transição: atual no centro, vizinha fora da tela
+  fsEl.classList.remove("fs-deslizando");
+  fsPeerDir = dir;
+  fsPeerLargura = img.getBoundingClientRect().width || window.innerWidth * 0.9;
+  fsSwipeDx = 0;
+  peer.src = viz.src;
+  peer.style.opacity = "1";
+  fsAplicarTransform();
+  void img.offsetWidth; // força reflow para a transição pegar
+
+  // liga a transição e desliza as duas
+  fsEl.classList.add("fs-deslizando");
+  fsSwipeDx = -dir * fsPeerLargura;
+  fsAplicarTransform();
+
+  fsAnimTimer = setTimeout(() => {
+    fsTrocar(dir);
+    fsAnimando = false;
+    fsAnimTimer = null;
+  }, 360);
+}
+
 function fecharFullscreen(){
   const fsEl = $("#fs");
+  clearTimeout(fsAnimTimer);
+  fsAnimTimer = null; fsAnimando = false;
+  fsEl.classList.remove("fs-deslizando");
   // Sai do fullscreen do navegador ANTES de esconder o elemento (evitaEstado sujo).
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e){}
   if (fsEl) {
@@ -1492,6 +1531,10 @@ $("#fs").addEventListener("wheel", e => {
 // Duas pontas (pinça): zoom proporcional à distância entre os dedos.
 $("#fs").addEventListener("pointerdown", e => {
   if ($("#fs").hidden || e.target.closest(".fs-nav, .fs-close")) return;
+  // começo do gesto: nada de transição, o dedo comanda direto
+  clearTimeout(fsAnimTimer);
+  fsAnimTimer = null; fsAnimando = false;
+  $("#fs").classList.remove("fs-deslizando");
   fsPontos.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (fsPontos.size === 1) {
     fsGesto = {
@@ -1553,16 +1596,41 @@ const fsFimGesto = e => {
   if (!fsPontos.has(e.pointerId)) return;
   fsPontos.delete(e.pointerId);
 
+  const fsEl = $("#fs"), peerFim = $("#fs .fs-img-peer");
+  let pulou = 0;
   if (fsGesto && fsGesto.modo === "arraste" && fsGesto.moved && fsPontos.size === 0) {
     const dx = e.clientX - fsGesto.x0;
     const limiar = Math.max(60, window.innerWidth * 0.12);
-    if (dx < -limiar) fsMover(1);
-    else if (dx > limiar) fsMover(-1);
+    if (dx < -limiar) pulou = 1;
+    else if (dx > limiar) pulou = -1;
   }
-  fsSwipeDx = 0;
-  fsPeerDir = 0;
-  const peerFim = $("#fs .fs-img-peer");
-  if (peerFim) peerFim.style.opacity = "0";
+
+  if (pulou && fsPeerDir && !fsAnimando) {
+    // conclui o deslize suavemente e só depois troca a imagem de fato
+    const dir = fsPeerDir;
+    fsAnimando = true;
+    clearTimeout(fsAnimTimer);
+    fsEl.classList.add("fs-deslizando");
+    fsSwipeDx = -dir * fsPeerLargura;
+    fsAplicarTransform();
+    fsAnimTimer = setTimeout(() => {
+      fsTrocar(dir);
+      fsAnimando = false;
+      fsAnimTimer = null;
+    }, 360);
+  } else {
+    // não passou do limiar: volta suavemente ao centro
+    clearTimeout(fsAnimTimer);
+    fsEl.classList.add("fs-deslizando");
+    fsSwipeDx = 0;
+    fsAplicarTransform();
+    fsAnimTimer = setTimeout(() => {
+      if (peerFim) peerFim.style.opacity = "0";
+      fsPeerDir = 0; fsPeerLargura = 0;
+      fsEl.classList.remove("fs-deslizando");
+      fsAnimTimer = null;
+    }, 360);
+  }
 
   if (fsGesto && fsGesto.modo === "pinca" && fsPontos.size === 1) {
     const p = [...fsPontos.values()][0];
@@ -1570,7 +1638,6 @@ const fsFimGesto = e => {
   } else if (fsPontos.size === 0) {
     fsGesto = null;
   }
-  fsAplicarTransform();
 };
 window.addEventListener("pointerup", fsFimGesto);
 window.addEventListener("pointercancel", fsFimGesto);
