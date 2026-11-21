@@ -560,10 +560,13 @@ dialog[open]{animation:in .22s ease-out}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
   .cat-separator{margin:1.1rem .9rem 0}
-  /* no mobile os projetos vêm em coluna (feed): um em cima do outro, sem swipe */
-  :root{--thumb-h:169px}
-  .grid{flex-direction:column;align-items:flex-start;overflow-x:visible;scroll-snap-type:none;gap:1.5rem}
-  .item,.thumb,.thumb img{max-width:100%}
+  /* no mobile cada projeto ocupa toda a largura do vidro (feed), com sua proporção original */
+  .grid{flex-direction:column;align-items:stretch;overflow-x:visible;scroll-snap-type:none;gap:1.5rem}
+  #panel .grid{padding-left:0;padding-right:0}
+  .item,.thumb,.thumb img{width:100%;max-width:none}
+  .thumb img{height:auto}
+  .thumb:has(.ph){width:100%;height:auto;aspect-ratio:4/3}
+  .item h3{padding:0 1rem}
   .item h3{font-size:1rem}
   .about{padding:1.1rem .9rem}
   .contact-body{padding:1.1rem .9rem}
