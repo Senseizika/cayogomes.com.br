@@ -1393,14 +1393,15 @@ function fsMostrar(){
   $("#fs .fs-next").hidden = !many;
 }
 
-// Abre o overlay na mídia i. A navegação interna percorre todas as imagens do projeto.
+// Abre o overlay na mídia i. A navegação interna percorre SOMENTE as imagens
+// marcadas com fullscreen no painel — as demais nunca aparecem em tela cheia.
 function abrirFullscreen(i){
   const p = PROJECTS[current];
   const m = (p.media || [])[i];
-  if (!m || m.type !== "image" || !m.src) return;
+  if (!m || m.type !== "image" || !m.src || !m.fullscreen) return;
 
   fsIndices = (p.media || [])
-    .map((x, idx) => (x && x.type === "image" && x.src) ? idx : -1)
+    .map((x, idx) => (x && x.type === "image" && x.src && x.fullscreen) ? idx : -1)
     .filter(idx => idx >= 0);
   fsPos = Math.max(0, fsIndices.indexOf(i));
 
