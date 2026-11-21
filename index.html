@@ -574,8 +574,6 @@ dialog[open]{animation:in .22s ease-out}
 #fs .fs-img-peer{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 #fs .fs-close{position:absolute;top:1rem;right:1.2rem;z-index:3;background:none;border:0;color:#fff;font:700 2rem/1 system-ui,sans-serif;cursor:pointer;opacity:.8}
 #fs .fs-close:hover{opacity:1}
-#fs .fs-dica{color:#fff;font:500 .9rem/1.3 var(--tech);letter-spacing:.05em;opacity:.7}
-#fs.rotado .fs-img,#fs.rotado .fs-img-peer{transform:rotate(90deg);max-width:90vh;max-height:95vw}
 #fs .fs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;
   background:none;border:0;color:#fff;font:400 2.4rem/1 var(--mono);cursor:pointer;
   text-shadow:0 1px 6px rgba(0,0,0,.9);opacity:.55;transition:opacity .2s ease,color .2s ease}
@@ -720,7 +718,6 @@ dialog[open]{animation:in .22s ease-out}
   <img class="fs-img-peer" alt="" draggable="false" aria-hidden="true">
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
-  <p class="fs-dica" hidden>vire o celular para ver a imagem</p>
 </div>
 <script src="conteudo/projetos.js"></script>
 <script src="content.js"></script>
@@ -1373,16 +1370,15 @@ function irMedia(n){
 }
 
 // ---------- overlay de tela cheia ----------
-// Aplica transform de rotação (mobile paisagem) + pan + zoom na imagem.
+// Aplica pan + zoom na imagem (sem rotação: no celular, basta virar a tela).
 function fsAplicarTransform(){
   const img = $("#fs .fs-img"), peer = $("#fs .fs-img-peer");
   if (!img) return;
-  const rot = $("#fs").classList.contains("rotado") ? "rotate(90deg) " : "";
-  img.style.transform = rot + `translate(${(fsPanX + fsSwipeDx).toFixed(1)}px, ${fsPanY.toFixed(1)}px) scale(${fsZoom.toFixed(3)})`;
+  img.style.transform = `translate(${(fsPanX + fsSwipeDx).toFixed(1)}px, ${fsPanY.toFixed(1)}px) scale(${fsZoom.toFixed(3)})`;
   img.style.cursor = fsZoom > 1.01 ? "grab" : "default";
   if (peer) {
     const off = fsPeerDir * (fsPeerLargura + fsEspacamento); // +1 => direita; -1 => esquerda
-    peer.style.transform = rot + `translate(${(off + fsSwipeDx).toFixed(1)}px, 0px) scale(1)`;
+    peer.style.transform = `translate(${(off + fsSwipeDx).toFixed(1)}px, 0px) scale(1)`;
   }
 }
 
@@ -1397,27 +1393,13 @@ function fsResetZoom(){
 
 // Mostra a imagem apontada por fsPos dentro de fsIndices.
 function fsMostrar(){
-  const fsEl = $("#fs"), img = $("#fs .fs-img"), dica = $("#fs .fs-dica");
+  const img = $("#fs .fs-img");
   const i = fsIndices[fsPos];
   const m = (PROJECTS[current]?.media || [])[i];
   if (!img || !m || m.type !== "image" || !m.src) return;
 
-  fsEl.classList.remove("rotado");
-  dica.hidden = true;
   img.src = m.src;
   fsResetZoom(); // cada imagem começa sem zoom
-
-  // mobile + paisagem -> gira a imagem e mostra a dica
-  const isMobile = window.matchMedia("(hover: none) and (max-width: 900px)").matches
-                || window.matchMedia("(pointer: coarse)").matches;
-  img.onload = () => {
-    if (isMobile && img.naturalWidth > img.naturalHeight) {
-      fsEl.classList.add("rotado");
-      dica.hidden = false;
-      fsAplicarTransform();
-    }
-  };
-  if (img.complete && img.naturalWidth) img.onload();
 
   // setas só fazem sentido com mais de uma imagem
   const many = fsIndices.length > 1;
@@ -1511,10 +1493,7 @@ function fecharFullscreen(){
   fsEl.classList.remove("fs-deslizando");
   // Sai do fullscreen do navegador ANTES de esconder o elemento (evitaEstado sujo).
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e){}
-  if (fsEl) {
-    fsEl.hidden = true;
-    fsEl.classList.remove("rotado");
-  }
+  if (fsEl) fsEl.hidden = true;
   // NÃO limpar img.src: src vazio dispara o handler global de erro e troca o <img> por .ph.
   // Só libera o scroll da página se o modal não estiver aberto.
   if (!$("#dlg").open) {
