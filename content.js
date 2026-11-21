@@ -18,6 +18,37 @@
    name/short/lead: textos em pt/en. */
 const AREAS = [
   {
+    "id": "3d",
+    "name": {
+      "pt": "Arte 3D",
+      "en": "3D Art"
+    },
+    "short": {
+      "pt": "3D",
+      "en": "3D"
+    },
+    "cats": [
+      {
+        "id": "game-ready",
+        "name": {
+          "pt": "Game Ready",
+          "en": "Game Ready"
+        }
+      },
+      {
+        "id": "personagem",
+        "name": {
+          "pt": "Personagem",
+          "en": "Character"
+        }
+      }
+    ],
+    "lead": {
+      "pt": "Arte 3D feita por um artista, seja estilizada ou realista.\nPersonagens, criaturas e props esculpidos à mão, prontos para jogos ou para impressão.",
+      "en": "3D art made by an artist, whether stylized or realist.\nCharacters, creatures, and props sculpted by hand, ready for games or print on demand."
+    }
+  },
+  {
     "id": "design",
     "name": {
       "pt": "Design Gráfico",
@@ -60,37 +91,6 @@ const AREAS = [
     "lead": {
       "pt": "Arte feita por um humano, nada é artificial.\nCartazes, panfletos, estampas para serigrafia e posts para redes sociais, com identidade visual do físico ao digital.",
       "en": "Art made by a human, never a machine.\nPosters, flyers, screen prints, social posts, and visual identity, from the page to the screen."
-    }
-  },
-  {
-    "id": "3d",
-    "name": {
-      "pt": "Arte 3D",
-      "en": "3D Art"
-    },
-    "short": {
-      "pt": "3D",
-      "en": "3D"
-    },
-    "cats": [
-      {
-        "id": "game-ready",
-        "name": {
-          "pt": "Game Ready",
-          "en": "Game Ready"
-        }
-      },
-      {
-        "id": "personagem",
-        "name": {
-          "pt": "Personagem",
-          "en": "Character"
-        }
-      }
-    ],
-    "lead": {
-      "pt": "Arte 3D feita por um artista, seja estilizada ou realista.\nPersonagens, criaturas e props esculpidos à mão, prontos para jogos ou para impressão.",
-      "en": "3D art made by an artist, whether stylized or realist.\nCharacters, creatures, and props sculpted by hand, ready for games or print on demand."
     }
   }
 ];
