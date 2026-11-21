@@ -1446,7 +1446,8 @@ function fecharFullscreen(){
 $("#fs .fs-close").addEventListener("click", fecharFullscreen);
 $("#fs .fs-prev").addEventListener("click", () => fsMover(-1));
 $("#fs .fs-next").addEventListener("click", () => fsMover(1));
-$("#fs").addEventListener("click", e => { if (e.target.id === "fs") fecharFullscreen(); });
+// Clique na área preta NÃO fecha (evita sair sem querer ao errar as setas).
+// Saída só pelo × ou Esc.
 
 // Esc dentro do fullscreen: fecha só o overlay, nunca o modal.
 document.addEventListener("keydown", e => {
