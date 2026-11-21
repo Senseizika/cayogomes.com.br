@@ -1484,7 +1484,7 @@ function fsMover(n){
   fsEl.classList.remove("fs-deslizando");
   fsPeerDir = dir;
   fsPeerLargura = img.getBoundingClientRect().width || window.innerWidth * 0.9;
-  fsEspacamento = Math.min(120, window.innerWidth * 0.08);
+  fsEspacamento = Math.min(160, window.innerWidth * 0.12);
   const fim = fsPeerLargura + fsEspacamento;
   fsSwipeDx = 0;
   peer.src = viz.src;
@@ -1545,7 +1545,7 @@ $("#fs").addEventListener("pointerdown", e => {
   // começo do gesto: comita troca pendente e deixa o dedo comandar direto
   fsFinalizarAnim();
   $("#fs").classList.remove("fs-deslizando");
-  fsEspacamento = Math.min(120, window.innerWidth * 0.08);
+  fsEspacamento = Math.min(160, window.innerWidth * 0.12);
   fsPontos.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (fsPontos.size === 1) {
     fsGesto = {
