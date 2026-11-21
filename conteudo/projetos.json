@@ -81,15 +81,18 @@
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/14.webp"
+        "src": "img/projetos/asd/14.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/15.webp"
+        "src": "img/projetos/asd/15.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/16.webp"
+        "src": "img/projetos/asd/16.webp",
+        "fullscreen": true
       }
     ]
   },
