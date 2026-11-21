@@ -569,11 +569,12 @@ dialog[open]{animation:in .22s ease-out}
 }
 #fs{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem;touch-action:none}
 #fs[hidden]{display:none}
-#fs .fs-img{max-width:95vw;max-height:90vh;object-fit:contain;touch-action:none;transform-origin:center center;user-select:none;-webkit-user-select:none}
+#fs .fs-img,#fs .fs-img-peer{max-width:95vw;max-height:90vh;object-fit:contain;touch-action:none;transform-origin:center center;user-select:none;-webkit-user-select:none}
+#fs .fs-img-peer{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 #fs .fs-close{position:absolute;top:1rem;right:1.2rem;background:none;border:0;color:#fff;font:700 2rem/1 system-ui,sans-serif;cursor:pointer;opacity:.8}
 #fs .fs-close:hover{opacity:1}
 #fs .fs-dica{color:#fff;font:500 .9rem/1.3 var(--tech);letter-spacing:.05em;opacity:.7}
-#fs.rotado .fs-img{transform:rotate(90deg);max-width:90vh;max-height:95vw}
+#fs.rotado .fs-img,#fs.rotado .fs-img-peer{transform:rotate(90deg);max-width:90vh;max-height:95vw}
 #fs .fs-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:auto;height:auto;
   background:none;border:0;color:#fff;font:400 2.4rem/1 var(--mono);cursor:pointer;
   text-shadow:0 1px 6px rgba(0,0,0,.9);opacity:.55;transition:opacity .2s ease,color .2s ease}
@@ -715,6 +716,7 @@ dialog[open]{animation:in .22s ease-out}
 <div id="fs" hidden>
   <button type="button" class="fs-close" aria-label="fechar">×</button>
   <button type="button" class="fs-nav fs-prev" aria-label="imagem anterior">‹</button>
+  <img class="fs-img-peer" alt="" draggable="false" aria-hidden="true">
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
   <p class="fs-dica" hidden>vire o celular para ver a imagem</p>
@@ -762,6 +764,7 @@ let mid = 0, thumbRun = 0;
 let fsIndices = [], fsPos = 0;
 // zoom/pan e gestos do overlay
 let fsZoom = 1, fsPanX = 0, fsPanY = 0, fsSwipeDx = 0;
+let fsPeerDir = 0, fsPeerLargura = 0; // prévia da imagem vizinha durante o arraste
 let fsPontos = new Map(), fsGesto = null;
 
 const YT = s => {
@@ -1370,15 +1373,22 @@ function irMedia(n){
 // ---------- overlay de tela cheia ----------
 // Aplica transform de rotação (mobile paisagem) + pan + zoom na imagem.
 function fsAplicarTransform(){
-  const img = $("#fs .fs-img");
+  const img = $("#fs .fs-img"), peer = $("#fs .fs-img-peer");
   if (!img) return;
   const rot = $("#fs").classList.contains("rotado") ? "rotate(90deg) " : "";
   img.style.transform = rot + `translate(${(fsPanX + fsSwipeDx).toFixed(1)}px, ${fsPanY.toFixed(1)}px) scale(${fsZoom.toFixed(3)})`;
   img.style.cursor = fsZoom > 1.01 ? "grab" : "default";
+  if (peer) {
+    const off = fsPeerDir * fsPeerLargura; // +1 => vizinha à direita; -1 => à esquerda
+    peer.style.transform = rot + `translate(${(off + fsSwipeDx).toFixed(1)}px, 0px) scale(1)`;
+  }
 }
 
 function fsResetZoom(){
   fsZoom = 1; fsPanX = 0; fsPanY = 0; fsSwipeDx = 0;
+  fsPeerDir = 0; fsPeerLargura = 0;
+  const peer = $("#fs .fs-img-peer");
+  if (peer) peer.style.opacity = "0";
   fsPontos.clear(); fsGesto = null;
   fsAplicarTransform();
 }
@@ -1489,6 +1499,8 @@ $("#fs").addEventListener("pointerdown", e => {
       x0: e.clientX, y0: e.clientY,
       panX0: fsPanX, panY0: fsPanY, moved: false
     };
+    const r = $("#fs .fs-img").getBoundingClientRect();
+    fsPeerLargura = r.width || window.innerWidth * 0.9;
   } else if (fsPontos.size === 2) {
     const [a, b] = [...fsPontos.values()];
     fsGesto = {
@@ -1518,7 +1530,20 @@ window.addEventListener("pointermove", e => {
     const dx = e.clientX - fsGesto.x0, dy = e.clientY - fsGesto.y0;
     if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
       fsGesto.moved = true;
-      fsSwipeDx = dx * 0.35; // leve acompanhamento do dedo
+      const dir = dx < 0 ? 1 : -1; // 1 = próxima (vem da direita), -1 = anterior
+      if (dir !== fsPeerDir) {
+        fsPeerDir = dir;
+        const peer = $("#fs .fs-img-peer");
+        const viz = (PROJECTS[current]?.media || [])[fsIndices[fsPos + dir]];
+        if (peer && viz && viz.src) {
+          peer.src = viz.src;
+          peer.style.opacity = "1";
+        } else {
+          fsPeerDir = 0; // não há vizinha marcada
+        }
+      }
+      // acompanha o dedo 1:1, limitado à largura de uma imagem
+      fsSwipeDx = Math.max(-fsPeerLargura, Math.min(fsPeerLargura, dx));
       fsAplicarTransform();
     }
   }
@@ -1535,6 +1560,9 @@ const fsFimGesto = e => {
     else if (dx > limiar) fsMover(-1);
   }
   fsSwipeDx = 0;
+  fsPeerDir = 0;
+  const peerFim = $("#fs .fs-img-peer");
+  if (peerFim) peerFim.style.opacity = "0";
 
   if (fsGesto && fsGesto.modo === "pinca" && fsPontos.size === 1) {
     const p = [...fsPontos.values()][0];
