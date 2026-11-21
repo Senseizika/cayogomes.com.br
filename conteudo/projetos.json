@@ -370,51 +370,63 @@
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/02.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/02.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/03.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/03.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/04.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/04.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/05.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/05.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/06.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/06.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/07.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/07.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/08.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/08.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/09.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/09.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/10.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/10.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/11.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/11.webp",
+        "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/12.webp"
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/12.webp",
+        "fullscreen": true
       }
     ]
   }
