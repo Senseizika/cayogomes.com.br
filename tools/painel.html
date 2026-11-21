@@ -991,6 +991,7 @@ async function salvar() {
     const r = await api('/api/estado');
     if (Array.isArray(r.projetos)) {
       projetos = r.projetos;
+      sincronizarSoftwares();
       projetoSelecionado = idxProjetoSel >= 0 ? (projetos[idxProjetoSel] || null) : null;
     }
     areas = r.areas;
@@ -1128,10 +1129,24 @@ function salvarSoftwaresDesativados(lista) {
 }
 function softwaresDisponiveis() {
   const desativados = new Set(softwaresDesativados());
+  const vistos = new Set();
+  projetos.forEach(p => parseTools(p.tools || "").forEach(t => vistos.add(t)));
+  const todos = new Set([...SOFTWARES_BASE, ...softwaresCustom(), ...vistos]);
+  return [...todos].filter(s => !desativados.has(s));
+}
+// Softwares que já existem em qualquer projeto passam a fazer parte da lista global,
+// para continuarem disponíveis mesmo depois de serem desmarcados em um projeto.
+function sincronizarSoftwares() {
+  const base = new Set(SOFTWARES_BASE);
   const custom = softwaresCustom();
-  const base = SOFTWARES_BASE.filter(s => !desativados.has(s));
-  const set = new Set([...base, ...custom]);
-  return [...set];
+  const vistos = new Set();
+  projetos.forEach(p => parseTools(p.tools || "").forEach(t => {
+    if (!base.has(t)) vistos.add(t);
+  }));
+  const todos = [...new Set([...custom, ...vistos])];
+  if (todos.length !== custom.length || todos.some((s, i) => s !== custom[i])) {
+    salvarSoftwaresCustom(todos);
+  }
 }
 function parseTools(str) {
   return new Set(String(str || "").split(/[·,;]/).map(s => s.trim()).filter(Boolean));
@@ -1984,6 +1999,7 @@ window.addEventListener("beforeunload", e => {
     projetos = r.projetos;
     areas = r.areas;
     areasEditaveis = r.areasCompletas || r.areas;
+    sincronizarSoftwares();
     desenharLista();
     ligarFrame();
     if (!token || token.indexOf("__PAINEL") === 0)
