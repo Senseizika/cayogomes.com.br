@@ -567,6 +567,22 @@ dialog[open]{animation:in .22s ease-out}
   .d-header{padding:.8rem .9rem;gap:.75rem}
   .d-header #d-title{font-size:clamp(1.8rem,9vw,2.2rem)}
 }
+/* Toque: amplia a área sensível ao dedo SEM mudar o tamanho visual dos botões.
+   O pseudo-elemento é transparente e faz parte do botão, então qualquer toque
+   nele dispara o clique — inclusive nas setas ‹ › e no ícone de tela cheia. */
+@media (hover: none), (pointer: coarse){
+  .d-nav::before,#fs .fs-nav::before,#fs .fs-close::before,
+  .d-fs::before,.d-dots button::before,.pl-btn::before,
+  .chip::before,.tab::before,#lang::before,#close::before{
+    content:"";position:absolute;inset:-12px;z-index:1}
+  .d-nav::before,#fs .fs-nav::before{inset:-14px}
+  #fs .fs-close::before{inset:-10px}
+  .chip::before,.tab::before,#lang::before,#close::before{inset:-4px}
+  .d-dots button,.pl-btn,.chip,.tab,#lang,#close{position:relative}
+  .d-dots{gap:1rem}
+  .d-dots button::before{inset:-8px}
+  .pl-bar::after{content:"";position:absolute;inset:-12px 0}
+}
 #fs{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem;touch-action:none}
 #fs[hidden]{display:none}
 #fs .fs-img,#fs .fs-img-peer{max-width:95vw;max-height:90vh;object-fit:contain;touch-action:none;transform-origin:center center;user-select:none;-webkit-user-select:none}
