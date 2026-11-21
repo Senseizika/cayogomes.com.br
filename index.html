@@ -234,6 +234,10 @@ a{color:inherit}
 }
 /* GRADE: minmax(300px,1fr) = largura mínima de cada card; gap = espaço entre eles */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.15rem;padding:1.4rem 1.2rem 1.4rem}
+/* respiro extra no painel: o "+" do canto do vidro não pode cobrir os cards */
+#panel .head,#panel .chips,#panel .grid{padding-left:2rem;padding-right:2rem}
+#panel .grid{padding-bottom:2.2rem}
+#panel .cat-separator{margin-left:2rem;margin-right:2rem}
 .item{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
 /* Cada miniatura acompanha a proporção natural da imagem, sem cortes ou deformações. */
 .thumb{overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
