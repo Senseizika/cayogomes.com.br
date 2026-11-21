@@ -64,7 +64,7 @@
   --hero-h:max(200px,35vh);    /* ALTURA DO TOPO = 35% da tela (mín. 200px) */
   --logo-max-h:40vh;           /* tamanho da logo mantido (independe da altura do hero) */
   --logo-sobe:1vh;             /* 0 = logo centralizada. Para subir, use ex.: 1vh */
-  --thumb-h:clamp(171px,13vw,179px); /* miniaturas: mesma altura do tamanho anterior (169px úteis no mobile, 177px no PC) */
+  --thumb-h:clamp(169px,13vw,177px); /* miniaturas: altura igual (169px no mobile, 177px no PC); largura segue a imagem */
 }
 @supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent} /* sem flash azul ao tocar no mobile */
@@ -233,21 +233,21 @@ a{color:inherit}
   content:"";height:1px;flex:1;
   background:currentColor;opacity:.7;
 }
-/* GRADE: cards com a largura de antes; a altura agora é igual para todos */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.15rem;padding:1.4rem 1.2rem 1.4rem}
+/* GRADE: cards fluem com a largura natural da imagem; a altura é uniforme */
+.grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1.15rem;padding:1.4rem 1.2rem 1.4rem}
 /* respiro extra no painel: o "+" do canto do vidro não pode cobrir os cards */
 #panel .head,#panel .chips,#panel .grid{padding-left:2rem;padding-right:2rem}
 #panel .grid{padding-bottom:2.2rem}
 #panel .cat-separator{margin-left:2rem;margin-right:2rem}
-.item{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
-/* Miniaturas com a MESMA altura e a largura de antes; a imagem preenche o card (cover). */
-.thumb{width:100%;height:var(--thumb-h);overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
+.item{flex:0 0 auto;display:block;width:auto;max-width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
+/* Miniaturas com a MESMA altura; a largura segue a proporção original da imagem (sem corte). */
+.thumb{width:fit-content;max-width:100%;overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
 /* fio de luz na aresta superior da miniatura (mesma linguagem do vidro) */
 .thumb::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.03)}
 .item:hover .thumb{border-color:var(--accent)}
-.thumb img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform .5s}
-.thumb:has(.ph){width:100%;height:var(--thumb-h)}
+.thumb img{height:var(--thumb-h);width:auto;max-width:100%;object-fit:contain;display:block;transition:transform .5s}
+.thumb:has(.ph){height:var(--thumb-h);width:calc(var(--thumb-h) * 4 / 3)}
 .item:hover .thumb img{transform:scale(1.015)}
 .ph{position:absolute;inset:0;display:grid;place-items:center;font:400 .85rem var(--mono);color:var(--mute);letter-spacing:.08em;
   background:linear-gradient(160deg,hsl(var(--h) 30% 14%),#08090b)}
@@ -560,7 +560,7 @@ dialog[open]{animation:in .22s ease-out}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
   .cat-separator{margin:1.1rem .9rem 0}
-  .grid{grid-template-columns:1fr;gap:1rem;padding:1rem .9rem}
+  .grid{gap:1rem;padding:1rem .9rem}
   .item h3{font-size:1rem}
   .about{padding:1.1rem .9rem}
   .contact-body{padding:1.1rem .9rem}
