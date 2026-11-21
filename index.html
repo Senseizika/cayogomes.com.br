@@ -802,8 +802,8 @@ const md = s => {
       codos.push(c);
       return `\u0001${codos.length - 1}\u0002`;
     });
-    out = out.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
-             .replace(/__([^_\n]+)__/g, "<strong>$1</strong>")
+    out = out.replace(/\*\*([^\n]+?)\*\*/g, "<strong>$1</strong>")
+             .replace(/__([^\n]+?)__/g, "<strong>$1</strong>")
              .replace(/~~([^~\n]+)~~/g, "<del>$1</del>")
              .replace(/\*([^*\n]+)\*/g, "<em>$1</em>")
              .replace(/_([^_\n]+)_/g, "<em>$1</em>")
@@ -821,7 +821,22 @@ const md = s => {
   const ehTitulo = l => /^(#{1,6})\s+/.test(l);
   const ehQuote = l => /^>\s?/.test(l);
   const ehRisco = l => /^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(l);
-  const ehLista = l => /^\s*[-*]\s+/.test(l) || /^\s*\d+[.)]\s+/.test(l);
+  // "* texto *" é itálico com espaços, não marcador de lista.
+  const itemLista = l => {
+    let m = l.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (m) return { ordenada: true, texto: m[1] };
+    m = l.match(/^\s*-\s+(.+)$/);
+    if (m) return { ordenada: false, texto: m[1] };
+    m = l.match(/^\s*\*\s+(.+)$/);
+    if (m) {
+      const corpo = m[1];
+      // itálico escrito com espaços: "* texto *"
+      const italicoEspacado = /\s+\*$/.test(corpo) && (corpo.match(/\*/g) || []).length === 1;
+      if (!italicoEspacado) return { ordenada: false, texto: corpo };
+    }
+    return null;
+  };
+  const ehLista = l => !!itemLista(l);
   const blocos = [];
   let i = 0;
 
@@ -849,13 +864,12 @@ const md = s => {
     }
 
     if (ehLista(linha)) {
-      const ordenada = /^\s*\d+[.)]\s+/.test(linha);
-      const itemRe = ordenada ? /^\s*\d+[.)]\s+(.+)$/ : /^\s*[-*]\s+(.+)$/;
+      const ordenada = itemLista(linha).ordenada;
       const itens = [];
       while (i < linhas.length) {
-        const item = linhas[i].match(itemRe);
-        if (!item) break;
-        itens.push(`<li>${inline(item[1])}</li>`);
+        const item = itemLista(linhas[i]);
+        if (!item || item.ordenada !== ordenada) break;
+        itens.push(`<li>${inline(item.texto)}</li>`);
         i++;
       }
       const tag = ordenada ? "ol" : "ul";
