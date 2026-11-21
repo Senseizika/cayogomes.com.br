@@ -1,5 +1,107 @@
 [
   {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "estampa",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "21° Moto Romaria",
+      "en": "21° Moto Romaria"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/21-moto-romaria/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/21-moto-romaria/02.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "estampa",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Camisa Xerifes 13 Anos",
+      "en": "Xerife's 13th Anniversary Shirt"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/camisa-xerifes-13-anos/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/camisa-xerifes-13-anos/02.webp"
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "game-ready",
+    "h": 0,
+    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "title": {
+      "pt": "Baú Medieval Estilizado ",
+      "en": "Stylized Medieval Chest"
+    },
+    "desc": {
+      "pt": "Projeto desenvolvido para ser um asset game-ready altamente otimizado, mantendo o máximo de qualidade visual. Além disso, criei uma animação curta e descontraída para aprimorar minhas habilidades de edição de vídeo, timing e movimento. Todo o processo de modelagem foi feito no ZBrush, com abertura de UVs e animação no Blender, baking e texturização no Substance Painter, renderização no Marmoset Toolbag e pós-produção de áudio e vídeo no DaVinci Resolve.",
+      "en": "Project developed to be a highly optimized game-ready asset while maintaining maximum visual quality. Additionally, I created a short, lighthearted animation to hone my video editing, timing, and motion skills. The entire modeling process was done in ZBrush, with UV unwrapping and animation in Blender, baking and texturing in Substance Painter, rendering in Marmoset Toolbag, and audio and video post-production in DaVinci Resolve."
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://youtube.com/shorts/ffUgwN4B9CY",
+        "poster": "img/projetos/bau-estilizado/04.webp"
+      },
+      {
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/stylized-game-ready-chest-d1706284f4fa4904a97a21c49d2dbf7f",
+        "poster": "img/projetos/bau-estilizado/02.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/02.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/03.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/04.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/05.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/07.webp",
+        "fullscreen": true
+      }
+    ]
+  },
+  {
     "area": "3d",
     "galeria": "slide",
     "cat": "personagem",
@@ -335,34 +437,39 @@
   },
   {
     "area": "design",
-    "galeria": "slide",
+    "galeria": "carrossel",
     "cat": "social",
     "h": 0,
     "tools": "Affinity",
     "title": {
-      "pt": "Você no Maracanã",
-      "en": "You at the Maracanã"
+      "pt": "Petrópolis, Chegamos!",
+      "en": "Petrópolis, We're Here!"
     },
     "desc": {
-      "pt": "Série de posts para o feed da Expresso Turismo na semana de Flamengo x Atlético-MG, do anúncio da partida à oferta de preço.\nDireção de arte e identidade visual da campanha — fotografia de estádio, tarjas rubro-negras, tipografia de arquibancada e a assinatura \"A primeira vez no Maracanã fica pra sempre\". Escudo, cores e selo de Agência Credenciada seguem o manual de marca do Flamengo.",
-      "en": "A series of feed posts for Expresso Turismo in the week of Flamengo vs Atlético-MG, from match announcement to price offer.\nArt direction and the campaign's visual identity — stadium photography, red-and-black bands, stand-inspired type and the \"your first time at the Maracanã lasts forever\" line. Crest, colors and the Authorized Agency seal follow Flamengo's brand manual."
+      "pt": "Carrossel para o Instagram da Expresso Turismo anunciando o transporte executivo de Petrópolis ao Maracanã para Flamengo x Chapecoense.\nDireção de arte e criação da identidade visual da campanha — colagem urbana, meio-tom, faixas de papel rasgado e paleta rubro-negra. Escudo, cores e selo de Agência Credenciada aplicados conforme as exigências do manual de marca do Flamengo.",
+      "en": "Instagram carousel for Expresso Turismo announcing the executive transport from Petrópolis to the Maracanã for Flamengo vs Chapecoense.\nArt direction and creation of the campaign's visual identity — urban collage, halftone, torn-paper ribbons and a red-and-black palette. Crest, colors and the Authorized Agency seal applied to Flamengo's brand manual requirements."
     },
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/flamengo/06.webp"
+        "src": "img/projetos/flamengo/01.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/07.webp"
+        "src": "img/projetos/flamengo/02.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/08.webp"
+        "src": "img/projetos/flamengo/03.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/09.webp"
+        "src": "img/projetos/flamengo/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/flamengo/05.webp",
+        "fullscreen": true
       }
     ]
   },
@@ -406,39 +513,129 @@
   },
   {
     "area": "design",
-    "galeria": "carrossel",
+    "galeria": "slide",
     "cat": "social",
     "h": 0,
     "tools": "Affinity",
     "title": {
-      "pt": "Petrópolis, Chegamos!",
-      "en": "Petrópolis, We're Here!"
+      "pt": "Você no Maracanã",
+      "en": "You at the Maracanã"
     },
     "desc": {
-      "pt": "Carrossel para o Instagram da Expresso Turismo anunciando o transporte executivo de Petrópolis ao Maracanã para Flamengo x Chapecoense.\nDireção de arte e criação da identidade visual da campanha — colagem urbana, meio-tom, faixas de papel rasgado e paleta rubro-negra. Escudo, cores e selo de Agência Credenciada aplicados conforme as exigências do manual de marca do Flamengo.",
-      "en": "Instagram carousel for Expresso Turismo announcing the executive transport from Petrópolis to the Maracanã for Flamengo vs Chapecoense.\nArt direction and creation of the campaign's visual identity — urban collage, halftone, torn-paper ribbons and a red-and-black palette. Crest, colors and the Authorized Agency seal applied to Flamengo's brand manual requirements."
+      "pt": "Série de posts para o feed da Expresso Turismo na semana de Flamengo x Atlético-MG, do anúncio da partida à oferta de preço.\nDireção de arte e identidade visual da campanha — fotografia de estádio, tarjas rubro-negras, tipografia de arquibancada e a assinatura \"A primeira vez no Maracanã fica pra sempre\". Escudo, cores e selo de Agência Credenciada seguem o manual de marca do Flamengo.",
+      "en": "A series of feed posts for Expresso Turismo in the week of Flamengo vs Atlético-MG, from match announcement to price offer.\nArt direction and the campaign's visual identity — stadium photography, red-and-black bands, stand-inspired type and the \"your first time at the Maracanã lasts forever\" line. Crest, colors and the Authorized Agency seal follow Flamengo's brand manual."
     },
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/flamengo/01.webp"
+        "src": "img/projetos/flamengo/06.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/02.webp"
+        "src": "img/projetos/flamengo/07.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/03.webp"
+        "src": "img/projetos/flamengo/08.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/04.webp"
+        "src": "img/projetos/flamengo/09.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "social",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Identidade Visual / Neo-Y2K",
+      "en": " Visual Identity / Neo-Y2K"
+    },
+    "desc": {
+      "pt": "Identidade visual que desenvolvi e adotei para este site, inspirada na cultura underground, na estética Y2K e no brutalismo digital. O projeto une a essência da cultura de rua ao retrofuturismo, resultando em uma linguagem autêntica e repleta de referências.",
+      "en": "\"Visual identity developed and applied to this website, inspired by underground culture, Y2K aesthetics, and digital brutalism. The project blends the essence of street culture with retrofuturism, resulting in an authentic visual language packed with references.\""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/minha-propaganda/01.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/flamengo/05.webp",
-        "fullscreen": true
+        "src": "img/projetos/minha-propaganda/02.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "social",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Xerifes M.C.",
+      "en": "Xerifes M.C."
+    },
+    "desc": {
+      "pt": "Responsável pela criação contínua de conteúdos para o Moto Clube Xerifes de Petrópolis, entregando materiais de alta qualidade que variam entre produções rápidas e projetos de maior complexidade.",
+      "en": "Responsible for continuously creating content for the Xerifes de Petrópolis Motorcycle Club, delivering high-quality materials ranging from quick turnarounds to more complex projects."
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/xerifes-m-c/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/xerifes-m-c/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/xerifes-m-c/06.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/xerifes-m-c/07.webp"
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "impressao-3d",
+    "h": 0,
+    "tools": "",
+    "title": {
+      "pt": "The Gotinhator",
+      "en": "The Gotinhator"
+    },
+    "desc": {
+      "pt": "Este é o Gotinhator, uma releitura que eu e meu amigo Bruno Pinheiro criamos para o Zé Gotinha, o famoso mascote do SUS aqui no Brasil. Desenvolvemos o projeto durante a pandemia para participar de um concurso online — ele cuidou de toda a concept art e eu fiz a modelagem 3D. No fim, tivemos a grande honra de vencer o concurso e receber como prêmio uma estatueta do nosso personagem impressa em 3D.",
+      "en": "This is Gotinhator, a reimagining that my friend Bruno Pinheiro and I created for Zé Gotinha, the famous mascot of SUS (Brazil's public health system). We developed the project during the pandemic to enter an online contest—he handled all the concept art, and I did the 3D modeling. In the end, we had the great honor of winning the contest and receiving a 3D-printed figurine of our character as a prize"
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/the-gotinhator/03.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/the-gotinhator/04.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/the-gotinhator/05.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/the-gotinhator/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/the-gotinhator/02.webp"
       }
     ]
   }

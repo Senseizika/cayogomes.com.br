@@ -36,17 +36,17 @@ const AREAS = [
         }
       },
       {
-        "id": "impresso",
-        "name": {
-          "pt": "Impresso",
-          "en": "Print"
-        }
-      },
-      {
         "id": "estampa",
         "name": {
           "pt": "Estampa",
           "en": "Screen Print"
+        }
+      },
+      {
+        "id": "impresso",
+        "name": {
+          "pt": "Impresso",
+          "en": "Print"
         }
       },
       {
@@ -85,6 +85,13 @@ const AREAS = [
         "name": {
           "pt": "Game Ready",
           "en": "Game Ready"
+        }
+      },
+      {
+        "id": "impressao-3d",
+        "name": {
+          "pt": "Impressão 3D",
+          "en": "3D Print"
         }
       }
     ],
