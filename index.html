@@ -517,6 +517,11 @@ dialog[open]{animation:in .22s ease-out}
 .d-body{padding:0 clamp(1.2rem,3vw,2.2rem) 2rem}
 .d-body p{max-width:90ch}
 #d-desc{white-space:pre-line;overflow-wrap:anywhere;word-break:break-word}
+#d-desc strong{font-weight:700}
+#d-desc em{font-style:italic}
+#d-desc del{opacity:.55}
+#d-desc code{font:400 .9em var(--mono);background:rgba(255,255,255,.09);padding:.1em .35em;border-radius:4px}
+#d-desc a{color:var(--accent);text-decoration:underline;text-underline-offset:.2em}
 .d-tools{margin:0 calc(-1*clamp(1.2rem,3vw,2.2rem)) 0;padding:.8rem clamp(1.2rem,3vw,2.2rem);border-bottom:1px solid rgba(0,0,0,.92);box-shadow:0 1px 0 rgba(255,255,255,.16)}
 .d-tools-label{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em}
 .d-desc-label{display:block;color:var(--mute);font:400 .75rem/1.2 var(--mono);letter-spacing:.1em;margin-top:.8rem;margin-bottom:.5rem}
@@ -779,6 +784,18 @@ if (!UI[lang]) lang = "pt";
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// Markdown mínimo e seguro: escapa tudo primeiro, depois aplica só as marcações permitidas.
+const md = s => {
+  const codos = [];
+  let out = esc(s).replace(/`([^`]+)`/g, (_, c) => { codos.push(c); return `__MDCODE_${codos.length-1}__`; });
+  out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+           .replace(/~~([^~]+)~~/g, "<del>$1</del>")
+           .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+           .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (all, txt, url) =>
+             /^https?:\/\//i.test(url) ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${txt}</a>` : txt)
+           .replace(/__MDCODE_(\d+)__/g, (_, i) => `<code>${codos[+i]}</code>`);
+  return out;
+};
 const tr = o => (o && (o[lang] || o.pt || o.en)) || "";
 const pad = n => String(n).padStart(3,"0");
 const slugProj = p => String(p?.title?.pt || p?.title?.en || "")
@@ -1071,7 +1088,7 @@ function fill(i){
   $("#d-title").textContent = tr(p.title);
   $("#d-meta").textContent = p.tools || "";
   $("#d-tools").hidden = !String(p.tools || "").trim();
-  $("#d-desc").textContent = tr(p.desc);
+  $("#d-desc").innerHTML = md(tr(p.desc));
   $("#d-scroll").scrollTop = 0;
   mid = 0;
   thumbRun++;
