@@ -74,17 +74,17 @@ const AREAS = [
     },
     "cats": [
       {
-        "id": "game-ready",
-        "name": {
-          "pt": "Game Ready",
-          "en": "Game Ready"
-        }
-      },
-      {
         "id": "personagem",
         "name": {
           "pt": "Personagem",
           "en": "Character"
+        }
+      },
+      {
+        "id": "game-ready",
+        "name": {
+          "pt": "Game Ready",
+          "en": "Game Ready"
         }
       }
     ],
