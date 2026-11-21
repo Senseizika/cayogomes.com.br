@@ -66,7 +66,7 @@
   --logo-sobe:1vh;             /* 0 = logo centralizada. Para subir, use ex.: 1vh */
 }
 @supports (height:max(1px,1vh)){:root{--fundo-h:max(133.34vw,130vh)}}
-*{box-sizing:border-box;margin:0}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent} /* sem flash azul ao tocar no mobile */
 /* barras de rolagem: overlay discreta (sem trilho/gutter), some sozinha como no mobile */
 html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%;scrollbar-width:none}
 ::-webkit-scrollbar-button{display:none;width:0;height:0}
@@ -571,6 +571,7 @@ dialog[open]{animation:in .22s ease-out}
    O pseudo-elemento é transparente e faz parte do botão, então qualquer toque
    nele dispara o clique — inclusive nas setas ‹ › e no ícone de tela cheia. */
 @media (hover: none), (pointer: coarse){
+  button{-webkit-user-select:none;user-select:none} /* evita seleção de texto no toque */
   .d-nav::before,#fs .fs-nav::before,#fs .fs-close::before,
   .d-fs::before,.d-dots button::before,.pl-btn::before,
   .chip::before,.tab::before,#lang::before,#close::before{
