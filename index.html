@@ -567,9 +567,9 @@ dialog[open]{animation:in .22s ease-out}
   .d-header{padding:.8rem .9rem;gap:.75rem}
   .d-header #d-title{font-size:clamp(1.8rem,9vw,2.2rem)}
 }
-#fs{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem}
+#fs{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem;touch-action:none}
 #fs[hidden]{display:none}
-#fs .fs-img{max-width:95vw;max-height:90vh;object-fit:contain}
+#fs .fs-img{max-width:95vw;max-height:90vh;object-fit:contain;touch-action:none;transform-origin:center center;user-select:none;-webkit-user-select:none}
 #fs .fs-close{position:absolute;top:1rem;right:1.2rem;background:none;border:0;color:#fff;font:700 2rem/1 system-ui,sans-serif;cursor:pointer;opacity:.8}
 #fs .fs-close:hover{opacity:1}
 #fs .fs-dica{color:#fff;font:500 .9rem/1.3 var(--tech);letter-spacing:.05em;opacity:.7}
@@ -715,7 +715,7 @@ dialog[open]{animation:in .22s ease-out}
 <div id="fs" hidden>
   <button type="button" class="fs-close" aria-label="fechar">×</button>
   <button type="button" class="fs-nav fs-prev" aria-label="imagem anterior">‹</button>
-  <img class="fs-img" alt="">
+  <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
   <p class="fs-dica" hidden>vire o celular para ver a imagem</p>
 </div>
@@ -758,8 +758,11 @@ const slugProj = p => String(p?.title?.pt || p?.title?.en || "")
   .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 let mid = 0, thumbRun = 0;
-// estado do overlay de tela cheia: índices das imagens do projeto e posição atual
+// estado do overlay de tela cheia: índices das imagens marcadas e posição atual
 let fsIndices = [], fsPos = 0;
+// zoom/pan e gestos do overlay
+let fsZoom = 1, fsPanX = 0, fsPanY = 0, fsSwipeDx = 0;
+let fsPontos = new Map(), fsGesto = null;
 
 const YT = s => {
   s = String(s || "").trim();
@@ -1365,6 +1368,21 @@ function irMedia(n){
 }
 
 // ---------- overlay de tela cheia ----------
+// Aplica transform de rotação (mobile paisagem) + pan + zoom na imagem.
+function fsAplicarTransform(){
+  const img = $("#fs .fs-img");
+  if (!img) return;
+  const rot = $("#fs").classList.contains("rotado") ? "rotate(90deg) " : "";
+  img.style.transform = rot + `translate(${(fsPanX + fsSwipeDx).toFixed(1)}px, ${fsPanY.toFixed(1)}px) scale(${fsZoom.toFixed(3)})`;
+  img.style.cursor = fsZoom > 1.01 ? "grab" : "default";
+}
+
+function fsResetZoom(){
+  fsZoom = 1; fsPanX = 0; fsPanY = 0; fsSwipeDx = 0;
+  fsPontos.clear(); fsGesto = null;
+  fsAplicarTransform();
+}
+
 // Mostra a imagem apontada por fsPos dentro de fsIndices.
 function fsMostrar(){
   const fsEl = $("#fs"), img = $("#fs .fs-img"), dica = $("#fs .fs-dica");
@@ -1375,6 +1393,7 @@ function fsMostrar(){
   fsEl.classList.remove("rotado");
   dica.hidden = true;
   img.src = m.src;
+  fsResetZoom(); // cada imagem começa sem zoom
 
   // mobile + paisagem -> gira a imagem e mostra a dica
   const isMobile = window.matchMedia("(hover: none) and (max-width: 900px)").matches
@@ -1383,6 +1402,7 @@ function fsMostrar(){
     if (isMobile && img.naturalWidth > img.naturalHeight) {
       fsEl.classList.add("rotado");
       dica.hidden = false;
+      fsAplicarTransform();
     }
   };
   if (img.complete && img.naturalWidth) img.onload();
@@ -1448,6 +1468,84 @@ $("#fs .fs-prev").addEventListener("click", () => fsMover(-1));
 $("#fs .fs-next").addEventListener("click", () => fsMover(1));
 // Clique na área preta NÃO fecha (evita sair sem querer ao errar as setas).
 // Saída só pelo × ou Esc.
+
+// Roda do mouse: zoom centrado (1x a 6x).
+$("#fs").addEventListener("wheel", e => {
+  if ($("#fs").hidden) return;
+  e.preventDefault();
+  fsZoom = Math.min(6, Math.max(1, fsZoom * Math.exp(-e.deltaY * 0.0015)));
+  if (fsZoom <= 1.001) { fsZoom = 1; fsPanX = fsPanY = 0; }
+  fsAplicarTransform();
+}, { passive: false });
+
+// Drag / swipe: troca de imagem em 1x; com zoom, arrasta a imagem.
+// Duas pontas (pinça): zoom proporcional à distância entre os dedos.
+$("#fs").addEventListener("pointerdown", e => {
+  if ($("#fs").hidden || e.target.closest(".fs-nav, .fs-close")) return;
+  fsPontos.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (fsPontos.size === 1) {
+    fsGesto = {
+      modo: fsZoom > 1.01 ? "pan" : "arraste",
+      x0: e.clientX, y0: e.clientY,
+      panX0: fsPanX, panY0: fsPanY, moved: false
+    };
+  } else if (fsPontos.size === 2) {
+    const [a, b] = [...fsPontos.values()];
+    fsGesto = {
+      modo: "pinca",
+      dist0: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+      zoom0: fsZoom, moved: true
+    };
+  }
+  try { $("#fs").setPointerCapture(e.pointerId); } catch(err){}
+});
+
+window.addEventListener("pointermove", e => {
+  if ($("#fs").hidden || !fsPontos.has(e.pointerId) || !fsGesto) return;
+  fsPontos.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (fsGesto.modo === "pinca" && fsPontos.size >= 2) {
+    const [a, b] = [...fsPontos.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    fsZoom = Math.min(6, Math.max(1, fsGesto.zoom0 * d / fsGesto.dist0));
+    if (fsZoom <= 1.001) { fsZoom = 1; fsPanX = fsPanY = 0; }
+    fsAplicarTransform();
+  } else if (fsGesto.modo === "pan" && fsPontos.size === 1) {
+    fsPanX = fsGesto.panX0 + (e.clientX - fsGesto.x0);
+    fsPanY = fsGesto.panY0 + (e.clientY - fsGesto.y0);
+    fsAplicarTransform();
+  } else if (fsGesto.modo === "arraste" && fsPontos.size === 1) {
+    const dx = e.clientX - fsGesto.x0, dy = e.clientY - fsGesto.y0;
+    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+      fsGesto.moved = true;
+      fsSwipeDx = dx * 0.35; // leve acompanhamento do dedo
+      fsAplicarTransform();
+    }
+  }
+});
+
+const fsFimGesto = e => {
+  if (!fsPontos.has(e.pointerId)) return;
+  fsPontos.delete(e.pointerId);
+
+  if (fsGesto && fsGesto.modo === "arraste" && fsGesto.moved && fsPontos.size === 0) {
+    const dx = e.clientX - fsGesto.x0;
+    const limiar = Math.max(60, window.innerWidth * 0.12);
+    if (dx < -limiar) fsMover(1);
+    else if (dx > limiar) fsMover(-1);
+  }
+  fsSwipeDx = 0;
+
+  if (fsGesto && fsGesto.modo === "pinca" && fsPontos.size === 1) {
+    const p = [...fsPontos.values()][0];
+    fsGesto = { modo: "pan", x0: p.x, y0: p.y, panX0: fsPanX, panY0: fsPanY, moved: true };
+  } else if (fsPontos.size === 0) {
+    fsGesto = null;
+  }
+  fsAplicarTransform();
+};
+window.addEventListener("pointerup", fsFimGesto);
+window.addEventListener("pointercancel", fsFimGesto);
 
 // Esc dentro do fullscreen: fecha só o overlay, nunca o modal.
 document.addEventListener("keydown", e => {
