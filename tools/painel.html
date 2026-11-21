@@ -1315,9 +1315,9 @@ function desenharForm() {
         <label>título PT <input data-campo="title.pt" value="${esc(p.title?.pt)}"></label>
         <label>título EN <input data-campo="title.en" value="${esc(p.title?.en)}"></label>
       </div>
-      <label>descrição PT <textarea rows="3" data-campo="desc.pt" title="Markdown: **negrito**, *itálico*, ~~riscado~~, \`código\`, [texto](https://...)">${esc(p.desc?.pt)}</textarea></label>
-      <label>descrição EN <textarea rows="3" data-campo="desc.en" title="Markdown: **negrito**, *itálico*, ~~riscado~~, \`código\`, [texto](https://...)">${esc(p.desc?.en)}</textarea></label>
-      <p class="dica" style="margin:-.2rem 0 .6rem">markdown: **negrito**, *itálico*, ~~riscado~~, \`código\`, [texto](https://...)</p>
+      <label>descrição PT <textarea rows="4" data-campo="desc.pt" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.pt)}</textarea></label>
+      <label>descrição EN <textarea rows="4" data-campo="desc.en" title="Markdown: **negrito**/__negrito__, *itálico*/_itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)">${esc(p.desc?.en)}</textarea></label>
+      <p class="dica" style="margin:-.2rem 0 .6rem">markdown: **negrito** / __negrito__, *itálico* / _itálico_, ~~riscado~~, \`código\`, # título, - lista, &gt; citação, [texto](https://...)</p>
       
       <!-- NOVO CAMPO AQUI -->
       <label>softwares
