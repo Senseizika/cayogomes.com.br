@@ -55,71 +55,81 @@
     "area": "3d",
     "galeria": "slide",
     "cat": "game-ready",
-    "id": "p-mwtkwh0p-vha8t",
+    "id": "p-mwtkwh0p-za0wr",
     "h": 0,
-    "tools": "Blender · ZBrush · Substance 3D Designer · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag",
     "title": {
-      "pt": "O Piromante",
-      "en": "The Pyromancer"
+      "pt": "Checkpoint de Corrida sci-fi",
+      "en": "sci-fi Racing Checkpoint"
     },
     "desc": {
-      "pt": "O Piromante é um projeto pessoal para estudar um pouco sobre edição de vídeo e áudio, além de renderização e animação. O foco foi contar uma história por meio do áudio, então é melhor ouvir com fones de ouvido. Mas também é uma demonstração do trabalho de modelagem e texturização para jogos, pois fiz tudo do zero, com qualidade suficiente para uma renderização realista, mas escalável para um asset game ready.",
-      "en": "The Pyromancer is a personal project to study a little about video and audio editing, as well as rendering and animation. The focus was to tell a story through audio, so it’s best to listen with headphones. But it is also a demonstration of modeling and texturing work for games, since I made everything from scratch, with enough quality for realistic rendering, yet scalable for a game-ready asset."
+      "pt": "Meu objetivo era projetar um checkpoint que fosse não apenas funcional, mas também visualmente atraente, distorcendo levemente a ideia de um checkpoint estacionário para algo mais fluido e interativo, quase como se ele tivesse personalidade própria.\n\nComecei o processo pesquisando imagens de referência e organizando-as em um documento do PureRef. Depois, comecei a esboçar as ideias iniciais. Não demorou muito para encontrar uma silhueta facilmente distinguível do ambiente do jogo e visualmente agradável. Desenvolvi a ideia de um checkpoint em forma de nave que se desloca até os pontos de corrida, abre como um leque e projeta um holograma para sinalizar o caminho. Apesar de sua forma peculiar, é possível personalizar livremente as cores desse conceito para que ele possa ser usado em diversas condições de terreno sem se misturar ao ambiente.\n\nApós estabelecer o conceito, comecei pela modelagem; depois de modelar no ZBrush, fiz a retopologia e criei o mapa UV no Blender. A texturização foi feita no Substance Painter, onde tentei variar bastante os materiais, adicionando listras de corrida e alguns avisos de perigo. Os renders foram feitos no Marmoset Toolbag.\n\nEste modelo foi projetado, modelado, texturizado e renderizado em aproximadamente dois dias 😊",
+      "en": "I aimed to design a checkpoint that was not\nonly functional but also visually appealing, slightly distorting the idea of a stationary\ncheckpoint into something more fluid and interactive, almost like its own character.\nI started the process by searching for reference images and organizing them in a PureRef\ndocument. Then, I began sketching the initial ideas. It didn't take long to find a silhouette that\nwas easily distinguishable from the game's environment and visually pleasing. I developed\nthe idea of a checkpoint-ship that moves to the race points, opens like a fan, and projects a\nhologram to signal the way. Despite its distinct and unique shape, it's possible to freely\ncustomize the colors of this concept so that it can be used in various terrain conditions\nwithout blending into the environment.\nAfter establishing the concept, I started modeling; After modeling in ZBrush, I\ndid the retopology and created the UV map in Blender. The texturing was done in Substance\nPainter, where I tried to vary the materials significantly, adding racing stripes and some\ndanger warnings. The renders were done in Marmoset Toolbag.\nThis model was designed, modeled, textured, and rendered in approximately two days smiley"
     },
     "media": [
       {
-        "type": "video",
-        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
-        "poster": "img/projetos/o-piromante/09.webp"
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
+        "poster": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/01.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/02.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/02.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/03.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/03.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/04.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/04.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/05.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/05.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/06.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/06.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/07.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/07.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/08.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/08.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/09.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/09.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/o-piromante/10.webp",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/10.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/11.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/checkpoint-de-corrida-sci-fi/12.webp",
         "fullscreen": true
       }
     ]
@@ -311,89 +321,6 @@
     "area": "3d",
     "galeria": "slide",
     "cat": "game-ready",
-    "id": "p-mwtkwh0p-za0wr",
-    "h": 0,
-    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag",
-    "title": {
-      "pt": "Checkpoint de Corrida sci-fi",
-      "en": "sci-fi Racing Checkpoint"
-    },
-    "desc": {
-      "pt": "Meu objetivo era projetar um checkpoint que fosse não apenas funcional, mas também visualmente atraente, distorcendo levemente a ideia de um checkpoint estacionário para algo mais fluido e interativo, quase como se ele tivesse personalidade própria.\n\nComecei o processo pesquisando imagens de referência e organizando-as em um documento do PureRef. Depois, comecei a esboçar as ideias iniciais. Não demorou muito para encontrar uma silhueta facilmente distinguível do ambiente do jogo e visualmente agradável. Desenvolvi a ideia de um checkpoint em forma de nave que se desloca até os pontos de corrida, abre como um leque e projeta um holograma para sinalizar o caminho. Apesar de sua forma peculiar, é possível personalizar livremente as cores desse conceito para que ele possa ser usado em diversas condições de terreno sem se misturar ao ambiente.\n\nApós estabelecer o conceito, comecei pela modelagem; depois de modelar no ZBrush, fiz a retopologia e criei o mapa UV no Blender. A texturização foi feita no Substance Painter, onde tentei variar bastante os materiais, adicionando listras de corrida e alguns avisos de perigo. Os renders foram feitos no Marmoset Toolbag.\n\nEste modelo foi projetado, modelado, texturizado e renderizado em aproximadamente dois dias 😊",
-      "en": "I aimed to design a checkpoint that was not\nonly functional but also visually appealing, slightly distorting the idea of a stationary\ncheckpoint into something more fluid and interactive, almost like its own character.\nI started the process by searching for reference images and organizing them in a PureRef\ndocument. Then, I began sketching the initial ideas. It didn't take long to find a silhouette that\nwas easily distinguishable from the game's environment and visually pleasing. I developed\nthe idea of a checkpoint-ship that moves to the race points, opens like a fan, and projects a\nhologram to signal the way. Despite its distinct and unique shape, it's possible to freely\ncustomize the colors of this concept so that it can be used in various terrain conditions\nwithout blending into the environment.\nAfter establishing the concept, I started modeling; After modeling in ZBrush, I\ndid the retopology and created the UV map in Blender. The texturing was done in Substance\nPainter, where I tried to vary the materials significantly, adding racing stripes and some\ndanger warnings. The renders were done in Marmoset Toolbag.\nThis model was designed, modeled, textured, and rendered in approximately two days smiley"
-    },
-    "media": [
-      {
-        "type": "sketchfab",
-        "src": "https://sketchfab.com/3d-models/sci-fi-racing-checkpoint-4212ac2bc93f4f6998bc7bd188da7194",
-        "poster": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/01.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/02.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/03.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/04.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/05.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/06.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/07.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/08.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/09.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/10.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/11.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/checkpoint-de-corrida-sci-fi/12.webp",
-        "fullscreen": true
-      }
-    ]
-  },
-  {
-    "area": "3d",
-    "galeria": "slide",
-    "cat": "game-ready",
     "id": "p-mwtkwh0p-5wpdg",
     "h": 0,
     "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
@@ -439,6 +366,79 @@
       {
         "type": "image",
         "src": "img/projetos/bau-estilizado/07.webp",
+        "fullscreen": true
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "game-ready",
+    "id": "p-mwtkwh0p-vha8t",
+    "h": 0,
+    "tools": "Blender · ZBrush · Substance 3D Designer · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "title": {
+      "pt": "O Piromante",
+      "en": "The Pyromancer"
+    },
+    "desc": {
+      "pt": "O Piromante é um projeto pessoal para estudar um pouco sobre edição de vídeo e áudio, além de renderização e animação. O foco foi contar uma história por meio do áudio, então é melhor ouvir com fones de ouvido. Mas também é uma demonstração do trabalho de modelagem e texturização para jogos, pois fiz tudo do zero, com qualidade suficiente para uma renderização realista, mas escalável para um asset game ready.",
+      "en": "The Pyromancer is a personal project to study a little about video and audio editing, as well as rendering and animation. The focus was to tell a story through audio, so it’s best to listen with headphones. But it is also a demonstration of modeling and texturing work for games, since I made everything from scratch, with enough quality for realistic rendering, yet scalable for a game-ready asset."
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/o-piromante/09.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/01.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/02.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/03.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/04.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/05.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/06.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/07.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/08.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/09.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/10.webp",
         "fullscreen": true
       }
     ]
@@ -559,32 +559,6 @@
     "area": "design",
     "galeria": "slide",
     "cat": "social",
-    "id": "p-mwtkwh0p-632ul",
-    "h": 0,
-    "tools": "Affinity",
-    "title": {
-      "pt": "Identidade Visual / Neo-Y2K",
-      "en": " Visual Identity / Neo-Y2K"
-    },
-    "desc": {
-      "pt": "Identidade visual que desenvolvi e adotei para este site, inspirada na cultura underground, na estética Y2K e no brutalismo digital. O projeto une a essência da cultura de rua ao retrofuturismo, resultando em uma linguagem autêntica e repleta de referências.",
-      "en": "\"Visual identity developed and applied to this website, inspired by underground culture, Y2K aesthetics, and digital brutalism. The project blends the essence of street culture with retrofuturism, resulting in an authentic visual language packed with references.\""
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/minha-propaganda/01.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/minha-propaganda/02.webp"
-      }
-    ]
-  },
-  {
-    "area": "design",
-    "galeria": "slide",
-    "cat": "social",
     "id": "p-mwtkwh0p-lygc4",
     "h": 0,
     "tools": "Affinity",
@@ -612,6 +586,32 @@
       {
         "type": "image",
         "src": "img/projetos/xerifes-m-c/07.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "slide",
+    "cat": "social",
+    "id": "p-mwtkwh0p-632ul",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Identidade Visual / Neo-Y2K",
+      "en": " Visual Identity / Neo-Y2K"
+    },
+    "desc": {
+      "pt": "Identidade visual que desenvolvi e adotei para este site, inspirada na cultura underground, na estética Y2K e no brutalismo digital. O projeto une a essência da cultura de rua ao retrofuturismo, resultando em uma linguagem autêntica e repleta de referências.",
+      "en": "\"Visual identity developed and applied to this website, inspired by underground culture, Y2K aesthetics, and digital brutalism. The project blends the essence of street culture with retrofuturism, resulting in an authentic visual language packed with references.\""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/minha-propaganda/01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/minha-propaganda/02.webp"
       }
     ]
   },
