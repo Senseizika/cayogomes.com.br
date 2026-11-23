@@ -241,6 +241,8 @@ a{color:inherit}
 .thumb img{height:var(--thumb-h);width:auto;max-width:none;object-fit:contain;display:block;transition:transform .5s}
 .thumb:has(.ph){height:var(--thumb-h);width:calc(var(--thumb-h) * 4 / 3)}
 .item:hover .thumb img{transform:scale(1.015)}
+/* etiqueta da categoria dentro da miniatura - so no filtro "Todos" */
+.cat-etiqueta{position:absolute;top:.5rem;right:.6rem;z-index:2;max-width:calc(100% - 1.2rem);font:500 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;text-align:right;color:rgba(255,255,255,.5);text-shadow:0 1px 2px rgba(0,0,0,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
 .ph{position:absolute;inset:0;display:grid;place-items:center;font:400 .85rem var(--mono);color:var(--mute);letter-spacing:.08em;
   background:linear-gradient(160deg,hsl(var(--h) 30% 14%),#08090b)}
 .item h3{font:500 1.2rem/1.2 var(--tech);margin-top:.7rem;letter-spacing:.03em}
@@ -1096,12 +1098,19 @@ function renderAbas(){
   ).join('<span class="sep" role="presentation" aria-hidden="true"></span>');
 }
 
-function renderGradeHTML(list){
+// Nome da categoria do projeto, no idioma atual (vazio se não tiver categoria).
+function nomeCategoria(p){
+  if (!p?.cat) return "";
+  const cats = AREAS.find(a => a.id === p.area)?.cats || [];
+  return tr(cats.find(c => c.id === p.cat)?.name) || String(p.cat);
+}
+
+function renderGradeHTML(list, comCategoria = false){
   const u = UI[lang];
   if (!list.length) return `<p class="vazio">${esc(u.empty)}</p>`;
   return `<div class="grid">${list.map(([p, j], idx) => `
       <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${capaHTML(p, idx < 3)}</div>
+        <div class="thumb">${capaHTML(p, idx < 3)}${comCategoria && p.cat ? `<span class="cat-etiqueta">${esc(nomeCategoria(p))}</span>` : ""}</div>
         <h3>${esc(tr(p.title))}</h3>
       </button>`).join("")}</div>`;
 }
@@ -1138,7 +1147,7 @@ function renderPainel(soGrade){
 
   if (soGrade && $("#grade")) {
     $("#panel").querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", String(ch.dataset.c === filter)));
-    $("#grade").innerHTML = renderGradeHTML(exibida);
+    $("#grade").innerHTML = renderGradeHTML(exibida, filter === "all");
     return;
   }
 
@@ -1153,7 +1162,7 @@ function renderPainel(soGrade){
     <span class="hud-plus bl" aria-hidden="true"></span>
     <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
-    <div id="grade">${renderGradeHTML(exibida)}</div>`;
+    <div id="grade">${renderGradeHTML(exibida, filter === "all")}</div>`;
 }
 
 function render(){
