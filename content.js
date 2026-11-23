@@ -29,17 +29,17 @@ const AREAS = [
     },
     "cats": [
       {
-        "id": "social",
-        "name": {
-          "pt": "Redes Sociais",
-          "en": "Social Media"
-        }
-      },
-      {
         "id": "estampa",
         "name": {
           "pt": "Estampa",
           "en": "Screen Print"
+        }
+      },
+      {
+        "id": "social",
+        "name": {
+          "pt": "Redes Sociais",
+          "en": "Social Media"
         }
       },
       {
