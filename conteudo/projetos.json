@@ -54,49 +54,69 @@
     "galeria": "slide",
     "cat": "game-ready",
     "h": 0,
-    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "tools": "Blender · ZBrush · Substance 3D Designer · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
     "title": {
-      "pt": "Baú Medieval Estilizado ",
-      "en": "Stylized Medieval Chest"
+      "pt": "O Piromante",
+      "en": "The Pyromancer"
     },
     "desc": {
-      "pt": "Projeto desenvolvido para ser um asset game-ready altamente otimizado, mantendo o máximo de qualidade visual. Além disso, criei uma animação curta e descontraída para aprimorar minhas habilidades de edição de vídeo, timing e movimento. Todo o processo de modelagem foi feito no ZBrush, com abertura de UVs e animação no Blender, baking e texturização no Substance Painter, renderização no Marmoset Toolbag e pós-produção de áudio e vídeo no DaVinci Resolve.",
-      "en": "Project developed to be a highly optimized game-ready asset while maintaining maximum visual quality. Additionally, I created a short, lighthearted animation to hone my video editing, timing, and motion skills. The entire modeling process was done in ZBrush, with UV unwrapping and animation in Blender, baking and texturing in Substance Painter, rendering in Marmoset Toolbag, and audio and video post-production in DaVinci Resolve."
+      "pt": "O Piromante é um projeto pessoal para estudar um pouco sobre edição de vídeo e áudio, além de renderização e animação. O foco foi contar uma história por meio do áudio, então é melhor ouvir com fones de ouvido. Mas também é uma demonstração do trabalho de modelagem e texturização para jogos, pois fiz tudo do zero, com qualidade suficiente para uma renderização realista, mas escalável para um asset game ready.",
+      "en": "The Pyromancer is a personal project to study a little about video and audio editing, as well as rendering and animation. The focus was to tell a story through audio, so it’s best to listen with headphones. But it is also a demonstration of modeling and texturing work for games, since I made everything from scratch, with enough quality for realistic rendering, yet scalable for a game-ready asset."
     },
     "media": [
       {
         "type": "video",
-        "src": "https://youtube.com/shorts/ffUgwN4B9CY",
-        "poster": "img/projetos/bau-estilizado/04.webp"
-      },
-      {
-        "type": "sketchfab",
-        "src": "https://sketchfab.com/3d-models/stylized-game-ready-chest-d1706284f4fa4904a97a21c49d2dbf7f",
-        "poster": "img/projetos/bau-estilizado/02.webp"
+        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
+        "poster": "img/projetos/o-piromante/09.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/bau-estilizado/02.webp",
+        "src": "img/projetos/o-piromante/01.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/bau-estilizado/03.webp",
+        "src": "img/projetos/o-piromante/02.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/bau-estilizado/04.webp",
+        "src": "img/projetos/o-piromante/03.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/bau-estilizado/05.webp",
+        "src": "img/projetos/o-piromante/04.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/bau-estilizado/07.webp",
+        "src": "img/projetos/o-piromante/05.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/06.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/07.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/08.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/09.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/o-piromante/10.webp",
         "fullscreen": true
       }
     ]
@@ -261,78 +281,6 @@
     ]
   },
   {
-    "area": "3d",
-    "galeria": "slide",
-    "cat": "game-ready",
-    "h": 0,
-    "tools": "Blender · ZBrush · Substance 3D Designer · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
-    "title": {
-      "pt": "O Piromante",
-      "en": "The Pyromancer"
-    },
-    "desc": {
-      "pt": "O Piromante é um projeto pessoal para estudar um pouco sobre edição de vídeo e áudio, além de renderização e animação. O foco foi contar uma história por meio do áudio, então é melhor ouvir com fones de ouvido. Mas também é uma demonstração do trabalho de modelagem e texturização para jogos, pois fiz tudo do zero, com qualidade suficiente para uma renderização realista, mas escalável para um asset game ready.",
-      "en": "The Pyromancer is a personal project to study a little about video and audio editing, as well as rendering and animation. The focus was to tell a story through audio, so it’s best to listen with headphones. But it is also a demonstration of modeling and texturing work for games, since I made everything from scratch, with enough quality for realistic rendering, yet scalable for a game-ready asset."
-    },
-    "media": [
-      {
-        "type": "video",
-        "src": "https://www.youtube.com/watch?v=NIAfnejk4m8",
-        "poster": "img/projetos/o-piromante/09.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/01.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/02.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/03.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/04.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/05.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/06.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/07.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/08.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/09.webp",
-        "fullscreen": true
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/o-piromante/10.webp",
-        "fullscreen": true
-      }
-    ]
-  },
-  {
     "area": "design",
     "galeria": "slide",
     "cat": "impresso",
@@ -431,6 +379,58 @@
       {
         "type": "image",
         "src": "img/projetos/checkpoint-de-corrida-sci-fi/12.webp",
+        "fullscreen": true
+      }
+    ]
+  },
+  {
+    "area": "3d",
+    "galeria": "slide",
+    "cat": "game-ready",
+    "h": 0,
+    "tools": "ZBrush · Blender · Substande 3D Painter · Marmoset Toolbag · DaVinci Resolve",
+    "title": {
+      "pt": "Baú Medieval Estilizado ",
+      "en": "Stylized Medieval Chest"
+    },
+    "desc": {
+      "pt": "Projeto desenvolvido para ser um asset game-ready altamente otimizado, mantendo o máximo de qualidade visual. Além disso, criei uma animação curta e descontraída para aprimorar minhas habilidades de edição de vídeo, timing e movimento. Todo o processo de modelagem foi feito no ZBrush, com abertura de UVs e animação no Blender, baking e texturização no Substance Painter, renderização no Marmoset Toolbag e pós-produção de áudio e vídeo no DaVinci Resolve.",
+      "en": "Project developed to be a highly optimized game-ready asset while maintaining maximum visual quality. Additionally, I created a short, lighthearted animation to hone my video editing, timing, and motion skills. The entire modeling process was done in ZBrush, with UV unwrapping and animation in Blender, baking and texturing in Substance Painter, rendering in Marmoset Toolbag, and audio and video post-production in DaVinci Resolve."
+    },
+    "media": [
+      {
+        "type": "video",
+        "src": "https://youtube.com/shorts/ffUgwN4B9CY",
+        "poster": "img/projetos/bau-estilizado/04.webp"
+      },
+      {
+        "type": "sketchfab",
+        "src": "https://sketchfab.com/3d-models/stylized-game-ready-chest-d1706284f4fa4904a97a21c49d2dbf7f",
+        "poster": "img/projetos/bau-estilizado/02.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/02.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/03.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/04.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/05.webp",
+        "fullscreen": true
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/bau-estilizado/07.webp",
         "fullscreen": true
       }
     ]
