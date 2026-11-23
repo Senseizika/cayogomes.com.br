@@ -236,6 +236,15 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
   let ext = String(path.extname(String(nomeOriginal || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
   if (!ext || ext.length > 10) ext = 'bin';
 
+  const EXTENSOES_PERMITIDAS = new Set([
+    'webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'bmp', 'tif', 'tiff', 'heic', 'heif', 'jxl', 'psd', 'psb',
+    'mp4', 'webm', 'mov', 'avi', 'mkv',
+    'glb', 'gltf', 'fbx', 'obj',
+    'pdf',
+    'mp3', 'wav', 'ogg', 'flac'
+  ]);
+  if (!EXTENSOES_PERMITIDAS.has(ext)) throw new Error('tipo de arquivo não permitido: .' + ext);
+
   const seg = slugify(pasta);
   if (!seg) throw new Error('pasta inválida');
 
