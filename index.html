@@ -226,24 +226,11 @@ a{color:inherit}
 .area .head{padding:1.2rem 1.2rem 0}   /* espaço ao redor do título da área */
 .area h2{font:400 clamp(2.6rem,6vw,4.4rem)/1 var(--big);letter-spacing:.02em}
 .area .lead{color:var(--mute);max-width:56ch;margin-top:.4rem;white-space:pre-line}
-/* Separadores discretos das categorias na visualização "Todos". */
-.cat-group{min-width:0}
-.cat-group+.cat-group{content-visibility:auto;contain-intrinsic-size:auto 360px}
-.cat-separator{
-  display:flex;align-items:center;gap:.8rem;
-  margin:1.25rem 1.2rem 0;
-  color:var(--mute);font:inherit;font-size:1rem;line-height:1.3;
-}
-.cat-separator::after{
-  content:"";height:1px;flex:1;
-  background:currentColor;opacity:.7;
-}
 /* GRADE: cards fluem com a largura natural da imagem; a altura é uniforme */
 .grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1.15rem;padding:1.4rem 1.2rem 1.4rem}
 /* respiro extra no painel: o "+" do canto do vidro não pode cobrir os cards */
 #panel .head,#panel .chips,#panel .grid{padding-left:2rem;padding-right:2rem}
 #panel .grid{padding-bottom:2.2rem}
-#panel .cat-separator{margin-left:2rem;margin-right:2rem}
 .item{flex:0 0 auto;display:block;width:auto;max-width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
 /* Miniaturas com a MESMA altura; a largura segue a proporção original da imagem (sem corte). */
 .thumb{width:fit-content;max-width:none;overflow:hidden;background:#0c0d10;border:1px solid var(--line);border-radius:8px;position:relative;transition:border-color .2s}
@@ -579,7 +566,6 @@ dialog[open]{animation:in .22s ease-out}
   .bar{padding:.55rem .8rem;font-size:.78rem}
   .area .head{padding:1rem .9rem 0}
   .chips{padding:.9rem .9rem 0}
-  .cat-separator{margin:1.1rem .9rem 0}
   /* no mobile cada projeto ocupa a largura do vidro com um respiro nas bordas (feed) */
   .grid{flex-direction:column;align-items:stretch;overflow-x:visible;scroll-snap-type:none;gap:1.5rem}
   #panel .grid{padding-left:1rem;padding-right:1rem}
@@ -1109,34 +1095,14 @@ function renderAbas(){
   ).join('<span class="sep" role="presentation" aria-hidden="true"></span>');
 }
 
-function renderGradeHTML(a, list){
+function renderGradeHTML(list){
   const u = UI[lang];
   if (!list.length) return `<p class="vazio">${esc(u.empty)}</p>`;
-  const cats = a.cats || [];
-  const cardsHTML = (items, offset) => `<div class="grid">${items.map(([p, j], idx) => `
+  return `<div class="grid">${list.map(([p, j], idx) => `
       <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${capaHTML(p, offset + idx < 3)}</div>
+        <div class="thumb">${capaHTML(p, idx < 3)}</div>
         <h3>${esc(tr(p.title))}</h3>
       </button>`).join("")}</div>`;
-
-  // Em "Todos", agrupa pela ordem das categorias cadastradas; dentro de cada
-  // categoria, preserva a ordem original dos projetos em PROJECTS.
-  if (filter === "all" && cats.length) {
-    const catIds = new Set(cats.map(c => c.id));
-    const grupos = cats.map(c => ({ cat: c, items: list.filter(([p]) => p.cat === c.id) })).filter(g => g.items.length);
-    const semCat = list.filter(([p]) => !p.cat || !catIds.has(p.cat));
-    if (grupos.length) {
-      let visto = 0;
-      const htmlGrupos = grupos.map(g => {
-        const bloco = `<section class="cat-group"><div class="cat-separator"><span>${esc(tr(g.cat.name))}</span></div>${cardsHTML(g.items, visto)}</section>`;
-        visto += g.items.length;
-        return bloco;
-      }).join("");
-      const htmlSemCat = semCat.length ? `<section class="cat-group">${cardsHTML(semCat, visto)}</section>` : "";
-      return htmlGrupos + htmlSemCat;
-    }
-  }
-  return cardsHTML(list, 0);
 }
 
 function renderPainel(soGrade){
@@ -1149,7 +1115,7 @@ function renderPainel(soGrade){
 
   if (soGrade && $("#grade")) {
     $("#panel").querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", String(ch.dataset.c === filter)));
-    $("#grade").innerHTML = renderGradeHTML(a, list);
+    $("#grade").innerHTML = renderGradeHTML(list);
     return;
   }
 
@@ -1164,7 +1130,7 @@ function renderPainel(soGrade){
     <span class="hud-plus bl" aria-hidden="true"></span>
     <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
-    <div id="grade">${renderGradeHTML(a, list)}</div>`;
+    <div id="grade">${renderGradeHTML(list)}</div>`;
 }
 
 function render(){
