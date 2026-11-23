@@ -755,6 +755,7 @@ dialog[open]{animation:in .22s ease-out}
 </div>
 <script src="conteudo/projetos.js"></script>
 <script src="content.js"></script>
+<script src="conteudo/ordem-todos.js"></script>
 <script>
 /* ============================================================
    ESTE ARQUIVO TEM SÓ O CÓDIGO.
@@ -1105,6 +1106,27 @@ function renderGradeHTML(list){
       </button>`).join("")}</div>`;
 }
 
+// Ordem personalizada do "Todos", salva pelo painel por área.
+// Mantém o índice original (j) de cada projeto para o modal continuar correto.
+function aplicarOrdemTodos(a, list){
+  if (typeof ORDEM_TODOS === 'undefined') return list;
+  const ids = ORDEM_TODOS[a.id];
+  if (!Array.isArray(ids) || !ids.length) return list;
+  const chave = par => String(par[0].id || slugProj(par[0]));
+  const porId = new Map(list.map(par => [chave(par), par]));
+  const usados = new Set();
+  const out = [];
+  for (const id of ids) {
+    const k = String(id);
+    if (porId.has(k) && !usados.has(k)) { out.push(porId.get(k)); usados.add(k); }
+  }
+  for (const par of list) {
+    const k = chave(par);
+    if (!usados.has(k)) { out.push(par); usados.add(k); }
+  }
+  return out;
+}
+
 function renderPainel(soGrade){
   const u = UI[lang];
   const a = AREAS.find(x => x.id === area);
@@ -1112,10 +1134,11 @@ function renderPainel(soGrade){
   const i = AREAS.indexOf(a);
   const cats = a.cats || [];
   const list = PROJECTS.map((p, j) => [p, j]).filter(([p]) => p.area === a.id && (filter === "all" || p.cat === filter));
+  const exibida = filter === "all" ? aplicarOrdemTodos(a, list) : list;
 
   if (soGrade && $("#grade")) {
     $("#panel").querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", String(ch.dataset.c === filter)));
-    $("#grade").innerHTML = renderGradeHTML(list);
+    $("#grade").innerHTML = renderGradeHTML(exibida);
     return;
   }
 
@@ -1130,7 +1153,7 @@ function renderPainel(soGrade){
     <span class="hud-plus bl" aria-hidden="true"></span>
     <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
-    <div id="grade">${renderGradeHTML(list)}</div>`;
+    <div id="grade">${renderGradeHTML(exibida)}</div>`;
 }
 
 function render(){

@@ -112,6 +112,8 @@ ol li.vazio{display:block;color:var(--mute);cursor:default;font-size:.85rem;text
 .drag-over-inside { background: rgba(239,43,49,.15) !important; border: 1px dashed var(--accent) !important; }
 
 .aviso-icon { color: #f0b429; font-size: .85rem; cursor: help; line-height: 1; }
+.marcador-todos { font: 400 .62rem ui-monospace, Consolas, monospace; color: var(--accent); letter-spacing: .03em; }
+.dica-todos { padding: .45rem .6rem .65rem; color: var(--mute); font: 400 .72rem ui-monospace, Consolas, monospace; line-height: 1.45; }
 
 #palco{display:flex;flex-direction:column;min-width:0;min-height:0}
 #ferramentas{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-bottom:1px solid var(--line);font:400 .72rem ui-monospace,Consolas,monospace;color:var(--mute);flex:0 0 auto}
@@ -218,6 +220,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
     <button data-modo="areas">áreas</button>
     <button data-modo="categorias">categorias</button>
     <button class="on" data-modo="projetos">projetos</button>
+    <button data-modo="todos">todos</button>
   </div>
   <span id="sujo" hidden>não salvo</span>
   <span id="status"></span>
@@ -284,7 +287,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 
 <script>
 const token = "__PAINEL_TOKEN__";
-let projetos = [], areas = [], areasEditaveis = [];
+let projetos = [], areas = [], areasEditaveis = [], ordemTodos = {};
 let projetoSelecionado = null, areaSelecionada = null, categoriaSelecionada = null;
 let sujo = false, modoAtual = 'projetos';
 let editorOrigem = null;
@@ -418,6 +421,33 @@ function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
 const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "item";
 const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
 
+// Identificador estável dos projetos (usado pela ordem do "Todos").
+const idProjeto = p => String(p?.id || slug(p?.title?.pt || p?.title?.en || ""));
+function garantirIdsProjetos(){
+  projetos.forEach(p => {
+    if (!p.id) p.id = 'p-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+  });
+}
+// Devolve a ordem salva de uma área, descartando projetos removidos e
+// acrescentando no fim os que ainda não entraram na lista.
+function ordemDaArea(areaId){
+  const salva = Array.isArray(ordemTodos[areaId]) ? ordemTodos[areaId].slice() : [];
+  const daArea = projetos.filter(p => p.area === areaId);
+  const limpos = salva.filter(id => daArea.some(p => idProjeto(p) === id));
+  const vistos = new Set(limpos);
+  daArea.forEach(p => {
+    const id = idProjeto(p);
+    if (!vistos.has(id)) { limpos.push(id); vistos.add(id); }
+  });
+  ordemTodos[areaId] = limpos;
+  return limpos.slice();
+}
+function sincronizarOrdemTodos(){
+  const nova = {};
+  areasEditaveis.forEach(a => { nova[a.id] = ordemDaArea(a.id); });
+  ordemTodos = nova;
+}
+
 const lerBase64 = f => new Promise((ok, err) => {
   if (!f) return err(new Error("nenhum arquivo selecionado"));
   const r = new FileReader();
@@ -512,8 +542,16 @@ function mudarModo(m) {
     $('#duplicar').style.display = 'none';
     $('#preview-projeto').style.display = 'none';
     $('#apagar').style.display = 'none';
+  } else if (m === 'todos') {
+    $('#novo').textContent = '+ projeto';
+    $('#filtros-lista').style.display = 'none';
+    $('#ver-site').style.display = 'none';
+    $('#duplicar').style.display = 'none';
+    $('#preview-projeto').style.display = 'none';
+    $('#apagar').style.display = 'none';
   }
   
+  if (m === 'todos') sincronizarOrdemTodos();
   desenharLista(true);
   
   if (m === 'projetos' && projetoSelecionado) {
@@ -668,6 +706,33 @@ function desenharListaCategorias() {
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma categoria</p>';
 }
 
+function desenharListaTodos(){
+  let html = '<p class="dica-todos">1º = primeira impressão · último = última impressão · arraste para reorganizar.</p>';
+  areasEditaveis.forEach(a => {
+    const ids = ordemDaArea(a.id);
+    const porId = new Map(projetos.filter(p => p.area === a.id).map(p => [idProjeto(p), p]));
+    const ab = estaAberto('todos', 'area', a.id) ? 'open' : '';
+    html += `<details class="grupo" ${ab} data-area-id="${esc(a.id)}">
+      <summary><span class="handle" draggable="true" title="Arraste para reordenar a área">☰</span>${esc(a.name?.pt || '(sem nome)')}<span class="marcador-todos" style="margin-left:auto">${ids.length} projeto(s)</span></summary>
+      <div class="grupo-conteudo"><ol data-area-id="${esc(a.id)}">`;
+    ids.forEach((id, idx) => {
+      const p = porId.get(id);
+      if (!p) return;
+      const marca = idx === 0 ? '<span class="marcador-todos">1ª impressão</span>'
+        : idx === ids.length - 1 ? '<span class="marcador-todos">última impressão</span>' : '';
+      html += `<li data-pid="${esc(id)}" data-area-id="${esc(a.id)}" draggable="true" title="${esc(p.title?.pt || '')}">
+        <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
+        <b>${String(idx + 1).padStart(2, '0')}</b>
+        <span>${esc(p.title?.pt || '(sem título)')}${marca}</span>
+        <em>${esc(p.cat || 'sem categoria')}</em>
+      </li>`;
+    });
+    if (!ids.length) html += '<li class="vazio">nenhum projeto</li>';
+    html += '</ol></div></details>';
+  });
+  $("#lista").innerHTML = html || '<p class="vazio">nenhuma área</p>';
+}
+
 function desenharLista(jaSincronizado = false) {
   const lateral = $("#lateral-conteudo");
   const rolagem = lateral ? lateral.scrollTop : 0;
@@ -675,6 +740,7 @@ function desenharLista(jaSincronizado = false) {
   if (modoAtual === 'projetos') desenharListaProjetos();
   else if (modoAtual === 'areas') desenharListaAreas();
   else if (modoAtual === 'categorias') desenharListaCategorias();
+  else if (modoAtual === 'todos') desenharListaTodos();
   if (lateral) lateral.scrollTop = rolagem;
 }
 
@@ -699,7 +765,7 @@ $("#lista").addEventListener("dragstart", e => {
 
   // A linha inteira é arrastável (não só o "☰"), então o tipo é deduzido
   // pelo elemento em que o arraste começou.
-  const li = e.target.closest("li[data-ci], li[data-ai], li[data-i]");
+  const li = e.target.closest("li[data-ci], li[data-ai], li[data-i], li[data-pid]");
   const catGroup = e.target.closest("details.grupo-cat");
   const areaGroup = e.target.closest("details.grupo");
 
@@ -715,10 +781,12 @@ $("#lista").addEventListener("dragstart", e => {
     iniciar('area-item', { areaIndex: +li.dataset.ai }, li);
   } else if (li && li.dataset.i !== undefined && modoAtual === 'projetos') {
     iniciar('proj', { index: +li.dataset.i }, li);
+  } else if (li && li.dataset.pid !== undefined && modoAtual === 'todos') {
+    iniciar('todos', { areaId: li.dataset.areaId, pid: li.dataset.pid }, li);
   } else if (catGroup && modoAtual === 'projetos') {
     if (catGroup.dataset.catId === 'sem-cat') { e.preventDefault(); return; }
     iniciar('cat', { areaId: catGroup.dataset.areaId, catId: catGroup.dataset.catId }, catGroup);
-  } else if (areaGroup) {
+  } else if (areaGroup && modoAtual !== 'todos') {
     iniciar('area', { areaId: areaGroup.dataset.areaId }, areaGroup);
   } else {
     e.preventDefault();
@@ -745,6 +813,7 @@ $("#lista").addEventListener("dragover", e => {
   const targetCatGroup = e.target.closest("details.grupo-cat");
   const targetSemCatList = e.target.closest("ol.sem-cat-list");
   const targetLiProj = e.target.closest("li[data-i]");
+  const targetLiTodos = e.target.closest("li[data-pid]");
   const targetLiItem = e.target.closest("li[data-ai]");
   // para grupos abertos, a metade certa é a do cabeçalho (summary), não a do bloco inteiro
   const rectDoGrupo = el => (el.querySelector(":scope > summary") || el).getBoundingClientRect();
@@ -763,6 +832,12 @@ $("#lista").addEventListener("dragover", e => {
       targetLiProj.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
     } else if ((targetCatGroup || targetSemCatList) && !targetLiProj) {
       (targetCatGroup || targetSemCatList).classList.add("drag-over-inside");
+    }
+  }
+  else if (dragType === 'todos') {
+    if (targetLiTodos && targetLiTodos.dataset.pid !== dragData.pid && targetLiTodos.dataset.areaId === dragData.areaId) {
+      const rect = targetLiTodos.getBoundingClientRect();
+      targetLiTodos.classList.add(e.clientY < rect.top + rect.height / 2 ? "drag-over-top" : "drag-over-bottom");
     }
   }
   else if (dragType === 'area-item' && targetLiItem && +targetLiItem.dataset.ai !== dragData.areaIndex) {
@@ -794,6 +869,7 @@ $("#lista").addEventListener("drop", e => {
   const targetCatGroup = e.target.closest("details.grupo-cat");
   const targetSemCatList = e.target.closest("ol.sem-cat-list");
   const targetLiProj = e.target.closest("li[data-i]");
+  const targetLiTodos = e.target.closest("li[data-pid]");
   const targetLiItem = e.target.closest("li[data-ai]");
   const rectDoGrupo = el => (el.querySelector(":scope > summary") || el).getBoundingClientRect();
 
@@ -858,6 +934,29 @@ $("#lista").addEventListener("drop", e => {
           setTimeout(() => { abrirFormulario(); status("Projeto movido de categoria!"); }, 10);
         }
       }
+    }
+    else if (type === 'todos') {
+      const alvo = targetLiTodos || e.target.closest('ol[data-area-id]');
+      const areaId = alvo?.dataset.areaId || data.areaId;
+      if (!areaId || areaId !== data.areaId) return;
+      const ids = ordemDaArea(areaId);
+      const de = ids.indexOf(data.pid);
+      if (de < 0) return;
+      ids.splice(de, 1);
+      let para;
+      if (targetLiTodos && targetLiTodos.dataset.pid !== data.pid) {
+        para = ids.indexOf(targetLiTodos.dataset.pid);
+        if (para < 0) para = ids.length;
+        const rect = targetLiTodos.getBoundingClientRect();
+        if (e.clientY >= rect.top + rect.height / 2) para++;
+      } else {
+        para = ids.length;
+      }
+      ids.splice(para, 0, data.pid);
+      ordemTodos[areaId] = ids;
+      marcarSujo();
+      desenharLista(true);
+      status("Ordem do Todos atualizada!");
     }
     else if (type === 'area-item' && targetLiItem && +targetLiItem.dataset.ai !== data.areaIndex) {
       const toIndex = +targetLiItem.dataset.ai;
@@ -929,6 +1028,9 @@ $("#lista").addEventListener("click", e => {
         categoriaSelecionada = null;
         atualizarSelecaoVisual();
       }
+    } else if (modoAtual === 'todos') {
+      details.open = !details.open;
+      sincronizarAccordionsDOM('todos');
     }
     return;
   }
@@ -942,6 +1044,12 @@ $("#lista").addEventListener("click", e => {
 
   const li = e.target.closest("li[data-i]");
   if (li) { abrir(projetos[+li.dataset.i]); return; }
+  const lit = e.target.closest("li[data-pid]");
+  if (lit && modoAtual === 'todos') {
+    const p = projetos.find(x => idProjeto(x) === lit.dataset.pid);
+    if (p) abrir(p);
+    return;
+  }
   const lia = e.target.closest("li[data-ai]");
   if (lia && lia.dataset.ci === undefined) { abrirArea(areasEditaveis[+lia.dataset.ai]); return; }
   const lic = e.target.closest("li[data-ci]");
@@ -954,6 +1062,7 @@ function novoProjeto(galeria) {
   const areaId = areasEditaveis[0]?.id || "";
   projetos.unshift({ area: areaId, cat: "", galeria: galeria || "slide", h: 0, tools: "",
     title: { pt: "", en: "" }, desc: { pt: "", en: "" }, media: [] });
+  garantirIdsProjetos();
   abrirGrupoDoProjeto(projetos[0]);
   marcarSujo();
   projetoSelecionado = projetos[0];
@@ -965,7 +1074,7 @@ function novoProjeto(galeria) {
 $("#novo-carrossel").onclick = () => novoProjeto('carrossel');
 
 $("#novo").onclick = () => {
-  if (modoAtual === 'projetos') {
+  if (modoAtual === 'projetos' || modoAtual === 'todos') {
     novoProjeto('slide');
   } else if (modoAtual === 'areas') {
     const tempId = "area-" + Date.now();
@@ -1006,6 +1115,8 @@ async function salvar() {
     projetos.forEach(p => {
       if (!p.area || !areasEditaveis.some(a => a.id === p.area)) p.area = areasEditaveis[0]?.id || "";
     });
+    garantirIdsProjetos();
+    sincronizarOrdemTodos();
 
     const idxProjetoSel = projetoSelecionado ? projetos.indexOf(projetoSelecionado) : -1;
     const areaSelecionadaId = areaSelecionada?.id;
@@ -1014,10 +1125,12 @@ async function salvar() {
 
     await api("/api/projetos", { projetos });
     await api("/api/areas", { areas: areasEditaveis });
-    
+    await api("/api/ordem-todos", { ordem: ordemTodos });
+
     const r = await api('/api/estado');
     if (Array.isArray(r.projetos)) {
       projetos = r.projetos;
+      ordemTodos = r.ordemTodos || {};
       sincronizarSoftwares();
       projetoSelecionado = idxProjetoSel >= 0 ? (projetos[idxProjetoSel] || null) : null;
     }
@@ -2048,8 +2161,10 @@ window.addEventListener("beforeunload", e => {
   try {
     const r = await api("/api/estado");
     projetos = r.projetos;
+    ordemTodos = r.ordemTodos || {};
     areas = r.areas;
     areasEditaveis = r.areasCompletas || r.areas;
+    garantirIdsProjetos();
     sincronizarSoftwares();
     desenharLista();
     ligarFrame();

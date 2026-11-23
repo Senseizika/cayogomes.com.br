@@ -15,6 +15,8 @@ const ARQ_JSON = path.join(DIR_CONTEUDO, 'projetos.json');
 const ARQ_JS = path.join(DIR_CONTEUDO, 'projetos.js');
 const ARQ_CONTENT = path.join(ROOT, 'content.js');
 const ARQ_AREAS_JSON = path.join(DIR_CONTEUDO, 'areas.json');
+const ARQ_ORDEM_JSON = path.join(DIR_CONTEUDO, 'ordem-todos.json');
+const ARQ_ORDEM_JS = path.join(DIR_CONTEUDO, 'ordem-todos.js');
 const DIR_IMG = path.join(ROOT, 'img', 'projetos');
 const PAINEL_HTML = path.join(__dirname, 'painel.html');
 
@@ -102,6 +104,24 @@ function gravarAreas(lista) {
   if (novo !== src) fs.writeFileSync(ARQ_CONTENT, novo, 'utf8');
 }
 
+function lerOrdemTodos() {
+  try {
+    const v = JSON.parse(fs.readFileSync(ARQ_ORDEM_JSON, 'utf8'));
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
+    const out = {};
+    for (const [area, ids] of Object.entries(v)) {
+      if (Array.isArray(ids) && ids.length) out[area] = ids.map(String);
+    }
+    return out;
+  } catch (e) { return {}; }
+}
+
+function gravarOrdemTodos(obj) {
+  fs.mkdirSync(DIR_CONTEUDO, { recursive: true });
+  fs.writeFileSync(ARQ_ORDEM_JSON, JSON.stringify(obj, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(ARQ_ORDEM_JS, CABECALHO_JS + 'const ORDEM_TODOS = ' + JSON.stringify(obj) + ';\n', 'utf8');
+}
+
 function normalizar(lista) {
   if (!Array.isArray(lista)) throw new Error('formato inválido: esperava uma lista');
   if (lista.length > 500) throw new Error('limite de 500 projetos');
@@ -114,7 +134,9 @@ function normalizar(lista) {
         if (m.fullscreen) o.fullscreen = true;
         return o;
       });
+    const id = String(p.id || ('p-' + crypto.randomBytes(6).toString('hex')));
     const item = {
+      id,
       area: String(p.area || ''),
       galeria: p.galeria === 'carrossel' ? 'carrossel' : 'slide', /* <--- NOVA OPÇÃO AQUI */
       h: Math.max(0, Math.min(360, Number(p.h) || 0)),
@@ -334,7 +356,12 @@ const server = http.createServer(async (req, res) => {
       if (req.headers['x-painel-token'] !== TOKEN) return json(res, 403, { erro: 'token inválido' });
 
       if (rota === '/api/estado' && req.method === 'GET') {
-        return json(res, 200, { projetos: lerProjetos(), areas: lerAreas(), areasCompletas: lerAreasCompletas() });
+        return json(res, 200, {
+          projetos: lerProjetos(),
+          areas: lerAreas(),
+          areasCompletas: lerAreasCompletas(),
+          ordemTodos: lerOrdemTodos()
+        });
       }
       if (rota === '/api/projetos' && req.method === 'POST') {
         const dados = await corpo(req);
@@ -352,6 +379,24 @@ const server = http.createServer(async (req, res) => {
         gravarAreas(lista);
         console.log(`  áreas: ${lista.length} área(s) salva(s)`);
         return json(res, 200, { ok: true, total: lista.length });
+      }
+      if (rota === '/api/ordem-todos' && req.method === 'POST') {
+        const dados = await corpo(req);
+        const bruto = dados.ordem;
+        if (!bruto || typeof bruto !== 'object' || Array.isArray(bruto)) throw new Error('ordem inválida');
+        const ordem = {};
+        for (const [area, ids] of Object.entries(bruto)) {
+          if (!Array.isArray(ids)) continue;
+          const limpos = [];
+          for (const id of ids) {
+            const s = String(id || '');
+            if (s && !limpos.includes(s)) limpos.push(s);
+          }
+          if (limpos.length) ordem[String(area)] = limpos;
+        }
+        gravarOrdemTodos(ordem);
+        console.log(`  ordem do Todos: ${Object.keys(ordem).length} área(s)`);
+        return json(res, 200, { ok: true, ordem });
       }
       if (rota === '/api/arquivo' && req.method === 'POST') {
         const dados = await corpo(req);
