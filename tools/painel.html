@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel — cayogomes.com.br</title>
 <style>
-:root{--ink:#050506;--panel:#0b0c0e;--line:rgba(255,255,255,.14);--white:#f4f4f2;--mute:#8d9490;--accent:#ef2b31}
+:root{--ink:#050506;--panel:#0b0c0e;--line:rgba(255,255,255,.14);--white:#f4f4f2;--mute:#8d9490;--accent:#ef2b31;--mono:ui-monospace,Consolas,monospace}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
@@ -36,7 +36,7 @@ a:hover{color:var(--white)}
 .toggle-modo button:hover{border-color:transparent;color:var(--white)}
 
 main{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0;position:relative}
-body.editando main{grid-template-columns:300px 1fr min(420px,38vw)}
+body.editando main{grid-template-columns:300px 1fr min(560px,46vw)}
 
 #lateral{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#08090b}
 #filtros-lista{padding:.5rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;flex:0 0 auto}
@@ -131,7 +131,7 @@ body.editando #drawer{display:flex}
 .drawer-topo{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border-bottom:1px solid var(--line);flex:0 0 auto}
 .drawer-topo span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 .76rem ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--mute)}
 .drawer-topo button{padding:.2rem .5rem;font-size:.75rem}
-#form{flex:1;overflow:auto;padding:.9rem 1rem 2rem;min-height:0}
+#form{flex:1;overflow:auto;padding:.9rem 1.2rem 2rem;min-height:0}
 
 label{display:block;margin-bottom:.7rem;font:400 .68rem ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
 input,select,textarea{display:block;width:100%;margin-top:.22rem;background:#0f1114;border:1px solid var(--line);color:var(--white);padding:.45rem .55rem;border-radius:6px;font:400 .92rem system-ui,sans-serif}
@@ -140,13 +140,16 @@ textarea{resize:vertical}
 .rotulo-linha{display:flex;align-items:center;gap:.4rem}
 .btn-expandir{margin-left:auto;padding:.1rem .35rem;font:400 .85rem ui-monospace,Consolas,monospace;line-height:1;border-color:transparent;color:var(--mute)}
 .btn-expandir:hover{border-color:var(--line);color:var(--accent)}
-.linha{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.linha{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.form-secao-titulo{display:flex;align-items:center;gap:.6rem;margin:0 0 .65rem;font:400 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.form-secao-titulo::after{content:"";flex:1;height:1px;background:var(--line)}
 h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;text-transform:uppercase;color:var(--mute)}
 .toggle-webp{display:inline-flex;align-items:center;gap:.35rem;margin:0 0 0 auto;font:400 .72rem ui-monospace,Consolas,monospace;text-transform:none;letter-spacing:0;color:var(--mute);cursor:pointer}
 .toggle-webp input{width:auto;margin:0;accent-color:var(--accent)}
 .midia{border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-bottom:.6rem;background:#0e1013}
 .midia .topo{display:flex;gap:.35rem;align-items:center;margin-bottom:.5rem;cursor:grab}
 .midia .topo:active{cursor:grabbing}
+.midia .topo .midia-num{font:400 .72rem var(--mono);letter-spacing:.08em;color:var(--accent);padding-right:.1rem}
 .midia .topo select{width:auto;margin:0;padding:.3rem .4rem;font-size:.8rem}
 .midia .topo .empurra{margin-left:auto}
 .midia .topo button{padding:.2rem .45rem;font-size:.8rem}
@@ -187,6 +190,8 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .midias-cabecalho h3{margin:0;color:var(--white);font-size:.9rem;letter-spacing:.14em}
 .midias-cabecalho .dica{margin:.2rem 0 0;font-size:.74rem;line-height:1.4}
 .midias-cabecalho #add-midia{margin-left:auto;white-space:nowrap}
+.passo-titulo{display:flex;align-items:center;gap:.45rem;font:400 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.passo-num{display:inline-grid;place-items:center;width:1.15rem;height:1.15rem;border:1px solid var(--accent);border-radius:50%;font-size:.65rem;flex:0 0 auto}
 .import-card{border:1px solid var(--line);border-radius:8px;background:#0e1013;padding:.7rem;margin-bottom:.7rem}
 .import-card .card-titulo{font:400 .68rem ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
 .import-card .card-titulo small{margin-left:auto;color:var(--mute);letter-spacing:0;text-transform:none;font-size:.7rem}
@@ -200,9 +205,11 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .import-enviar{display:flex;align-items:center;gap:.6rem;margin-top:.65rem}
 .import-enviar .arquivo{margin:0}
 .import-enviar .dica{font-size:.72rem;line-height:1.35}
-.midias-acoes{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-bottom:.7rem;padding:.5rem;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.02)}
+.midias-acoes{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-bottom:.7rem;padding:.55rem;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.02)}
 .midias-acoes button{padding:.28rem .55rem;font:500 .74rem ui-monospace,Consolas,monospace}
+.midias-acoes .passo-titulo{flex-basis:100%;margin-bottom:.15rem}
 .midias-acoes .empurra{margin-left:auto}
+.midias-acoes .acoes-dica{flex-basis:100%;font:400 .72rem system-ui,sans-serif;color:var(--mute);margin-top:.1rem}
 #aplicar-mudancas{background:var(--accent);border-color:var(--accent);color:#050506;font-weight:600}
 #aplicar-mudancas:disabled{background:rgba(255,255,255,.06);border-color:var(--line);color:var(--mute)}
 #contador-pend{display:inline-block;min-width:1.2rem;padding:0 .25rem;margin-left:.25rem;border-radius:999px;background:rgba(0,0,0,.25);font-size:.7rem;text-align:center}
@@ -240,7 +247,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 
 @media(max-width:1400px){
   body.editando main{grid-template-columns:300px 1fr}
-  #drawer{position:absolute;top:0;right:0;bottom:0;width:min(460px,92vw);z-index:50;box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
+  #drawer{position:absolute;top:0;right:0;bottom:0;width:min(560px,94vw);z-index:50;box-shadow:-20px 0 50px rgba(0,0,0,.65);border-top:1px solid var(--line)}
 }
 @media(max-width:760px){
   main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
@@ -1443,7 +1450,7 @@ function linhaMidia(m, i, total) {
   const desejado = m.src ? desejoMidia(m.src) : { webp: false, marca: false };
   const pend = m.src ? pendenciaMidia(m.src) : false;
   const aplicado = m.src ? (estadoMidia[m.src] || {}) : {};
-  let info = "";
+  let info = "sem alteração";
   if (aplicado.origem) info = "aplicado: " + [aplicado.marca ? "marca" : "", aplicado.webp ? "webp" : ""].filter(Boolean).join(" + ");
   if (pend) info = "mudanças pendentes";
   const infoCls = pend ? "pendente" : (aplicado.origem ? "aplicado" : "");
@@ -1451,6 +1458,7 @@ function linhaMidia(m, i, total) {
   const dicaWebp = jaWebP ? "já é WebP — não precisa converter" : dicaOp;
   return `<div class="midia" data-mi="${i}">
     <div class="topo" draggable="true" title="Arraste para reordenar">
+      <span class="midia-num">${String(i + 1).padStart(2, "0")}</span>
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <select data-mcampo="type">
         ${["image", "video", "sketchfab"].map(t => `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("")}
@@ -1475,9 +1483,9 @@ function linhaMidia(m, i, total) {
       ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
       ${ehImg && m.src ? `<span class="img-info" data-src="${esc(m.src)}">carregando…</span>` : ""}
       ${ehImg && m.src ? `<div class="opcoes">
-        <span class="rot">processar</span>
-        <button type="button" class="op-pill ${desejado.webp && !jaWebP ? "on" : ""} ${pend ? "pendente" : ""}" data-op="webp" ${webpOp ? "" : "disabled"} title="${dicaWebp}">webp</button>
-        <button type="button" class="op-pill ${desejado.marca ? "on" : ""} ${pend ? "pendente" : ""}" data-op="marca" ${processavel ? "" : "disabled"} title="${dicaOp}">marca</button>
+        <span class="rot">nesta imagem</span>
+        <button type="button" class="op-pill ${desejado.webp && !jaWebP ? "on" : ""} ${pend ? "pendente" : ""}" data-op="webp" ${webpOp ? "" : "disabled"} title="${dicaWebp}">otimizar WebP</button>
+        <button type="button" class="op-pill ${desejado.marca ? "on" : ""} ${pend ? "pendente" : ""}" data-op="marca" ${processavel ? "" : "disabled"} title="${dicaOp}">marca d'água</button>
         ${info ? `<span class="op-info ${infoCls}">${esc(info)}</span>` : ""}
       </div>` : ""}
     </div>
@@ -1763,6 +1771,7 @@ function desenharForm() {
 
   try {
     $("#form").innerHTML = `
+      <div class="form-secao-titulo">detalhes do projeto</div>
       <div class="linha">
         <label>área
           <select data-campo="area">
@@ -1801,17 +1810,17 @@ function desenharForm() {
       <section class="midias-bloco">
         <div class="midias-cabecalho">
           <div>
-            <h3>mídias</h3>
-            <p class="dica">envie as imagens e escolha o que processar em cada uma</p>
+            <h3>mídias do projeto</h3>
+            <p class="dica">envie, escolha o que processar e confirme quando terminar</p>
           </div>
           <button type="button" id="add-midia" title="adicionar uma linha de mídia vazia">+ mídia</button>
         </div>
         <div class="import-card">
-          <div class="card-titulo">ao importar <small>vale só para arquivos novos</small></div>
+          <div class="card-titulo passo-titulo"><span class="passo-num">1</span> importar novos arquivos <small>vale só para arquivos novos</small></div>
           <div class="import-opcoes">
             <label class="opcao-check" title="Converte PNG, JPG e BMP para WebP mantendo o teto FullHD. Vale para arquivos novos.">
               <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}>
-              <span><b>otimizar p/ WebP</b><small>reduz PNG, JPG e BMP</small></span>
+              <span><b>otimizar para WebP</b><small>reduz PNG, JPG e BMP</small></span>
             </label>
             <label class="opcao-check" title="Queima a assinatura no centro da imagem, com 20% de opacidade. Vale para arquivos novos.">
               <input type="checkbox" id="opt-marca" ${marcaAtiva() ? "checked" : ""}>
@@ -1820,14 +1829,16 @@ function desenharForm() {
           </div>
           <div class="import-enviar">
             <button type="button" class="arquivo" id="enviar-imagens" title="as imagens entram no fim da lista">+ enviar imagens</button>
-            <span class="dica">adiciona novas linhas ao final</span>
+            <span class="dica">envia e adiciona ao fim da lista</span>
           </div>
         </div>
         <div class="midias-acoes">
-          <button type="button" data-bulk="on" title="Seleciona WebP e marca em todas as imagens deste projeto">marcar tudo</button>
+          <div class="passo-titulo"><span class="passo-num">2</span> revisar e processar</div>
+          <button type="button" data-bulk="on" title="Seleciona as opções disponíveis em todas as imagens deste projeto">marcar tudo</button>
           <button type="button" data-bulk="off" title="Cancela WebP e marca em todas as imagens deste projeto">desmarcar tudo</button>
-          <button type="button" id="marcar-todas-fs" title="Alternar tela cheia no modal">⛶ tela cheia</button>
+          <button type="button" id="marcar-todas-fs" title="Alternar a prévia em tela cheia">⛶ prévia</button>
           <button type="button" id="aplicar-mudancas" class="empurra" ${totalPendencias() ? "" : "disabled"} title="Reprocessa as imagens selecionadas">confirmar mudanças <span id="contador-pend">${totalPendencias()}</span></button>
+          <div class="acoes-dica">Os originais saem do site; as alterações só entram no site ao salvar.</div>
         </div>
         <div id="midias">
         ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
