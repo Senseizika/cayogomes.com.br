@@ -1822,9 +1822,9 @@ function desenharForm() {
               <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}>
               <span><b>otimizar para WebP</b><small>reduz PNG, JPG e BMP</small></span>
             </label>
-            <label class="opcao-check" title="Queima a assinatura no centro da imagem, com 20% de opacidade. Vale para arquivos novos.">
+            <label class="opcao-check" title="Queima a assinatura perto do centro e o gato no canto inferior esquerdo, com 20% de opacidade. Vale para arquivos novos.">
               <input type="checkbox" id="opt-marca" ${marcaAtiva() ? "checked" : ""}>
-              <span><b>marca d'água</b><small>assinatura no centro</small></span>
+              <span><b>marca d'água</b><small>assinatura + gato</small></span>
             </label>
           </div>
           <div class="import-enviar">
@@ -2374,16 +2374,58 @@ function carregarMarcaDagua() {
   return marcaDaguaCarregada;
 }
 
-// Queima a marca no centro do canvas, com 20% de opacidade.
+let marcaGatoCarregada = null;
+
+// O gato vem do favicon.svg do site. O servidor do painel serve a raiz do
+// projeto, então basta buscar o SVG e remover o fundo preto antes de usar.
+async function textoMarcaGato() {
+  for (const url of ["/favicon.svg", "favicon.svg"]) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) return await r.text();
+    } catch (e) {}
+  }
+  throw new Error("svg do gato não carregou");
+}
+
+function carregarMarcaGato() {
+  if (marcaGatoCarregada) return marcaGatoCarregada;
+  marcaGatoCarregada = (async () => {
+    const svg = await textoMarcaGato();
+    const limpo = svg
+      .replace(/<rect\b[^>]*>/i, "")
+      .replace(/<svg\b([^>]*)>/i, (todo, attrs) =>
+        `<svg${attrs}${/\bwidth=/.test(attrs) ? "" : ' width="213" height="213"' }>`);
+    const uri = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(limpo);
+    return new Promise((ok, falha) => {
+      const img = new Image();
+      img.onload = () => ok(img);
+      img.onerror = () => falha(new Error("svg do gato não desenhou"));
+      img.src = uri;
+    });
+  })().catch(e => { marcaGatoCarregada = null; throw e; });
+  return marcaGatoCarregada;
+}
+
+// Assinatura menor, levemente acima/à direita do centro; gato no canto
+// inferior esquerdo. Ambos com 20% de opacidade, queimados nos pixels.
 async function aplicarMarcaDagua(canvas, ctx) {
   try {
-    const img = await carregarMarcaDagua();
-    const largura = canvas.width * 0.2;
-    const proporcao = (img.naturalHeight || 168) / (img.naturalWidth || 356);
-    const altura = largura * proporcao;
+    const [assinatura, gato] = await Promise.all([carregarMarcaDagua(), carregarMarcaGato()]);
     ctx.save();
     ctx.globalAlpha = 0.2;
-    ctx.drawImage(img, (canvas.width - largura) / 2, (canvas.height - altura) / 2, largura, altura);
+
+    const largura = Math.min(canvas.width * 0.11, 240);
+    const proporcao = (assinatura.naturalHeight || 168) / (assinatura.naturalWidth || 356);
+    const altura = largura * proporcao;
+    const x = Math.max(0, Math.min(canvas.width - largura, canvas.width * 0.56 - largura / 2));
+    const y = Math.max(0, Math.min(canvas.height - altura, canvas.height * 0.44 - altura / 2));
+    ctx.drawImage(assinatura, x, y, largura, altura);
+
+    const tamGato = Math.min(canvas.width * 0.06, 96);
+    const margem = Math.max(8, Math.min(canvas.width, canvas.height) * 0.025);
+    ctx.drawImage(gato, margem, canvas.height - margem - tamGato, tamGato, tamGato);
+
     ctx.restore();
     return true;
   } catch (e) {
