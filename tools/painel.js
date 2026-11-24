@@ -454,12 +454,18 @@ const server = http.createServer(async (req, res) => {
           } catch (err) {
             const txt = (err.stdout || '') + '\n' + (err.stderr || '');
             if (/nothing to commit|no changes added/i.test(txt)) {
-              return json(res, 200, { ok: true, log: 'Nenhuma alteração para enviar.' });
+              // Já pode haver commits locais esperando push: não parar por aqui.
+              commitOut = 'Sem alterações locais para commitar.';
+            } else {
+              return json(res, 400, { erro: 'Falha no Git', log: err.stderr || err.stdout || err.message });
             }
-            return json(res, 400, { erro: 'Falha no Git', log: err.stderr || err.stdout || err.message });
           }
           const p = await rodarGit(['push']);
-          return json(res, 200, { ok: true, log: p.stdout || commitOut || 'Enviado para o GitHub com sucesso!' });
+          const enviado = ((p.stdout || '') + '\n' + (p.stderr || '')).trim();
+          return json(res, 200, {
+            ok: true,
+            log: [commitOut, enviado].filter(Boolean).join('\n').trim() || 'Enviado para o GitHub com sucesso!'
+          });
         } catch (err) {
           return json(res, 400, { erro: 'Falha no Git', log: err.stderr || err.stdout || err.message });
         }
