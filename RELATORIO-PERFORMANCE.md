@@ -99,7 +99,7 @@ Mesmo com CPU 4× a rolagem não travou. Tempos totais no mobile lento (via `Per
 | `img/Fundo2/camada1.webp` | 57,1 |
 | `img/Fundo/fundo2.webp` | ~57 |
 
-As miniaturas são servidas na resolução original (ex.: 2560×1440) mas exibidas a ~284×160 no mobile. A biblioteca inteira tem **71 arquivos / 18,8 MB**; o maior é `o-piromante/05.webp` (972 KB). O modal carrega mídias sob demanda — isso já está correto.
+As miniaturas são servidas na resolução original (teto FullHD, ex.: 1920×1080) mas exibidas a ~284×160 no mobile. A biblioteca inteira tem **102 arquivos / 25,9 MB** (101 WebP + 1 PSD); o maior WebP é `o-piromante/05.webp` (587 KB). O modal carrega mídias sob demanda — isso já está correto.
 
 **Compressão (ganho potencial no HTML/JS):**
 
