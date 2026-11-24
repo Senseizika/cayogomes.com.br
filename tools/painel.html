@@ -1590,6 +1590,72 @@ function registrarEstado(src, desejado, origem) {
   gravarMapa(KEY_ESTADO_MIDIA, estadoMidia);
 }
 
+// O original nunca fica em img/projetos depois da marca: ele vai para um
+// backup fora do repo. "origem" passa a ser uma chave desse backup.
+const PREFIXO_BACKUP = "backup:";
+const CHAVE_BACKUP_OK = /^[a-f0-9]{24}$/;
+
+function arquivoDeDataUrl(dados, nome) {
+  const tipo = ((String(dados || "").match(/^data:([^;,]+)/) || [])[1] || "");
+  return fetch(dados).then(r => r.blob()).then(b => new File([b], nome || "original", { type: tipo }));
+}
+function pastaDeMidia(...caminhos) {
+  for (const c of caminhos) {
+    const m = /^img\/projetos\/([^/]+)\//.exec(String(c || ""));
+    if (m) return m[1];
+  }
+  return "acervo";
+}
+function referenciasMidia() {
+  const refs = new Set();
+  for (const p of projetos) {
+    for (const m of (p.media || [])) {
+      for (const campo of ["src", "poster"]) if (m && m[campo]) refs.add(m[campo]);
+    }
+  }
+  return refs;
+}
+async function carregarOriginal(src) {
+  const origem = (estadoMidia[src] || {}).origem || src;
+  if (origem.startsWith(PREFIXO_BACKUP)) {
+    const chave = origem.slice(PREFIXO_BACKUP.length);
+    if (!CHAVE_BACKUP_OK.test(chave)) throw new Error("chave de backup inválida");
+    const r = await api("/api/midia/original?chave=" + encodeURIComponent(chave));
+    return { arquivo: await arquivoDeDataUrl(r.dados, r.nome), origem };
+  }
+  const resp = await fetch("/" + origem);
+  if (!resp.ok) throw new Error("HTTP " + resp.status + " ao ler " + origem);
+  const ext = ((origem.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
+  const nome = origem.split("/").pop() || ("imagem." + ext);
+  return { arquivo: new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" }), origem };
+}
+async function garantirBackups(itens) {
+  const criados = new Map();
+  for (const { origem } of itens) {
+    if (!origem || origem.startsWith(PREFIXO_BACKUP) || criados.has(origem)) continue;
+    const resp = await fetch("/" + origem);
+    if (!resp.ok) throw new Error("HTTP " + resp.status + " ao ler " + origem);
+    const ext = ((origem.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
+    const nome = origem.split("/").pop() || ("imagem." + ext);
+    const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
+    const r = await api("/api/midia/backup", { nome: arquivo.name, dados: await lerBase64(arquivo) });
+    criados.set(origem, PREFIXO_BACKUP + r.chave);
+  }
+  for (const { src, origem } of itens) {
+    if (!criados.has(origem)) continue;
+    const atual = estadoMidia[src] || {};
+    estadoMidia[src] = { webp: !!atual.webp, marca: !!atual.marca, origem: criados.get(origem) };
+  }
+  if (criados.size) gravarMapa(KEY_ESTADO_MIDIA, estadoMidia);
+  return criados;
+}
+async function removerArquivosMidia(caminhos) {
+  const lista = [...new Set(caminhos.filter(c => c && c.startsWith("img/projetos/")))];
+  if (!lista.length) return [];
+  const r = await api("/api/midia/remover", { caminhos: lista });
+  return r.removidos || [];
+}
+
 // Reprocessa somente as imagens com seleção pendente, sempre a partir do
 // arquivo original (guardado em estadoMidia[src].origem), para poder aplicar
 // e também desfazer WebP/marca sem acumular recompressões.
@@ -1601,29 +1667,39 @@ async function aplicarMudancasMidia() {
   const btn = $("#aplicar-mudancas");
   if (btn) btn.disabled = true;
   let ok = 0, falhas = 0;
+  const remover = new Set();
   try {
+    const pares = itens.map(m => ({ src: m.src, origem: (estadoMidia[m.src] || {}).origem || m.src }));
+    const criados = await garantirBackups(pares);
     for (let i = 0; i < itens.length; i++) {
-      const src = itens[i].src;
+      const src = pares[i].src;
+      const origemAntes = pares[i].origem;
       const desejado = desejoMidia(src);
       const origem = (estadoMidia[src] || {}).origem || src;
       status("processando " + (i + 1) + " de " + itens.length + ": " + (src.split("/").pop() || src));
       try {
-        let novoSrc = origem;
+        const { arquivo } = await carregarOriginal(src);
+        let novoSrc = src;
         if (desejado.webp || desejado.marca) {
-          const resp = await fetch("/" + origem);
-          if (!resp.ok) throw new Error("HTTP " + resp.status);
-          const ext = ((origem.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
-          const nome = origem.split("/").pop() || ("imagem." + ext);
-          const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
           const processado = await otimizarImagemWebP(arquivo, desejado);
           if (processado !== arquivo) {
             const r = await api("/api/arquivo", {
-              pasta: (origem.match(/^img\/projetos\/([^/]+)\//) || ["", "acervo"])[1],
+              pasta: pastaDeMidia(src, origem),
               nome: processado.name,
               dados: await lerBase64(processado)
             });
             novoSrc = r.caminho;
+          } else if (desejado.marca) {
+            throw new Error("o navegador não conseguiu aplicar a marca nesta imagem");
           }
+        } else {
+          // Desfazer: reenvia o original do backup como um arquivo novo.
+          const r = await api("/api/arquivo", {
+            pasta: pastaDeMidia(src, origem),
+            nome: arquivo.name,
+            dados: await lerBase64(arquivo)
+          });
+          novoSrc = r.caminho;
         }
         if (novoSrc !== src) {
           for (const pp of projetos) {
@@ -1631,6 +1707,8 @@ async function aplicarMudancasMidia() {
               for (const campo of ["src", "poster"]) if (mm[campo] === src) mm[campo] = novoSrc;
             }
           }
+          remover.add(src);
+          if (criados.has(origemAntes)) remover.add(origemAntes);
         }
         limparPendencia(src);
         delete estadoMidia[src];
@@ -1641,13 +1719,15 @@ async function aplicarMudancasMidia() {
         console.warn("falha ao processar mídia:", src, err);
       }
     }
+    const refs = referenciasMidia();
+    await removerArquivosMidia([...remover].filter(c => !refs.has(c)));
   } finally {
     marcarSujo();
     const rolagem = $("#form").scrollTop;
     desenharForm();
     $("#form").scrollTop = rolagem;
   }
-  status("mídias processadas: " + ok + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Clique em salvar para publicar.", falhas > 0);
+  status("mídias processadas: " + ok + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Originais fora do site; clique em salvar para publicar.", falhas > 0);
 }
 
 function desenharForm() {
@@ -2403,27 +2483,28 @@ $("#marcar-acervo").onclick = async e => {
   const lista = imagensMarcaveis().filter(c => !feitos.has(c));
   if (!lista.length) { status("acervo já marcado (shift+clique para refazer)"); return; }
   if (!confirm("Aplicar a marca em " + lista.length + " imagem(ns) do acervo?\n\n" +
-      "Serão criados arquivos novos e as referências dos projetos serão atualizadas. " +
-      "As imagens são recompressas; mantenha uma cópia se precisar da versão original.\n" +
+      "Serão criados arquivos novos, as referências serão atualizadas e os originais " +
+      "sairão de img/projetos. Cópias locais ficam fora do repositório para você desfazer depois.\n" +
       "Depois clique em salvar e em ↑ push.")) return;
 
   const btn = $("#marcar-acervo");
   btn.disabled = true;
   let ok = 0, falhas = 0;
+  const remover = new Set();
   try {
+    const pares = lista.map(caminho => ({ src: caminho, origem: (estadoMidia[caminho] || {}).origem || caminho }));
+    const criados = await garantirBackups(pares);
     for (let i = 0; i < lista.length; i++) {
       const caminho = lista[i];
+      const origemAntes = pares[i].origem;
+      const origem = (estadoMidia[caminho] || {}).origem || caminho;
       status("marcando " + (i + 1) + " de " + lista.length + ": " + (caminho.split("/").pop() || caminho));
       try {
-        const resp = await fetch("/" + caminho);
-        if (!resp.ok) throw new Error("HTTP " + resp.status);
-        const ext = ((caminho.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
-        const nome = caminho.split("/").pop() || ("imagem." + ext);
-        const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
+        const { arquivo } = await carregarOriginal(caminho);
         const marcada = await otimizarImagemWebP(arquivo, { marca: true, webp: false });
         if (marcada === arquivo) throw new Error("o navegador não processou a imagem");
         const r = await api("/api/arquivo", {
-          pasta: (caminho.match(/^img\/projetos\/([^/]+)\//) || ["", "acervo"])[1],
+          pasta: pastaDeMidia(caminho, origem),
           nome: marcada.name,
           dados: await lerBase64(marcada)
         });
@@ -2434,7 +2515,9 @@ $("#marcar-acervo").onclick = async e => {
         }
         limparPendencia(caminho);
         delete estadoMidia[caminho];
-        registrarEstado(r.caminho, { marca: true, webp: false }, caminho);
+        registrarEstado(r.caminho, { marca: true, webp: false }, origem);
+        remover.add(caminho);
+        if (criados.has(origemAntes)) remover.add(origemAntes);
         feitos.add(caminho);
         feitos.add(r.caminho);
         try { localStorage.setItem(CHAVE_MARCADOS_ACERVO, JSON.stringify([...feitos])); } catch (err) {}
@@ -2444,13 +2527,15 @@ $("#marcar-acervo").onclick = async e => {
         console.warn("marca do acervo falhou:", caminho, err);
       }
     }
+    const refs = referenciasMidia();
+    await removerArquivosMidia([...remover].filter(c => !refs.has(c)));
   } finally {
     btn.disabled = false;
   }
   marcarSujo();
   desenharLista();
   if (projetoAtual()) desenharForm();
-  status("acervo: " + ok + " imagem(ns) marcada(s)" + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Salve e depois ↑ push.", falhas > 0);
+  status("acervo: " + ok + " imagem(ns) marcada(s)" + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Originais fora do site. Salve e depois ↑ push.", falhas > 0);
 };
 
 function pastaDoProjeto(p) {
@@ -2483,12 +2568,25 @@ async function enviarArquivos(lista, alvo, mi0) {
     const original = arquivos[k];
     try {
       const f = await otimizarImagemWebP(original);
+      // O original do arquivo novo nunca entra no repo; guarde uma cópia fora
+      // dele para que "desmarcar + confirmar" consiga restaurar depois.
+      let origemBackup = null;
+      if (f !== original && alvo === "src") {
+        const b = await api("/api/midia/backup", { nome: original.name, dados: await lerBase64(original) });
+        origemBackup = PREFIXO_BACKUP + b.chave;
+      }
       status(arquivos.length > 1 ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name : "enviando " + f.name + "…");
       const dados = await lerBase64(f);
       const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
       if (projetoAtual() !== p) return;
       if (k > 0) { p.media.splice(destino + 1, 0, { type: "image", src: "" }); destino += 1; }
       p.media[destino][alvo] = r.caminho;
+      if (origemBackup && alvo === "src") {
+        registrarEstado(r.caminho, {
+          webp: webpAtivo() && /\.webp$/i.test(f.name),
+          marca: marcaAtiva() && TIPOS_IMAGEM_ESTATICA.test(original.type || "")
+        }, origemBackup);
+      }
       ultimo = r;
       if (alvo === "src" && !WEB_IMG.test(r.caminho)) foraDoSite.push(r.caminho.split("/").pop());
       marcarSujo();

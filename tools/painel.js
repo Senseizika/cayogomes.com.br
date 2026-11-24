@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
+const os = require('os');
 const crypto = require('crypto');
 const { exec, execFile } = require('child_process');
 
@@ -18,6 +19,9 @@ const ARQ_AREAS_JSON = path.join(DIR_CONTEUDO, 'areas.json');
 const ARQ_ORDEM_JSON = path.join(DIR_CONTEUDO, 'ordem-todos.json');
 const ARQ_ORDEM_JS = path.join(DIR_CONTEUDO, 'ordem-todos.js');
 const DIR_IMG = path.join(ROOT, 'img', 'projetos');
+// Originais das imagens marcadas ficam FORA do repositório: se ficassem em
+// img/projetos, qualquer visitante poderia abrir a versão sem marca por URL.
+const DIR_BACKUP_MIDIA = path.resolve(process.env.PAINEL_BACKUP_DIR || path.join(os.homedir(), '.cayogomes-painel', 'midias'));
 const PAINEL_HTML = path.join(__dirname, 'painel.html');
 
 const CABECALHO_JS = '/* GERADO POR tools/painel.js — não edite à mão.\n' +
@@ -246,25 +250,33 @@ function gravar(lista) {
   fs.writeFileSync(ARQ_JS, CABECALHO_JS + 'const PROJECTS = ' + JSON.stringify(lista) + ';\n', 'utf8');
 }
 
-function salvarArquivo(pasta, nomeOriginal, dataUrl) {
+const EXTENSOES_PERMITIDAS = new Set([
+  'webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'bmp', 'tif', 'tiff', 'heic', 'heif', 'jxl', 'psd', 'psb',
+  'mp4', 'webm', 'mov', 'avi', 'mkv',
+  'glb', 'gltf', 'fbx', 'obj',
+  'pdf',
+  'mp3', 'wav', 'ogg', 'flac'
+]);
+
+function decodificarDataUrl(dataUrl) {
   const m = /^data:([^,]*),([\s\S]*)$/.exec(String(dataUrl || ''));
   if (!m) throw new Error('arquivo inválido');
   if (!/;base64$/i.test(m[1])) throw new Error('envio não é base64');
-
   const buf = Buffer.from(m[2], 'base64');
   if (!buf.length) throw new Error('arquivo vazio');
   if (buf.length > 30 * 1024 * 1024) throw new Error('arquivo maior que 30 MB');
+  return buf;
+}
 
-  let ext = String(path.extname(String(nomeOriginal || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (!ext || ext.length > 10) ext = 'bin';
+function extensaoSegura(nome) {
+  let ext = String(path.extname(String(nome || '')).slice(1)).toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!ext || ext.length > 10 || !EXTENSOES_PERMITIDAS.has(ext)) ext = 'bin';
+  return ext;
+}
 
-  const EXTENSOES_PERMITIDAS = new Set([
-    'webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'bmp', 'tif', 'tiff', 'heic', 'heif', 'jxl', 'psd', 'psb',
-    'mp4', 'webm', 'mov', 'avi', 'mkv',
-    'glb', 'gltf', 'fbx', 'obj',
-    'pdf',
-    'mp3', 'wav', 'ogg', 'flac'
-  ]);
+function salvarArquivo(pasta, nomeOriginal, dataUrl) {
+  const buf = decodificarDataUrl(dataUrl);
+  const ext = extensaoSegura(nomeOriginal);
   if (!EXTENSOES_PERMITIDAS.has(ext)) throw new Error('tipo de arquivo não permitido: .' + ext);
 
   const seg = slugify(pasta);
@@ -275,6 +287,48 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
 
   fs.writeFileSync(path.join(dir, arq), buf);
   return { caminho: 'img/projetos/' + seg + '/' + arq, bytes: buf.length };
+}
+
+// ---------- originais fora do repositório ----------
+const CHAVE_BACKUP = /^[a-f0-9]{24}$/;
+
+function backupOriginal(nome, dataUrl) {
+  const buf = decodificarDataUrl(dataUrl);
+  const ext = extensaoSegura(nome);
+  const chave = crypto.randomBytes(12).toString('hex');
+  fs.mkdirSync(DIR_BACKUP_MIDIA, { recursive: true });
+  fs.writeFileSync(path.join(DIR_BACKUP_MIDIA, chave + '.' + ext), buf);
+  return { chave, bytes: buf.length };
+}
+
+function lerBackup(chave) {
+  if (!CHAVE_BACKUP.test(String(chave || ''))) throw new Error('chave de backup inválida');
+  if (!fs.existsSync(DIR_BACKUP_MIDIA)) throw new Error('original não encontrado no backup local');
+  const nome = fs.readdirSync(DIR_BACKUP_MIDIA).find(f => f.startsWith(chave + '.'));
+  if (!nome) throw new Error('original não encontrado no backup local');
+  const abs = path.join(DIR_BACKUP_MIDIA, nome);
+  const buf = fs.readFileSync(abs);
+  const ext = path.extname(nome).slice(1).toLowerCase();
+  const mime = MIME['.' + ext] || 'application/octet-stream';
+  return { dados: 'data:' + mime + ';base64,' + buf.toString('base64'), nome: 'original.' + ext };
+}
+
+function removerArquivosProjeto(caminhos) {
+  const removidos = [];
+  for (const caminho of (Array.isArray(caminhos) ? caminhos : [])) {
+    const rel = String(caminho || '');
+    if (!/^img\/projetos\//i.test(rel)) continue;
+    const abs = path.resolve(ROOT, rel);
+    if (!abs.startsWith(DIR_IMG + path.sep)) continue;
+    try {
+      if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) continue;
+      fs.unlinkSync(abs);
+      removidos.push(rel);
+    } catch (e) {
+      console.log('  erro ao remover ' + rel + ': ' + e.message);
+    }
+  }
+  return removidos;
 }
 
 const MIME = {
@@ -417,6 +471,21 @@ const server = http.createServer(async (req, res) => {
         console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
       }
+      if (rota === '/api/midia/backup' && req.method === 'POST') {
+        const dados = await corpo(req);
+        const r = backupOriginal(dados.nome, dados.dados);
+        console.log(`  original guardado fora do repo: ${r.chave} (${Math.round(r.bytes / 1024)} KB)`);
+        return json(res, 200, r);
+      }
+      if (rota === '/api/midia/original' && req.method === 'GET') {
+        return json(res, 200, lerBackup(url.searchParams.get('chave')));
+      }
+      if (rota === '/api/midia/remover' && req.method === 'POST') {
+        const dados = await corpo(req);
+        const removidos = removerArquivosProjeto(dados.caminhos);
+        if (removidos.length) console.log('  originais removidos do repo: ' + removidos.join(', '));
+        return json(res, 200, { ok: true, removidos });
+      }
       if (rota === '/api/git/pull' && req.method === 'POST') {
         const head = async () => (await rodarGit(['rev-parse', 'HEAD'])).stdout.trim();
         try {
@@ -503,6 +572,7 @@ function subir() {
     const link = `http://127.0.0.1:${porta}/`;
     console.log('\n  PAINEL — cayogomes.com.br');
     console.log('  ' + link);
+    console.log('  backups de originais (fora do repo): ' + DIR_BACKUP_MIDIA);
     console.log('  (Ctrl+C para parar)\n');
     if (ABRIR) exec(`start "" "${link}"`);
   });
