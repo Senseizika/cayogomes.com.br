@@ -304,6 +304,19 @@ function servirArquivo(res, abs, soCabecalho = false) {
   });
 }
 
+// Muda o ?v= dos scripts a cada push para o navegador não misturar
+// HTML novo com content.js/projetos.js antigos do cache do GitHub Pages.
+function carimbarVersao() {
+  const arq = path.join(ROOT, 'index.html');
+  const marca = Date.now().toString(36);
+  const html = fs.readFileSync(arq, 'utf8');
+  const novo = html.replace(
+    /(\b(?:src|href)=")((?:content\.js|conteudo\/projetos\.js|conteudo\/ordem-todos\.js))(?:\?v=[^"]*)?(")/g,
+    (m, abre, arquivo, fecha) => abre + arquivo + '?v=' + marca + fecha
+  );
+  if (novo !== html) fs.writeFileSync(arq, novo);
+}
+
 function rodarGit(args) {
   return new Promise((resolve, reject) => {
     execFile('git', args, { cwd: ROOT, env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }, (err, stdout, stderr) => {
@@ -446,6 +459,7 @@ const server = http.createServer(async (req, res) => {
         const dados = await corpo(req);
         const msg = String(dados.mensagem || 'Atualização via painel').trim() || 'Atualização via painel';
         try {
+          carimbarVersao();
           await rodarGit(['add', '-A']);
           let commitOut = '';
           try {
