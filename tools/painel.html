@@ -181,6 +181,42 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
 
+/* Bloco de mídias: importação + processamento por imagem */
+.midias-bloco{border:1px solid var(--line);border-radius:10px;background:#0a0c0f;padding:.8rem;margin:.2rem 0 1rem}
+.midias-cabecalho{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.75rem}
+.midias-cabecalho h3{margin:0;color:var(--white);font-size:.9rem;letter-spacing:.14em}
+.midias-cabecalho .dica{margin:.2rem 0 0;font-size:.74rem;line-height:1.4}
+.midias-cabecalho #add-midia{margin-left:auto;white-space:nowrap}
+.import-card{border:1px solid var(--line);border-radius:8px;background:#0e1013;padding:.7rem;margin-bottom:.7rem}
+.import-card .card-titulo{font:400 .68rem ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.import-card .card-titulo small{margin-left:auto;color:var(--mute);letter-spacing:0;text-transform:none;font-size:.7rem}
+.import-opcoes{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.opcao-check{display:flex;align-items:flex-start;gap:.5rem;margin:0;padding:.5rem .6rem;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.02);cursor:pointer;text-transform:none;letter-spacing:0;color:var(--white);transition:border-color .15s,background .15s}
+.opcao-check:hover{border-color:var(--mute)}
+.opcao-check:has(input:checked){border-color:var(--accent);background:rgba(239,43,49,.08)}
+.opcao-check input{width:auto;margin:.15rem 0 0;accent-color:var(--accent)}
+.opcao-check b{display:block;font:500 .8rem system-ui,sans-serif}
+.opcao-check small{display:block;font:400 .7rem system-ui,sans-serif;color:var(--mute)}
+.import-enviar{display:flex;align-items:center;gap:.6rem;margin-top:.65rem}
+.import-enviar .arquivo{margin:0}
+.import-enviar .dica{font-size:.72rem;line-height:1.35}
+.midias-acoes{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-bottom:.7rem;padding:.5rem;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.02)}
+.midias-acoes button{padding:.28rem .55rem;font:500 .74rem ui-monospace,Consolas,monospace}
+.midias-acoes .empurra{margin-left:auto}
+#aplicar-mudancas{background:var(--accent);border-color:var(--accent);color:#050506;font-weight:600}
+#aplicar-mudancas:disabled{background:rgba(255,255,255,.06);border-color:var(--line);color:var(--mute)}
+#contador-pend{display:inline-block;min-width:1.2rem;padding:0 .25rem;margin-left:.25rem;border-radius:999px;background:rgba(0,0,0,.25);font-size:.7rem;text-align:center}
+.midia .opcoes{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;margin-top:.55rem;padding-top:.55rem;border-top:1px dashed var(--line)}
+.midia .opcoes .rot{font:400 .64rem ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.op-pill{padding:.2rem .55rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);color:var(--mute);font:500 .7rem ui-monospace,Consolas,monospace;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.op-pill:hover:not(:disabled){border-color:var(--mute);color:var(--white)}
+.op-pill.on{background:rgba(239,43,49,.16);border-color:var(--accent);color:var(--white)}
+.op-pill.pendente{border-style:dashed;border-color:var(--accent)}
+.op-pill:disabled{opacity:.35;cursor:default}
+.op-info{margin-left:auto;font:400 .66rem ui-monospace,Consolas,monospace;color:var(--mute);text-align:right}
+.op-info.aplicado{color:#39d98a}
+.op-info.pendente{color:#f0b429}
+
 .carrossel-opcao{display:flex;gap:.6rem;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;margin-bottom:.7rem;background:#0e1013;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--white)}
 .carrossel-opcao input{width:auto;margin:.15rem 0 0;accent-color:var(--accent)}
 .carrossel-opcao b{display:block;font:500 .84rem system-ui,sans-serif;margin-bottom:.15rem}
@@ -424,9 +460,18 @@ const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
 
 // Identificador estável dos projetos (usado pela ordem do "Todos").
 const idProjeto = p => String(p?.id || slug(p?.title?.pt || p?.title?.en || ""));
+const novoIdProjeto = () => 'p-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
 function garantirIdsProjetos(){
+  // IDs repetidos colapsam no site: o filtro "Todos" usa um Map por id e
+  // descarta a segunda ocorrência. Cura duplicatas antigas também.
+  const vistos = new Set();
   projetos.forEach(p => {
-    if (!p.id) p.id = 'p-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+    let id = String(p.id || "");
+    if (!id || vistos.has(id)) {
+      do { id = novoIdProjeto(); } while (vistos.has(id));
+      p.id = id;
+    }
+    vistos.add(id);
   });
 }
 // Devolve a ordem salva de uma área, descartando projetos removidos e
@@ -1225,6 +1270,7 @@ $("#duplicar").onclick = () => {
   const p = projetoAtual();
   if (!p) return;
   const copia = JSON.parse(JSON.stringify(p));
+  copia.id = novoIdProjeto(); // sem isso o site dedupa os dois pelo mesmo id
   copia.title.pt += " (cópia)";
   copia.title.en += " (copy)";
   const posicao = projetos.indexOf(p);
@@ -1391,6 +1437,15 @@ function linhaMidia(m, i, total) {
   const pAtual = projetoAtual();
   const imagensDoProjeto = (pAtual?.media || []).filter(mm => (mm.type || "image") === "image" && mm.src);
   const preview = ehImg ? m.src : m.poster;
+  const processavel = ehImg && !!m.src && !/^https?:\/\//i.test(m.src) && /\.(png|jpe?g|bmp|webp|avif)$/i.test(m.src);
+  const desejado = m.src ? desejoMidia(m.src) : { webp: false, marca: false };
+  const pend = m.src ? pendenciaMidia(m.src) : false;
+  const aplicado = m.src ? (estadoMidia[m.src] || {}) : {};
+  let info = "";
+  if (aplicado.origem) info = "aplicado: " + [aplicado.marca ? "marca" : "", aplicado.webp ? "webp" : ""].filter(Boolean).join(" + ");
+  if (pend) info = "mudanças pendentes";
+  const infoCls = pend ? "pendente" : (aplicado.origem ? "aplicado" : "");
+  const dicaOp = processavel ? "clique para selecionar; aplique em confirmar mudanças" : "arquivo não processável pelo navegador";
   return `<div class="midia" data-mi="${i}">
     <div class="topo" draggable="true" title="Arraste para reordenar">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
@@ -1416,6 +1471,12 @@ function linhaMidia(m, i, total) {
       </label>` : ""}
       ${preview ? (WEB_IMG.test(preview) ? `<img class="mini" src="/${esc(preview)}" alt="" onclick="window.open('/${esc(preview)}', '_blank')" title="Clique para ampliar">` : `<span class="mini-nao-imagem" title="${esc(preview)}">${esc(String(preview).split("/").pop())}</span>`) : ""}
       ${ehImg && m.src ? `<span class="img-info" data-src="${esc(m.src)}">carregando…</span>` : ""}
+      ${ehImg && m.src ? `<div class="opcoes">
+        <span class="rot">processar</span>
+        <button type="button" class="op-pill ${desejado.webp ? "on" : ""} ${pend ? "pendente" : ""}" data-op="webp" ${processavel ? "" : "disabled"} title="${dicaOp}">webp</button>
+        <button type="button" class="op-pill ${desejado.marca ? "on" : ""} ${pend ? "pendente" : ""}" data-op="marca" ${processavel ? "" : "disabled"} title="${dicaOp}">marca</button>
+        ${info ? `<span class="op-info ${infoCls}">${esc(info)}</span>` : ""}
+      </div>` : ""}
     </div>
   </div>`;
 }
@@ -1459,12 +1520,134 @@ async function atualizarDetalhesImagens() {
   }
 }
 
+// Ambos os processamentos começam desligados. A migração única abaixo evita
+// que uma preferência antiga deixe o painel "pronto para aplicar" sem querer.
+try {
+  if (!localStorage.getItem("painel_import_v2")) {
+    localStorage.setItem("painel_webp", "0");
+    localStorage.setItem("painel_marca", "0");
+    localStorage.setItem("painel_import_v2", "1");
+  }
+} catch (e) {}
+
 function webpAtivo() {
-  try { return localStorage.getItem("painel_webp") !== "0"; } catch (e) { return true; }
+  try { return localStorage.getItem("painel_webp") === "1"; } catch (e) { return false; }
 }
 
 function marcaAtiva() {
-  try { return localStorage.getItem("painel_marca") !== "0"; } catch (e) { return true; }
+  try { return localStorage.getItem("painel_marca") === "1"; } catch (e) { return false; }
+}
+
+// Estado das mídias já processadas e seleções pendentes (somente no navegador;
+// o backend normaliza os projetos e não guarda campos extras).
+const KEY_ESTADO_MIDIA = "painel_midia_estado";
+const KEY_PENDENTE_MIDIA = "painel_midia_pendente";
+function lerMapa(chave) {
+  try {
+    const v = JSON.parse(localStorage.getItem(chave) || "{}");
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  } catch (e) { return {}; }
+}
+function gravarMapa(chave, obj) {
+  try { localStorage.setItem(chave, JSON.stringify(obj)); } catch (e) {}
+}
+let estadoMidia = lerMapa(KEY_ESTADO_MIDIA);
+let pendenteMidia = lerMapa(KEY_PENDENTE_MIDIA);
+
+function desejoMidia(src) {
+  const e = estadoMidia[src] || {}, p = pendenteMidia[src] || {};
+  return {
+    webp: "webp" in p ? !!p.webp : !!e.webp,
+    marca: "marca" in p ? !!p.marca : !!e.marca
+  };
+}
+function pendenciaMidia(src) {
+  const e = estadoMidia[src] || {}, p = pendenteMidia[src] || {};
+  return ("webp" in p && !!p.webp !== !!e.webp) || ("marca" in p && !!p.marca !== !!e.marca);
+}
+function midiaProcessavel(m) {
+  return m && (m.type || "image") === "image" && !!m.src &&
+    !/^https?:\/\//i.test(m.src) && /\.(png|jpe?g|bmp|webp|avif)$/i.test(m.src);
+}
+function totalPendencias() {
+  return (projetoAtual()?.media || []).filter(m => midiaProcessavel(m) && pendenciaMidia(m.src)).length;
+}
+function atualizarContadorPendencias() {
+  const n = totalPendencias();
+  const botao = $("#aplicar-mudancas"), contador = $("#contador-pend");
+  if (contador) contador.textContent = String(n);
+  if (botao) botao.disabled = !n;
+}
+function limparPendencia(src) {
+  if (pendenteMidia[src]) {
+    delete pendenteMidia[src];
+    gravarMapa(KEY_PENDENTE_MIDIA, pendenteMidia);
+  }
+}
+function registrarEstado(src, desejado, origem) {
+  if (src === origem || (!desejado.webp && !desejado.marca)) delete estadoMidia[src];
+  else estadoMidia[src] = { webp: !!desejado.webp, marca: !!desejado.marca, origem };
+  gravarMapa(KEY_ESTADO_MIDIA, estadoMidia);
+}
+
+// Reprocessa somente as imagens com seleção pendente, sempre a partir do
+// arquivo original (guardado em estadoMidia[src].origem), para poder aplicar
+// e também desfazer WebP/marca sem acumular recompressões.
+async function aplicarMudancasMidia() {
+  const p = projetoAtual();
+  if (!p) return;
+  const itens = (p.media || []).filter(m => midiaProcessavel(m) && pendenciaMidia(m.src));
+  if (!itens.length) { status("nenhuma mudança pendente"); return; }
+  const btn = $("#aplicar-mudancas");
+  if (btn) btn.disabled = true;
+  let ok = 0, falhas = 0;
+  try {
+    for (let i = 0; i < itens.length; i++) {
+      const src = itens[i].src;
+      const desejado = desejoMidia(src);
+      const origem = (estadoMidia[src] || {}).origem || src;
+      status("processando " + (i + 1) + " de " + itens.length + ": " + (src.split("/").pop() || src));
+      try {
+        let novoSrc = origem;
+        if (desejado.webp || desejado.marca) {
+          const resp = await fetch("/" + origem);
+          if (!resp.ok) throw new Error("HTTP " + resp.status);
+          const ext = ((origem.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
+          const nome = origem.split("/").pop() || ("imagem." + ext);
+          const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
+          const processado = await otimizarImagemWebP(arquivo, desejado);
+          if (processado !== arquivo) {
+            const r = await api("/api/arquivo", {
+              pasta: (origem.match(/^img\/projetos\/([^/]+)\//) || ["", "acervo"])[1],
+              nome: processado.name,
+              dados: await lerBase64(processado)
+            });
+            novoSrc = r.caminho;
+          }
+        }
+        if (novoSrc !== src) {
+          for (const pp of projetos) {
+            for (const mm of (pp.media || [])) {
+              for (const campo of ["src", "poster"]) if (mm[campo] === src) mm[campo] = novoSrc;
+            }
+          }
+        }
+        limparPendencia(src);
+        delete estadoMidia[src];
+        registrarEstado(novoSrc, desejado, origem);
+        ok++;
+      } catch (err) {
+        falhas++;
+        console.warn("falha ao processar mídia:", src, err);
+      }
+    }
+  } finally {
+    marcarSujo();
+    const rolagem = $("#form").scrollTop;
+    desenharForm();
+    $("#form").scrollTop = rolagem;
+  }
+  status("mídias processadas: " + ok + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Clique em salvar para publicar.", falhas > 0);
 }
 
 function desenharForm() {
@@ -1513,18 +1696,41 @@ function desenharForm() {
       
       <label>matiz (só sem mídia) <input type="number" min="0" max="360" data-campo="h" value="${p.h ?? 0}"></label>
       
-      <h3>mídias <button id="add-midia">+ mídia</button>
-         <button id="marcar-todas-fs">${(p.media||[]).filter(m=>m.type==='image').length && (p.media||[]).filter(m=>m.type==='image').every(m=>m.fullscreen) ? 'desmarcar todas' : 'marcar todas p/ tela cheia'}</button>
-        <label class="toggle-webp" title="Converte PNG, JPG e BMP para WebP na resolução original (só troca se ficar menor)">
-          <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}> otimizar p/ WebP
-        </label>
-        <label class="toggle-webp" title="Queima a assinatura no centro da imagem, com 20% de opacidade. Vale para PNG, JPG, BMP, WebP e AVIF; GIF e vídeos ficam intactos.">
-          <input type="checkbox" id="opt-marca" ${marcaAtiva() ? "checked" : ""}> aplicar marca d'água
-        </label>
-      </h3>
-      <div id="midias">
+      <section class="midias-bloco">
+        <div class="midias-cabecalho">
+          <div>
+            <h3>mídias</h3>
+            <p class="dica">envie as imagens e escolha o que processar em cada uma</p>
+          </div>
+          <button type="button" id="add-midia" title="adicionar uma linha de mídia vazia">+ mídia</button>
+        </div>
+        <div class="import-card">
+          <div class="card-titulo">ao importar <small>vale só para arquivos novos</small></div>
+          <div class="import-opcoes">
+            <label class="opcao-check" title="Converte PNG, JPG e BMP para WebP mantendo o teto FullHD. Vale para arquivos novos.">
+              <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}>
+              <span><b>otimizar p/ WebP</b><small>reduz PNG, JPG e BMP</small></span>
+            </label>
+            <label class="opcao-check" title="Queima a assinatura no centro da imagem, com 20% de opacidade. Vale para arquivos novos.">
+              <input type="checkbox" id="opt-marca" ${marcaAtiva() ? "checked" : ""}>
+              <span><b>marca d'água</b><small>assinatura no centro</small></span>
+            </label>
+          </div>
+          <div class="import-enviar">
+            <button type="button" class="arquivo" id="enviar-imagens" title="as imagens entram no fim da lista">+ enviar imagens</button>
+            <span class="dica">adiciona novas linhas ao final</span>
+          </div>
+        </div>
+        <div class="midias-acoes">
+          <button type="button" data-bulk="on" title="Seleciona WebP e marca em todas as imagens deste projeto">marcar tudo</button>
+          <button type="button" data-bulk="off" title="Cancela WebP e marca em todas as imagens deste projeto">desmarcar tudo</button>
+          <button type="button" id="marcar-todas-fs" title="Alternar tela cheia no modal">⛶ tela cheia</button>
+          <button type="button" id="aplicar-mudancas" class="empurra" ${totalPendencias() ? "" : "disabled"} title="Reprocessa as imagens selecionadas">confirmar mudanças <span id="contador-pend">${totalPendencias()}</span></button>
+        </div>
+        <div id="midias">
         ${(p.media || []).map((m, i) => linhaMidia(m, i, p.media.length)).join("") || '<p class="dica">nenhuma mídia</p>'}
-      </div>`;
+      </div>
+      </section>`;
   } catch (err) {
     console.error("Erro ao renderizar projeto:", err);
     $("#form").innerHTML = `<p class="dica" style="color:red">Erro ao carregar o projeto. Verifique os dados.</p>`;
@@ -1818,7 +2024,7 @@ $("#form").addEventListener("change", async e => {
   }
 });
 
-$("#form").addEventListener("click", e => {
+$("#form").addEventListener("click", async e => {
   const b = e.target.closest("button");
   if (!b) return;
 
@@ -1936,6 +2142,51 @@ $("#form").addEventListener("click", e => {
     desenharForm();
     return;
   }
+  if (b.dataset.op) {
+    const cx = b.closest("[data-mi]");
+    const m = projetoAtual()?.media?.[cx ? +cx.dataset.mi : -1];
+    if (!m || !midiaProcessavel(m)) return;
+    const op = b.dataset.op;
+    const ligar = !desejoMidia(m.src)[op];
+    const pend = { ...(pendenteMidia[m.src] || {}) };
+    if (ligar === !!(estadoMidia[m.src] || {})[op]) delete pend[op];
+    else pend[op] = ligar;
+    if (Object.keys(pend).length) pendenteMidia[m.src] = pend; else delete pendenteMidia[m.src];
+    gravarMapa(KEY_PENDENTE_MIDIA, pendenteMidia);
+    const rolagem = $("#form").scrollTop;
+    desenharForm();
+    $("#form").scrollTop = rolagem;
+    return;
+  }
+  if (b.dataset.bulk) {
+    const ligar = b.dataset.bulk === "on";
+    for (const m of (projetoAtual()?.media || [])) {
+      if (!midiaProcessavel(m)) continue;
+      const pend = { ...(pendenteMidia[m.src] || {}) };
+      for (const op of ["webp", "marca"]) {
+        if (ligar === !!(estadoMidia[m.src] || {})[op]) delete pend[op];
+        else pend[op] = ligar;
+      }
+      if (Object.keys(pend).length) pendenteMidia[m.src] = pend; else delete pendenteMidia[m.src];
+    }
+    gravarMapa(KEY_PENDENTE_MIDIA, pendenteMidia);
+    const rolagem = $("#form").scrollTop;
+    desenharForm();
+    $("#form").scrollTop = rolagem;
+    return;
+  }
+  if (b.id === "enviar-imagens") {
+    const p = projetoAtual();
+    if (!p) return;
+    p.media = p.media || [];
+    abrirSeletor("src", p.media.length);
+    return;
+  }
+  if (b.id === "aplicar-mudancas") {
+    await aplicarMudancasMidia();
+    return;
+  }
+
   const caixa = b.closest("[data-mi]");
   const mi = caixa ? +caixa.dataset.mi : -1;
   const media = projetoAtual()?.media || [];
@@ -2064,14 +2315,17 @@ async function desenharNoCanvas(file) {
 
 // Nome mantido por compatibilidade: além do WebP, agora queima a marca d'água
 // mesmo com a otimização desligada (reexportando no formato original).
-async function otimizarImagemWebP(file, forcarMarca = false) {
+async function otimizarImagemWebP(file, opcoes = null) {
+  // opcoes = { webp, marca } força o processamento desta imagem; um booleano
+  // legado significa "forçar marca" (usado pela marcação do acervo).
+  const escolha = typeof opcoes === "boolean" ? { marca: opcoes } : (opcoes && typeof opcoes === "object" ? opcoes : {});
   const tipoOriginal = file.type || "";
   const tipo = /^image\/jpg$/i.test(tipoOriginal) ? "image/jpeg" : tipoOriginal;
   const converter = /^image\/(png|jpeg|bmp)$/i.test(tipo);
   const jaWebP = /^image\/webp$/i.test(tipo);
   const estatica = TIPOS_IMAGEM_ESTATICA.test(tipo);
-  const webp = webpAtivo();
-  const marcar = estatica && (forcarMarca || marcaAtiva());
+  const webp = "webp" in escolha ? !!escolha.webp : webpAtivo();
+  const marcar = estatica && ("marca" in escolha ? !!escolha.marca : marcaAtiva());
 
   // GIF, vídeo, PDF, 3D e tipos desconhecidos passam intactos.
   if (!estatica) return file;
@@ -2166,7 +2420,7 @@ $("#marcar-acervo").onclick = async e => {
         const ext = ((caminho.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
         const nome = caminho.split("/").pop() || ("imagem." + ext);
         const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
-        const marcada = await otimizarImagemWebP(arquivo, true);
+        const marcada = await otimizarImagemWebP(arquivo, { marca: true, webp: false });
         if (marcada === arquivo) throw new Error("o navegador não processou a imagem");
         const r = await api("/api/arquivo", {
           pasta: (caminho.match(/^img\/projetos\/([^/]+)\//) || ["", "acervo"])[1],
@@ -2178,6 +2432,9 @@ $("#marcar-acervo").onclick = async e => {
             for (const campo of ["src", "poster"]) if (m[campo] === caminho) m[campo] = r.caminho;
           }
         }
+        limparPendencia(caminho);
+        delete estadoMidia[caminho];
+        registrarEstado(r.caminho, { marca: true, webp: false }, caminho);
         feitos.add(caminho);
         feitos.add(r.caminho);
         try { localStorage.setItem(CHAVE_MARCADOS_ACERVO, JSON.stringify([...feitos])); } catch (err) {}
