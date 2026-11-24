@@ -228,6 +228,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
     <a href="/site" target="_blank">abrir site ↗</a>
     <button id="git-pull" class="git pull" title="Baixar as últimas alterações do GitHub (git pull)">↓ pull</button>
     <button id="git-push" class="git push" title="Salvar e enviar para o GitHub (git push)">↑ push</button>
+    <button id="marcar-acervo" title="Aplicar a marca d'água nas imagens já salvas. Shift+clique refaz as já marcadas.">✎ marcar acervo</button>
     <button id="novo">+ projeto</button>
     <button id="novo-carrossel" title="novo projeto com as imagens em sequência contínua">+ carrossel</button>
     <button id="salvar" class="pri">salvar</button>
@@ -2063,14 +2064,14 @@ async function desenharNoCanvas(file) {
 
 // Nome mantido por compatibilidade: além do WebP, agora queima a marca d'água
 // mesmo com a otimização desligada (reexportando no formato original).
-async function otimizarImagemWebP(file) {
+async function otimizarImagemWebP(file, forcarMarca = false) {
   const tipoOriginal = file.type || "";
   const tipo = /^image\/jpg$/i.test(tipoOriginal) ? "image/jpeg" : tipoOriginal;
   const converter = /^image\/(png|jpeg|bmp)$/i.test(tipo);
   const jaWebP = /^image\/webp$/i.test(tipo);
   const estatica = TIPOS_IMAGEM_ESTATICA.test(tipo);
   const webp = webpAtivo();
-  const marcar = estatica && marcaAtiva();
+  const marcar = estatica && (forcarMarca || marcaAtiva());
 
   // GIF, vídeo, PDF, 3D e tipos desconhecidos passam intactos.
   if (!estatica) return file;
@@ -2112,6 +2113,88 @@ async function otimizarImagemWebP(file) {
   const nome = destino === tipo ? file.name : base + (ext || (file.name.match(/\.[^.]+$/) || [""])[0]);
   return new File([blob], nome, { type: destino });
 }
+
+// Marca em massa das imagens já salvas no acervo — tudo no navegador:
+// lê cada arquivo, passa pelo mesmo fluxo de marca e grava via /api/arquivo.
+const MIME_IMAGEM = {
+  png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg",
+  bmp: "image/bmp", webp: "image/webp", avif: "image/avif"
+};
+const CHAVE_MARCADOS_ACERVO = "painel_marca_acervo";
+
+function imagensMarcaveis() {
+  const achados = new Set();
+  for (const p of projetos) {
+    for (const m of (p.media || [])) {
+      for (const campo of ["src", "poster"]) {
+        const v = m && m[campo];
+        if (typeof v !== "string" || /^https?:\/\//i.test(v)) continue;
+        if (/\.(png|jpe?g|bmp|webp|avif)$/i.test(v)) achados.add(v);
+      }
+    }
+  }
+  return [...achados];
+}
+
+function jaMarcadosNoAcervo() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CHAVE_MARCADOS_ACERVO) || "[]");
+    return new Set(Array.isArray(v) ? v : []);
+  } catch (e) { return new Set(); }
+}
+
+$("#marcar-acervo").onclick = async e => {
+  const refazer = e.shiftKey;
+  const feitos = refazer ? new Set() : jaMarcadosNoAcervo();
+  const lista = imagensMarcaveis().filter(c => !feitos.has(c));
+  if (!lista.length) { status("acervo já marcado (shift+clique para refazer)"); return; }
+  if (!confirm("Aplicar a marca em " + lista.length + " imagem(ns) do acervo?\n\n" +
+      "Serão criados arquivos novos e as referências dos projetos serão atualizadas. " +
+      "As imagens são recompressas; mantenha uma cópia se precisar da versão original.\n" +
+      "Depois clique em salvar e em ↑ push.")) return;
+
+  const btn = $("#marcar-acervo");
+  btn.disabled = true;
+  let ok = 0, falhas = 0;
+  try {
+    for (let i = 0; i < lista.length; i++) {
+      const caminho = lista[i];
+      status("marcando " + (i + 1) + " de " + lista.length + ": " + (caminho.split("/").pop() || caminho));
+      try {
+        const resp = await fetch("/" + caminho);
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        const ext = ((caminho.match(/\.([^.]+)$/) || ["", ""])[1] || "").toLowerCase();
+        const nome = caminho.split("/").pop() || ("imagem." + ext);
+        const arquivo = new File([await resp.arrayBuffer()], nome, { type: MIME_IMAGEM[ext] || "" });
+        const marcada = await otimizarImagemWebP(arquivo, true);
+        if (marcada === arquivo) throw new Error("o navegador não processou a imagem");
+        const r = await api("/api/arquivo", {
+          pasta: (caminho.match(/^img\/projetos\/([^/]+)\//) || ["", "acervo"])[1],
+          nome: marcada.name,
+          dados: await lerBase64(marcada)
+        });
+        for (const p of projetos) {
+          for (const m of (p.media || [])) {
+            for (const campo of ["src", "poster"]) if (m[campo] === caminho) m[campo] = r.caminho;
+          }
+        }
+        feitos.add(caminho);
+        feitos.add(r.caminho);
+        try { localStorage.setItem(CHAVE_MARCADOS_ACERVO, JSON.stringify([...feitos])); } catch (err) {}
+        ok++;
+      } catch (err) {
+        falhas++;
+        console.warn("marca do acervo falhou:", caminho, err);
+      }
+    }
+  } finally {
+    btn.disabled = false;
+  }
+  marcarSujo();
+  desenharLista();
+  if (projetoAtual()) desenharForm();
+  status("acervo: " + ok + " imagem(ns) marcada(s)" + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Salve e depois ↑ push.", falhas > 0);
+};
 
 function pastaDoProjeto(p) {
   for (const m of (p.media || [])) {
