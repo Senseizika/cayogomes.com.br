@@ -1462,6 +1462,10 @@ function webpAtivo() {
   try { return localStorage.getItem("painel_webp") !== "0"; } catch (e) { return true; }
 }
 
+function marcaAtiva() {
+  try { return localStorage.getItem("painel_marca") !== "0"; } catch (e) { return true; }
+}
+
 function desenharForm() {
   const p = projetoAtual();
   if (!p) { $("#form").innerHTML = ''; return; }
@@ -1512,6 +1516,9 @@ function desenharForm() {
          <button id="marcar-todas-fs">${(p.media||[]).filter(m=>m.type==='image').length && (p.media||[]).filter(m=>m.type==='image').every(m=>m.fullscreen) ? 'desmarcar todas' : 'marcar todas p/ tela cheia'}</button>
         <label class="toggle-webp" title="Converte PNG, JPG e BMP para WebP na resolução original (só troca se ficar menor)">
           <input type="checkbox" id="opt-webp" ${webpAtivo() ? "checked" : ""}> otimizar p/ WebP
+        </label>
+        <label class="toggle-webp" title="Queima a assinatura no centro da imagem, com 20% de opacidade. Vale para PNG, JPG, BMP, WebP e AVIF; GIF e vídeos ficam intactos.">
+          <input type="checkbox" id="opt-marca" ${marcaAtiva() ? "checked" : ""}> aplicar marca d'água
         </label>
       </h3>
       <div id="midias">
@@ -1749,6 +1756,10 @@ $("#form").addEventListener("change", async e => {
     try { localStorage.setItem("painel_webp", e.target.checked ? "1" : "0"); } catch (err) {}
     return;
   }
+  if (e.target.id === "opt-marca") {
+    try { localStorage.setItem("painel_marca", e.target.checked ? "1" : "0"); } catch (err) {}
+    return;
+  }
   const tipo = e.target.closest('[data-mcampo="type"]');
   if (tipo) {
     const mi = +tipo.closest("[data-mi]").dataset.mi;
@@ -1975,24 +1986,59 @@ seletor.addEventListener("change", () => {
 // Mantém a proporção original e nunca amplia imagens menores.
 const LIMITE_W = 1920, LIMITE_H = 1080;
 
-async function otimizarImagemWebP(file) {
-  if (!webpAtivo()) return file;
-  const tipo = file.type || "";
-  const converter = /^image\/(png|jpeg|bmp)$/i.test(tipo);
-  const jaWebP = /^image\/webp$/i.test(tipo);
-  if (!converter && !jaWebP) return file;
+// Imagens estáticas que podem receber a marca (GIF fica de fora: pode ser animado).
+const TIPOS_IMAGEM_ESTATICA = /^image\/(png|jpe?g|bmp|webp|avif)$/i;
+
+// A marca é a assinatura "Cayo" embutida em tools/assets/Atlas.svg (elemento
+// _Image1, 356×168). O servidor do painel não expõe /tools/..., então o PNG
+// vai embutido aqui; para atualizar, troque o data URI abaixo.
+const MARCA_DAGUA_PNG = "data:image/png;base64,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";
+
+let marcaDaguaCarregada = null;
+
+function carregarMarcaDagua() {
+  if (marcaDaguaCarregada) return marcaDaguaCarregada;
+  marcaDaguaCarregada = new Promise((ok, falha) => {
+    const img = new Image();
+    img.onload = () => ok(img);
+    img.onerror = () => { marcaDaguaCarregada = null; falha(new Error("imagem da marca não carregou")); };
+    img.src = MARCA_DAGUA_PNG;
+  });
+  return marcaDaguaCarregada;
+}
+
+// Queima a marca no centro do canvas, com 20% de opacidade.
+async function aplicarMarcaDagua(canvas, ctx) {
+  try {
+    const img = await carregarMarcaDagua();
+    const largura = canvas.width * 0.2;
+    const proporcao = (img.naturalHeight || 168) / (img.naturalWidth || 356);
+    const altura = largura * proporcao;
+    ctx.save();
+    ctx.globalAlpha = 0.2;
+    ctx.drawImage(img, (canvas.width - largura) / 2, (canvas.height - altura) / 2, largura, altura);
+    ctx.restore();
+    return true;
+  } catch (e) {
+    console.warn("marca d'água não aplicada:", e);
+    return false;
+  }
+}
+
+// Desenha o arquivo no canvas já com o teto FullHD (mesma conta de antes).
+async function desenharNoCanvas(file) {
   let bmp = null, url = null;
   try {
     const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     let srcW, srcH;
     if (typeof createImageBitmap === "function") {
       bmp = await createImageBitmap(file);
       srcW = bmp.width; srcH = bmp.height;
-      if (jaWebP && srcW <= LIMITE_W && srcH <= LIMITE_H) return file;
       const scale = Math.min(1, LIMITE_W / srcW, LIMITE_H / srcH);
       canvas.width = Math.round(srcW * scale);
       canvas.height = Math.round(srcH * scale);
-      canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
     } else {
       url = URL.createObjectURL(file);
       const img = await new Promise((res, rej) => {
@@ -2003,26 +2049,68 @@ async function otimizarImagemWebP(file) {
       });
       srcW = img.naturalWidth || img.width;
       srcH = img.naturalHeight || img.height;
-      if (jaWebP && srcW <= LIMITE_W && srcH <= LIMITE_H) return file;
       const scale = Math.min(1, LIMITE_W / srcW, LIMITE_H / srcH);
       canvas.width = Math.round(srcW * scale);
       canvas.height = Math.round(srcH * scale);
-      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
-    const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.92));
-    // Para PNG/JPEG/BMP só troca se o WebP ficar menor; para WebP grande,
-    // o teto tem prioridade mesmo que o arquivo resultante fique um pouco maior.
-    if (blob && blob.size > 0 && (jaWebP || blob.size < file.size)) {
-      const base = file.name.replace(/\.[^.]+$/, "") || "imagem";
-      return new File([blob], base + ".webp", { type: "image/webp" });
-    }
-  } catch (e) {
-    // Se falhar a conversão no navegador, envia o arquivo original
+    return { canvas, ctx, srcW, srcH };
   } finally {
     if (bmp && typeof bmp.close === "function") bmp.close();
     if (url) URL.revokeObjectURL(url);
   }
-  return file;
+}
+
+// Nome mantido por compatibilidade: além do WebP, agora queima a marca d'água
+// mesmo com a otimização desligada (reexportando no formato original).
+async function otimizarImagemWebP(file) {
+  const tipoOriginal = file.type || "";
+  const tipo = /^image\/jpg$/i.test(tipoOriginal) ? "image/jpeg" : tipoOriginal;
+  const converter = /^image\/(png|jpeg|bmp)$/i.test(tipo);
+  const jaWebP = /^image\/webp$/i.test(tipo);
+  const estatica = TIPOS_IMAGEM_ESTATICA.test(tipo);
+  const webp = webpAtivo();
+  const marcar = estatica && marcaAtiva();
+
+  // GIF, vídeo, PDF, 3D e tipos desconhecidos passam intactos.
+  if (!estatica) return file;
+  // WebP desligado e sem marca: nada a fazer.
+  if (!webp && !marcar) return file;
+  // Com WebP ligado, sem marca, só PNG/JPEG/BMP/WebP são processados.
+  if (!marcar && !(converter || jaWebP)) return file;
+
+  let desenho;
+  try {
+    desenho = await desenharNoCanvas(file);
+  } catch (e) {
+    // Se falhar o desenho no navegador, envia o arquivo original.
+    return file;
+  }
+  const { canvas, ctx, srcW, srcH } = desenho;
+
+  // WebP já dentro do teto e sem marca não precisa ser reencodado (regra antiga).
+  if (!marcar && jaWebP && srcW <= LIMITE_W && srcH <= LIMITE_H) return file;
+
+  if (marcar) await aplicarMarcaDagua(canvas, ctx);
+
+  const usarWebP = webp && (converter || jaWebP);
+  let destino = usarWebP ? "image/webp" : tipo;
+  let blob = await new Promise(res => canvas.toBlob(res, destino, 0.92));
+
+  // Alguns navegadores não exportam BMP/AVIF: cai para PNG para não perder a marca.
+  if (!blob && marcar && destino !== "image/png") {
+    destino = "image/png";
+    blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+  }
+  if (!blob || !blob.size) return file;
+
+  // Sem marca, mantém a regra antiga: PNG/JPEG/BMP só trocam se o WebP ficar menor.
+  if (!marcar && !jaWebP && blob.size >= file.size) return file;
+
+  const base = file.name.replace(/\.[^.]+$/, "") || "imagem";
+  const ext = { "image/webp": ".webp", "image/png": ".png", "image/jpeg": ".jpg", "image/avif": ".avif" }[destino];
+  const nome = destino === tipo ? file.name : base + (ext || (file.name.match(/\.[^.]+$/) || [""])[0]);
+  return new File([blob], nome, { type: destino });
 }
 
 function pastaDoProjeto(p) {
