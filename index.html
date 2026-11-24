@@ -252,7 +252,9 @@ a{color:inherit}
 .cta-kicker{font:400 .72rem/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .cta-main{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.7rem 1.6rem;background:var(--accent);border:1px solid var(--accent);border-radius:6px;color:#050506;font:700 .9rem var(--mono);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:filter .2s}
 .cta-main:hover{filter:brightness(1.12)}
-.cta-mail{font:400 .74rem/1.3 var(--mono);color:var(--mute);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.cta-acoes{display:flex;flex-direction:column;align-items:stretch;gap:.6rem;width:fit-content;max-width:100%}
+.cta-main{width:100%}
+.cta-mail{display:flex;align-items:center;justify-content:center;width:100%;min-height:32px;padding:0 .4rem 2px;font:400 .85rem/1.3 var(--mono);color:var(--mute);text-decoration:none;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
 .cta-mail:hover{color:var(--accent);border-color:var(--accent)}
 
 /* grid institucional estilo pôster (sobre + player + contato) */
@@ -264,7 +266,7 @@ a{color:inherit}
 .about{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(.8rem,2vw,1.5rem);padding:clamp(1.2rem,3vw,2.2rem)}
 .about-side{display:flex;flex-direction:column;align-items:flex-end;gap:1.4rem;color:var(--mute)}
 .vert-tag{writing-mode:vertical-rl;transform:rotate(180deg);font:400 .72rem/1 var(--mono);letter-spacing:.42em;color:var(--accent);opacity:.7;white-space:nowrap;user-select:none}
-.pitch-lg{font:400 clamp(2.6rem,5.5vw,4.5rem)/.96 var(--big);letter-spacing:.02em;max-width:13ch;margin-bottom:1rem}
+.pitch-lg{font:400 clamp(2.6rem,5.5vw,4.5rem)/.96 var(--big);letter-spacing:.02em;max-width:22ch;margin-bottom:1rem;white-space:pre-line;text-transform:uppercase}
 .about-copy{max-width:58ch}
 .about-copy+.about-copy{margin-top:.85rem}
 .about-hr{border:0;height:1px;background:rgba(255,255,255,.5);margin:1.4rem 0 1rem}
@@ -299,6 +301,7 @@ a{color:inherit}
 .pl-btn.main .pl-ico{width:22px;height:22px}
 
 /* contato (janela direita do pôster) */
+.contact .bar{justify-content:flex-end}
 .contact-body{position:relative;padding:clamp(1.2rem,3vw,1rem);text-align:center}
 .contact-chev{color:var(--mute);margin-bottom:.75rem;display:flex;justify-content:center}
 .contact-chev svg{width:26px;height:15px}
@@ -595,8 +598,11 @@ dialog[open]{animation:in .22s ease-out}
   .d-stage{height: 70vh; min-height: 260px; }
   .d-nav{width:auto;height:auto}
   .d-thumb{height:48px;min-width:64px}
-  .d-header{padding:.8rem .9rem;gap:.75rem}
-  .d-header #d-title{font-size:clamp(1.8rem,9vw,2.2rem)}
+  .pitch-lg{font-size:clamp(1.9rem,8vw,2.8rem);max-width:none}
+  .d-header{flex-wrap:wrap;padding:.8rem .9rem;gap:.6rem}
+  .d-header-copy{flex:1 1 100%}
+  .d-cta{flex:1 1 100%;justify-content:flex-end}
+  .d-header #d-title{font-size:clamp(1.6rem,7vw,2rem);line-height:1}
 }
 /* Toque: amplia a área sensível ao dedo SEM mudar o tamanho visual dos botões.
    O pseudo-elemento é transparente e faz parte do botão, então qualquer toque
@@ -694,7 +700,7 @@ dialog[open]{animation:in .22s ease-out}
     <div class="side-col">
       <!-- SEÇÃO CONTATO (edite o número do WhatsApp e o e-mail abaixo) -->
       <section class="win contact" id="contato">
-        <div class="bar"><span data-i18n="contact_bar"></span><span class="win-ctl" aria-hidden="true"><i></i><b></b></span></div>
+        <div class="bar"><span class="win-ctl" aria-hidden="true"><i></i><b></b></span></div>
         <div class="contact-body">
           <span class="hud-plus tr" aria-hidden="true"></span>
           <span class="hud-plus bl" aria-hidden="true"></span>
@@ -1167,8 +1173,10 @@ function blocoCTA(){
   const u = UI[lang];
   return `<div class="cta-bloco">
     <span class="cta-kicker">${esc(u.quote)}</span>
-    <a class="cta-main" href="${esc(waLink(textoWa()))}" target="_blank" rel="noopener">${esc(u.cta_titulo)}</a>
-    <a class="cta-mail" href="mailto:cayogomes.99@gmail.com">cayogomes.99@gmail.com</a>
+    <div class="cta-acoes">
+      <a class="cta-main" href="${esc(waLink(textoWa()))}" target="_blank" rel="noopener">${esc(u.cta_titulo)}</a>
+      <a class="cta-mail" href="mailto:cayogomes.99@gmail.com">cayogomes.99@gmail.com</a>
+    </div>
   </div>`;
 }
 
