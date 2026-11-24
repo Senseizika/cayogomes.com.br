@@ -191,17 +191,17 @@ a{color:inherit}
 /* o preenchimento do hover só em aparelhos com mouse: no toque ele ficaria aceso */
 @media(hover:hover){#lang:hover{background:var(--accent);color:var(--ink)}} /* texto escuro: o destaque é claro */
 
-/* hero = linha de função + logo + etiqueta vertical; código de barras real (URL) abaixo */
+/* hero = linha de função + logo + código de barras no canto (tamanho próprio) */
 .hero{position:relative;overflow:hidden;padding:clamp(.25rem,.8vw,.6rem) 0 clamp(.8rem,2vw,1.2rem)}
 .hero-row{position:relative;display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.8vw,24px);width:fit-content;max-width:100%;margin-inline:auto}
 .hero-logo{display:block;margin:0;line-height:0;flex:0 1 auto;min-width:0}
 .hero-logo img{display:block;width:auto;height:auto;max-width:100%;max-height:var(--logo-max-h);object-fit:contain}
-/* etiqueta vertical ao lado da logo; --bc-h manda no tamanho da fonte. */
+/* código de barras: travado proporcionalmente com a logo (33% da altura da logo),
+   aumentado em 10% e alinhado verticalmente à direita dela. Escala junto com a tela.
+   --bc-h manda no tamanho de tudo. */
 .hero-barcode{--bc-h:clamp(46px,min(calc(var(--logo-max-h)*.33),12.5vw),165px);flex:0 0 auto;height:var(--bc-h);width:auto;display:flex;align-items:stretch;gap:calc(var(--bc-h)*.052);color:var(--accent);opacity:.7;user-select:none;pointer-events:none}
-.bc-txt{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 clamp(9px,calc(var(--bc-h)*.093),15px)/1 var(--mono);letter-spacing:.1em;white-space:nowrap}
-/* Code 128 real com a URL do site; fundo claro para manter o contraste de leitura. */
-.hero-scan{width:min(620px,88vw);margin:.9rem auto 0;padding:clamp(6px,.7vw,9px) clamp(8px,1vw,12px);background:#f2efe8;border-radius:3px;color:#07090d;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
-.bc-real{display:block;width:100%;height:clamp(34px,4.4vw,54px)}
+.bc-bars{flex:0 0 calc(var(--bc-h)*.206);height:100%;width:calc(var(--bc-h)*.206);display:block}
+.bc-txt{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);font:400 calc(var(--bc-h)*.093)/1 var(--mono);letter-spacing:.1em;white-space:nowrap}
 /* fundo em duas camadas: ocupa a largura da tela, começa no topo da página e sobe
    mais devagar que ela (parallax). As duas camadas têm sempre o mesmo tamanho. */
 .fundo-clip{position:absolute;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
@@ -636,7 +636,7 @@ dialog[open]{animation:in .22s ease-out}
 <!-- camadas do fundo (as imagens são sorteadas pelo JS no fim do arquivo) -->
 <div class="fundo-clip" aria-hidden="true"><div class="fundo"><img class="f1" alt="" decoding="async"><img class="f2" alt="" decoding="async"></div></div>
 
-<!-- HERO (capa do topo): logo + etiqueta vertical + Code 128 real com a URL do site -->
+<!-- HERO (capa do topo): logo + código de barras vertical da mesma altura + linha de função -->
 <header class="hero" id="top">
   <div class="wrap">
     <div class="sub">
@@ -646,12 +646,9 @@ dialog[open]{animation:in .22s ease-out}
     <div class="hero-row">
       <h1 class="hero-logo"><img src="img/cayo_gomes.webp" width="1920" height="842" alt="Cayo Gomes" fetchpriority="high" decoding="async"></h1>
       <div class="hero-barcode" aria-hidden="true">
+        <svg class="bc-bars" viewBox="0 0 24 200" preserveAspectRatio="none"><path fill="currentColor" d="M0 0h24v2H0zM0 3h24v1H0zM0 6h24v1H0zM0 11h24v3H0zM0 15h24v1H0zM0 17h24v2H0zM0 22h24v1H0zM0 26h24v2H0zM0 29h24v1H0zM0 33h24v1H0zM0 35h24v3H0zM0 41h24v2H0zM0 44h24v1H0zM0 46h24v2H0zM0 51h24v1H0zM0 55h24v1H0zM0 59h24v2H0zM0 62h24v1H0zM0 66h24v1H0zM0 69h24v2H0zM0 72h24v3H0zM0 77h24v2H0zM0 80h24v3H0zM0 84h24v1H0zM0 88h24v1H0zM0 92h24v2H0zM0 95h24v1H0zM0 99h24v2H0zM0 102h24v2H0zM0 106h24v2H0zM0 110h24v1H0zM0 112h24v1H0zM0 116h24v2H0zM0 121h24v2H0zM0 124h24v2H0zM0 128h24v2H0zM0 132h24v1H0zM0 134h24v1H0zM0 138h24v2H0zM0 143h24v1H0zM0 147h24v2H0zM0 150h24v3H0zM0 154h24v1H0zM0 156h24v3H0zM0 160h24v2H0zM0 165h24v1H0zM0 167h24v1H0zM0 171h24v2H0zM0 176h24v1H0zM0 178h24v2H0zM0 181h24v3H0zM0 187h24v2H0zM0 192h24v3H0zM0 196h24v1H0zM0 198h24v2H0z"/></svg>
         <span class="bc-txt" data-i18n="soul"></span>
       </div>
-    </div>
-    <!-- Code 128 real com https://cayogomes.com.br (regerar se o domínio mudar) -->
-    <div class="hero-scan" aria-hidden="true">
-      <svg class="bc-real" viewBox="0 0 319 30" preserveAspectRatio="none" shape-rendering="crispEdges"><path fill="currentColor" d="M10 0h2v30H10zM13 0h1v30H13zM16 0h1v30H16zM21 0h1v30H21zM24 0h2v30H24zM30 0h1v30H30zM32 0h1v30H32zM35 0h4v30H35zM40 0h1v30H40zM43 0h1v30H43zM46 0h4v30H46zM51 0h1v30H51zM54 0h1v30H54zM56 0h1v30H56zM59 0h4v30H59zM65 0h1v30H65zM67 0h4v30H67zM73 0h1v30H73zM76 0h3v30H76zM81 0h1v30H81zM84 0h2v30H84zM87 0h1v30H87zM89 0h3v30H89zM94 0h2v30H94zM98 0h1v30H98zM100 0h3v30H100zM105 0h2v30H105zM109 0h1v30H109zM114 0h1v30H114zM116 0h2v30H116zM120 0h1v30H120zM123 0h1v30H123zM125 0h2v30H125zM131 0h2v30H131zM134 0h2v30H134zM137 0h4v30H137zM142 0h1v30H142zM146 0h4v30H146zM151 0h1v30H151zM153 0h1v30H153zM156 0h2v30H156zM159 0h1v30H159zM164 0h1v30H164zM168 0h4v30H168zM173 0h1v30H173zM175 0h4v30H175zM180 0h3v30H180zM184 0h1v30H184zM186 0h1v30H186zM188 0h2v30H188zM192 0h1v30H192zM197 0h1v30H197zM199 0h4v30H199zM205 0h1v30H205zM208 0h1v30H208zM211 0h2v30H211zM215 0h3v30H215zM219 0h1v30H219zM224 0h1v30H224zM226 0h2v30H226zM230 0h1v30H230zM234 0h4v30H234zM239 0h1v30H239zM241 0h4v30H241zM246 0h3v30H246zM250 0h1v30H250zM252 0h1v30H252zM255 0h2v30H255zM259 0h3v30H259zM263 0h1v30H263zM266 0h1v30H266zM271 0h2v30H271zM274 0h1v30H274zM277 0h1v30H277zM280 0h4v30H280zM285 0h2v30H285zM288 0h3v30H288zM294 0h1v30H294zM296 0h2v30H296zM301 0h3v30H301zM305 0h1v30H305zM307 0h2v30H307z"/></svg>
     </div>
   </div>
 </header>
@@ -1056,6 +1053,11 @@ function pick(id, push){
   }
 }
 
+const BC_PATHS = {
+  pt: { d: "M0 0h24v2H0zM0 3h24v1H0zM0 6h24v1H0zM0 11h24v3H0zM0 15h24v1H0zM0 17h24v2H0zM0 22h24v1H0zM0 26h24v2H0zM0 29h24v1H0zM0 33h24v1H0zM0 35h24v3H0zM0 41h24v2H0zM0 44h24v1H0zM0 46h24v2H0zM0 51h24v1H0zM0 55h24v1H0zM0 59h24v2H0zM0 62h24v1H0zM0 66h24v1H0zM0 69h24v2H0zM0 72h24v3H0zM0 77h24v2H0zM0 80h24v3H0zM0 84h24v1H0zM0 88h24v1H0zM0 92h24v2H0zM0 95h24v1H0zM0 99h24v2H0zM0 102h24v2H0zM0 106h24v2H0zM0 110h24v1H0zM0 112h24v1H0zM0 116h24v2H0zM0 121h24v2H0zM0 124h24v2H0zM0 128h24v2H0zM0 132h24v1H0zM0 134h24v1H0zM0 138h24v2H0zM0 143h24v1H0zM0 147h24v2H0zM0 150h24v3H0zM0 154h24v1H0zM0 156h24v3H0zM0 160h24v2H0zM0 165h24v1H0zM0 167h24v1H0zM0 171h24v2H0zM0 176h24v1H0zM0 178h24v2H0zM0 181h24v3H0zM0 187h24v2H0zM0 192h24v3H0zM0 196h24v1H0zM0 198h24v2H0z", vb: "0 0 24 200" },
+  en: { d: "M0 0h24v2H0zM0 3h24v1H0zM0 6h24v1H0zM0 11h24v2H0zM0 14h24v3H0zM0 18h24v1H0zM0 22h24v1H0zM0 26h24v3H0zM0 30h24v2H0zM0 33h24v2H0zM0 36h24v3H0zM0 40h24v3H0zM0 44h24v1H0zM0 48h24v2H0zM0 51h24v3H0zM0 55h24v2H0zM0 58h24v2H0zM0 62h24v2H0zM0 66h24v1H0zM0 70h24v2H0zM0 75h24v1H0zM0 77h24v1H0zM0 81h24v3H0zM0 85h24v2H0zM0 88h24v2H0zM0 93h24v1H0zM0 95h24v3H0zM0 99h24v2H0zM0 102h24v2H0zM0 106h24v2H0zM0 110h24v2H0zM0 113h24v3H0zM0 117h24v1H0zM0 121h24v1H0zM0 123h24v1H0zM0 127h24v2H0zM0 132h24v1H0zM0 136h24v2H0zM0 139h24v3H0zM0 143h24v1H0zM0 147h24v2H0zM0 150h24v1H0zM0 154h24v3H0zM0 158h24v1H0zM0 161h24v2H0zM0 165h24v2H0zM0 170h24v3H0zM0 174h24v1H0zM0 176h24v2H0z", vb: "0 0 24 178" }
+};
+
 function aplicarIdioma(){
   const u = UI[lang];
   document.documentElement.lang = u.lang;
@@ -1069,6 +1071,12 @@ function aplicarIdioma(){
   $("#d-next").setAttribute("aria-label", u.next);
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = u[el.dataset.i18n]);
   $("#services").innerHTML = SERVICES[lang].map(s => `<li><span>${esc(s)}</span></li>`).join("");
+  const bcSvg = $(".hero-barcode .bc-bars");
+  if (bcSvg && BC_PATHS[lang]) {
+    bcSvg.setAttribute("viewBox", BC_PATHS[lang].vb);
+    const path = bcSvg.querySelector("path");
+    if (path) path.setAttribute("d", BC_PATHS[lang].d);
+  }
 }
 
 function renderAbas(){
@@ -2127,7 +2135,7 @@ sortear(FUNDOS.camada, $(".fundo .f2"));
   }, { passive: true });
 })();
 
-/* sincroniza o tamanho da etiqueta vertical proporcionalmente com a logo (33% da altura) */
+/* sincroniza a altura do código de barras proporcionalmente com a logo (33% da altura) */
 (function(){
   const logo = $(".hero-logo img");
   const barcode = $(".hero-barcode");
