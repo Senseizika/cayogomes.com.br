@@ -1438,6 +1438,8 @@ function linhaMidia(m, i, total) {
   const imagensDoProjeto = (pAtual?.media || []).filter(mm => (mm.type || "image") === "image" && mm.src);
   const preview = ehImg ? m.src : m.poster;
   const processavel = ehImg && !!m.src && !/^https?:\/\//i.test(m.src) && /\.(png|jpe?g|bmp|webp|avif)$/i.test(m.src);
+  const jaWebP = ehImg && /\.webp$/i.test(m.src || "");
+  const webpOp = processavel && !jaWebP;
   const desejado = m.src ? desejoMidia(m.src) : { webp: false, marca: false };
   const pend = m.src ? pendenciaMidia(m.src) : false;
   const aplicado = m.src ? (estadoMidia[m.src] || {}) : {};
@@ -1446,6 +1448,7 @@ function linhaMidia(m, i, total) {
   if (pend) info = "mudanças pendentes";
   const infoCls = pend ? "pendente" : (aplicado.origem ? "aplicado" : "");
   const dicaOp = processavel ? "clique para selecionar; aplique em confirmar mudanças" : "arquivo não processável pelo navegador";
+  const dicaWebp = jaWebP ? "já é WebP — não precisa converter" : dicaOp;
   return `<div class="midia" data-mi="${i}">
     <div class="topo" draggable="true" title="Arraste para reordenar">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
@@ -1473,7 +1476,7 @@ function linhaMidia(m, i, total) {
       ${ehImg && m.src ? `<span class="img-info" data-src="${esc(m.src)}">carregando…</span>` : ""}
       ${ehImg && m.src ? `<div class="opcoes">
         <span class="rot">processar</span>
-        <button type="button" class="op-pill ${desejado.webp ? "on" : ""} ${pend ? "pendente" : ""}" data-op="webp" ${processavel ? "" : "disabled"} title="${dicaOp}">webp</button>
+        <button type="button" class="op-pill ${desejado.webp && !jaWebP ? "on" : ""} ${pend ? "pendente" : ""}" data-op="webp" ${webpOp ? "" : "disabled"} title="${dicaWebp}">webp</button>
         <button type="button" class="op-pill ${desejado.marca ? "on" : ""} ${pend ? "pendente" : ""}" data-op="marca" ${processavel ? "" : "disabled"} title="${dicaOp}">marca</button>
         ${info ? `<span class="op-info ${infoCls}">${esc(info)}</span>` : ""}
       </div>` : ""}
@@ -1569,6 +1572,9 @@ function midiaProcessavel(m) {
   return m && (m.type || "image") === "image" && !!m.src &&
     !/^https?:\/\//i.test(m.src) && /\.(png|jpe?g|bmp|webp|avif)$/i.test(m.src);
 }
+function arquivoJaWebP(f) {
+  return !!f && (/^image\/webp$/i.test(f.type || "") || /\.webp$/i.test(f.name || ""));
+}
 function totalPendencias() {
   return (projetoAtual()?.media || []).filter(m => midiaProcessavel(m) && pendenciaMidia(m.src)).length;
 }
@@ -1658,7 +1664,8 @@ async function removerArquivosMidia(caminhos) {
 
 // Reprocessa somente as imagens com seleção pendente, sempre a partir do
 // arquivo original (guardado em estadoMidia[src].origem), para poder aplicar
-// e também desfazer WebP/marca sem acumular recompressões.
+// e também desfazer WebP/marca sem acumular recompressões. WebP que já é WebP
+// e cabe no FullHD passa direto: não vira arquivo novo nem vira estado.
 async function aplicarMudancasMidia() {
   const p = projetoAtual();
   if (!p) return;
@@ -1666,41 +1673,56 @@ async function aplicarMudancasMidia() {
   if (!itens.length) { status("nenhuma mudança pendente"); return; }
   const btn = $("#aplicar-mudancas");
   if (btn) btn.disabled = true;
-  let ok = 0, falhas = 0;
+  let ok = 0, inalteradas = 0, falhas = 0;
   const remover = new Set();
+  const backupsPorOrigem = new Map();
   try {
-    const pares = itens.map(m => ({ src: m.src, origem: (estadoMidia[m.src] || {}).origem || m.src }));
-    const criados = await garantirBackups(pares);
+    const pares = itens.map(m => ({ src: m.src }));
     for (let i = 0; i < itens.length; i++) {
       const src = pares[i].src;
-      const origemAntes = pares[i].origem;
       const desejado = desejoMidia(src);
-      const origem = (estadoMidia[src] || {}).origem || src;
       status("processando " + (i + 1) + " de " + itens.length + ": " + (src.split("/").pop() || src));
       try {
-        const { arquivo } = await carregarOriginal(src);
+        const { arquivo, origem } = await carregarOriginal(src);
         let novoSrc = src;
+        let origemFinal = origem;
         if (desejado.webp || desejado.marca) {
           const processado = await otimizarImagemWebP(arquivo, desejado);
           if (processado !== arquivo) {
+            // Só guarda o original se realmente vai haver arquivo novo.
+            if (!origem.startsWith(PREFIXO_BACKUP)) {
+              if (backupsPorOrigem.has(origem)) origemFinal = backupsPorOrigem.get(origem);
+              else {
+                const b = await api("/api/midia/backup", { nome: arquivo.name, dados: await lerBase64(arquivo) });
+                origemFinal = PREFIXO_BACKUP + b.chave;
+                backupsPorOrigem.set(origem, origemFinal);
+                remover.add(origem);
+              }
+            }
             const r = await api("/api/arquivo", {
               pasta: pastaDeMidia(src, origem),
               nome: processado.name,
               dados: await lerBase64(processado)
             });
             novoSrc = r.caminho;
-          } else if (desejado.marca) {
-            throw new Error("o navegador não conseguiu aplicar a marca nesta imagem");
+          } else {
+            // Já é WebP dentro do teto: nada a converter, nada a apagar.
+            inalteradas++;
           }
-        } else {
-          // Desfazer: reenvia o original do backup como um arquivo novo.
+        } else if (origem.startsWith(PREFIXO_BACKUP)) {
+          // Desfazer: reenvia o original guardado fora do repo.
           const r = await api("/api/arquivo", {
             pasta: pastaDeMidia(src, origem),
             nome: arquivo.name,
             dados: await lerBase64(arquivo)
           });
           novoSrc = r.caminho;
+        } else {
+          // Original legado ainda no repo: apenas volta a apontar para ele.
+          novoSrc = origem;
         }
+        limparPendencia(src);
+        delete estadoMidia[src];
         if (novoSrc !== src) {
           for (const pp of projetos) {
             for (const mm of (pp.media || [])) {
@@ -1708,11 +1730,11 @@ async function aplicarMudancasMidia() {
             }
           }
           remover.add(src);
-          if (criados.has(origemAntes)) remover.add(origemAntes);
+          registrarEstado(novoSrc, {
+            webp: desejado.webp && !arquivoJaWebP(arquivo),
+            marca: desejado.marca
+          }, origemFinal);
         }
-        limparPendencia(src);
-        delete estadoMidia[src];
-        registrarEstado(novoSrc, desejado, origem);
         ok++;
       } catch (err) {
         falhas++;
@@ -1727,7 +1749,7 @@ async function aplicarMudancasMidia() {
     desenharForm();
     $("#form").scrollTop = rolagem;
   }
-  status("mídias processadas: " + ok + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Originais fora do site; clique em salvar para publicar.", falhas > 0);
+  status("mídias processadas: " + ok + (inalteradas ? " · " + inalteradas + " sem alteração" : "") + (falhas ? " · " + falhas + " falha(s) (ver console)" : "") + ". Originais fora do site; clique em salvar para publicar.", falhas > 0);
 }
 
 function desenharForm() {
@@ -2227,6 +2249,7 @@ $("#form").addEventListener("click", async e => {
     const m = projetoAtual()?.media?.[cx ? +cx.dataset.mi : -1];
     if (!m || !midiaProcessavel(m)) return;
     const op = b.dataset.op;
+    if (op === "webp" && /\.webp$/i.test(m.src || "")) return; // já é WebP
     const ligar = !desejoMidia(m.src)[op];
     const pend = { ...(pendenteMidia[m.src] || {}) };
     if (ligar === !!(estadoMidia[m.src] || {})[op]) delete pend[op];
@@ -2244,6 +2267,7 @@ $("#form").addEventListener("click", async e => {
       if (!midiaProcessavel(m)) continue;
       const pend = { ...(pendenteMidia[m.src] || {}) };
       for (const op of ["webp", "marca"]) {
+        if (op === "webp" && /\.webp$/i.test(m.src || "")) { delete pend.webp; continue; }
         if (ligar === !!(estadoMidia[m.src] || {})[op]) delete pend[op];
         else pend[op] = ligar;
       }
@@ -2583,7 +2607,7 @@ async function enviarArquivos(lista, alvo, mi0) {
       p.media[destino][alvo] = r.caminho;
       if (origemBackup && alvo === "src") {
         registrarEstado(r.caminho, {
-          webp: webpAtivo() && /\.webp$/i.test(f.name),
+          webp: webpAtivo() && !arquivoJaWebP(original) && /\.webp$/i.test(f.name),
           marca: marcaAtiva() && TIPOS_IMAGEM_ESTATICA.test(original.type || "")
         }, origemBackup);
       }
