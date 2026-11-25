@@ -278,6 +278,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
     <button id="marcar-acervo" title="Aplicar a marca d'água nas imagens já salvas. Shift+clique refaz as já marcadas.">✎ marcar acervo</button>
     <button id="novo">+ projeto</button>
     <button id="novo-carrossel" title="novo projeto com as imagens em sequência contínua">+ carrossel</button>
+    <button id="desfazer" title="Nada para desfazer" disabled>↶ desfazer</button>
     <button id="salvar" class="pri">salvar</button>
   </div>
 </header>
@@ -465,6 +466,56 @@ function status(msg, erro) {
 
 function marcarSujo(){ sujo = true; $("#sujo").hidden = false; }
 function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
+
+// Desfazer só das mudanças estruturais: os campos de texto já têm undo nativo.
+const pilhaDesfazer = [];
+const MAX_DESFAZER = 40;
+function atualizarBotaoDesfazer() {
+  const b = $("#desfazer");
+  if (!b) return;
+  const ultimo = pilhaDesfazer[pilhaDesfazer.length - 1];
+  b.disabled = !ultimo;
+  b.title = ultimo ? "Desfazer: " + ultimo.descricao + " (Ctrl+Z)" : "Nada para desfazer";
+}
+function registrarDesfazer(descricao, aplicar) {
+  pilhaDesfazer.push({ descricao, aplicar });
+  if (pilhaDesfazer.length > MAX_DESFAZER) pilhaDesfazer.shift();
+  atualizarBotaoDesfazer();
+}
+function limparDesfazer() {
+  pilhaDesfazer.length = 0;
+  atualizarBotaoDesfazer();
+}
+function desfazerUltimo() {
+  const acao = pilhaDesfazer.pop();
+  if (!acao) return;
+  try {
+    acao.aplicar();
+    marcarSujo();
+    status("desfeito: " + acao.descricao);
+  } catch (e) {
+    pilhaDesfazer.push(acao);
+    status("não foi possível desfazer: " + (e?.message || String(e)), true);
+  } finally {
+    atualizarBotaoDesfazer();
+  }
+}
+$("#desfazer").onclick = desfazerUltimo;
+
+function registrarDesfazerReordemProjeto(proj, snapshot, areaAntes, catAntes, selecionadoAntes) {
+  registrarDesfazer("reordenar " + (proj.title?.pt || "projeto"), () => {
+    projetos.length = 0;
+    projetos.push(...snapshot);
+    proj.area = areaAntes;
+    if (catAntes === undefined) delete proj.cat; else proj.cat = catAntes;
+    abrirGrupoDoProjeto(proj);
+    projetoSelecionado = selecionadoAntes && projetos.includes(selecionadoAntes) ? selecionadoAntes : proj;
+    desenharLista(true);
+    atualizarSelecaoVisual();
+    if (projetoSelecionado) abrir(projetoSelecionado);
+    else fechar();
+  });
+}
 
 const slug = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "item";
 const WEB_IMG = /\.(webp|jpe?g|png|gif|avif|svg|bmp|ico)$/i;
@@ -963,6 +1014,8 @@ $("#lista").addEventListener("drop", e => {
           const dropAfter = e.clientY >= rect.top + rect.height / 2;
           const proj = projetos[data.index];
           const alvoProj = projetos[targetIndex];
+          const snapshotAntes = projetos.slice();
+          const areaAntes = proj.area, catAntes = proj.cat, selecionadoAntes = projetoSelecionado;
           proj.area = alvoProj.area;
           if (alvoProj.cat) proj.cat = alvoProj.cat; else delete proj.cat;
           projetos.splice(data.index, 1);
@@ -970,6 +1023,7 @@ $("#lista").addEventListener("drop", e => {
           if (!dropAfter) insertIndex = targetIndex > data.index ? targetIndex - 1 : targetIndex;
           else insertIndex = targetIndex > data.index ? targetIndex : targetIndex + 1;
           projetos.splice(insertIndex, 0, proj);
+          registrarDesfazerReordemProjeto(proj, snapshotAntes, areaAntes, catAntes, selecionadoAntes);
           abrirGrupoDoProjeto(proj);
           marcarSujo();
           projetoSelecionado = proj;
@@ -981,10 +1035,13 @@ $("#lista").addEventListener("drop", e => {
         const areaId = targetCategory.dataset.areaId;
         const proj = projetos[data.index];
         if (proj && ((proj.cat || 'sem-cat') !== catId || proj.area !== areaId)) {
+          const snapshotAntes = projetos.slice();
+          const areaAntes = proj.area, catAntes = proj.cat, selecionadoAntes = projetoSelecionado;
           proj.area = areaId;
           if (catId === 'sem-cat') delete proj.cat; else proj.cat = catId;
           projetos.splice(data.index, 1);
           projetos.push(proj);
+          registrarDesfazerReordemProjeto(proj, snapshotAntes, areaAntes, catAntes, selecionadoAntes);
           abrirGrupoDoProjeto(proj);
           marcarSujo();
           projetoSelecionado = proj;
@@ -1198,6 +1255,7 @@ async function salvar() {
     categoriaSelecionada = areaDaCategoriaNova?.cats?.find(c => c.id === categoriaSelecionadaId) || null;
 
     limparSujo();
+    limparDesfazer();
     await carregarPreview();
     abrirFormulario();
     status("salvo — o site atualizado");
@@ -1280,12 +1338,21 @@ $("#ver-site").onclick = async () => {
 $("#duplicar").onclick = () => {
   const p = projetoAtual();
   if (!p) return;
+  const nome = p.title?.pt || p.title?.en || "projeto";
   const copia = JSON.parse(JSON.stringify(p));
   copia.id = novoIdProjeto(); // sem isso o site dedupa os dois pelo mesmo id
   copia.title.pt += " (cópia)";
   copia.title.en += " (copy)";
   const posicao = projetos.indexOf(p);
   projetos.splice(posicao + 1, 0, copia);
+  registrarDesfazer("duplicar " + nome, () => {
+    const i = projetos.indexOf(copia);
+    if (i >= 0) projetos.splice(i, 1);
+    abrirGrupoDoProjeto(p);
+    projetoSelecionado = p;
+    desenharLista(true);
+    abrir(p);
+  });
   abrirGrupoDoProjeto(copia);
   marcarSujo();
   projetoSelecionado = copia;
@@ -1304,6 +1371,14 @@ function apagarProjetoAtual() {
   if (!confirm(`Apagar "${nome}" da lista? A pasta de imagens será removida ao salvar.`)) return;
   const pi = projetos.indexOf(removido);
   if (pi >= 0) projetos.splice(pi, 1);
+  registrarDesfazer("apagar " + nome, () => {
+    if (projetos.includes(removido)) return;
+    projetos.splice(Math.min(pi, projetos.length), 0, removido);
+    abrirGrupoDoProjeto(removido);
+    projetoSelecionado = removido;
+    desenharLista(true);
+    abrir(removido);
+  });
   projetoSelecionado = projetos[Math.min(pi, projetos.length - 1)] || null;
   marcarSujo();
   if (!projetoSelecionado) fechar();
@@ -2843,6 +2918,12 @@ document.addEventListener("keydown", e => {
   }
   if (e.key === "Escape" && editorAberto) return; // o próprio dialog fecha
   if (e.key === "Escape" && document.body.classList.contains("editando")) { fechar(); return; }
+  if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "z" && !e.shiftKey &&
+      !editorAberto && !campoEditavel(e.target)) {
+    e.preventDefault();
+    desfazerUltimo();
+    return;
+  }
   if (editorAberto || campoEditavel(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
 
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
