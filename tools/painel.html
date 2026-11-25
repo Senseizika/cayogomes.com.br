@@ -1626,6 +1626,12 @@ function pastaDeMidia(...caminhos) {
   }
   return "acervo";
 }
+function prefixoProjetoDeSrc(src) {
+  const p = projetos.find(pp => (pp.media || []).some(m => m.src === src || m.poster === src));
+  if (!p) return "";
+  const titulo = String(p.title?.pt || "").trim();
+  return titulo ? slug(titulo) : (p._pastaTemp || "");
+}
 function referenciasMidia() {
   const refs = new Set();
   for (const p of projetos) {
@@ -1716,7 +1722,8 @@ async function aplicarMudancasMidia() {
             const r = await api("/api/arquivo", {
               pasta: pastaDeMidia(src, origem),
               nome: processado.name,
-              dados: await lerBase64(processado)
+              dados: await lerBase64(processado),
+              prefixo: prefixoProjetoDeSrc(src)
             });
             novoSrc = r.caminho;
           } else {
@@ -1728,7 +1735,8 @@ async function aplicarMudancasMidia() {
           const r = await api("/api/arquivo", {
             pasta: pastaDeMidia(src, origem),
             nome: arquivo.name,
-            dados: await lerBase64(arquivo)
+            dados: await lerBase64(arquivo),
+            prefixo: prefixoProjetoDeSrc(src)
           });
           novoSrc = r.caminho;
         } else {
@@ -2599,7 +2607,8 @@ $("#marcar-acervo").onclick = async e => {
         const r = await api("/api/arquivo", {
           pasta: pastaDeMidia(caminho, origem),
           nome: marcada.name,
-          dados: await lerBase64(marcada)
+          dados: await lerBase64(marcada),
+          prefixo: prefixoProjetoDeSrc(caminho)
         });
         for (const p of projetos) {
           for (const m of (p.media || [])) {
@@ -2671,7 +2680,7 @@ async function enviarArquivos(lista, alvo, mi0, opcoes) {
       }
       status(arquivos.length > 1 ? "enviando " + (k + 1) + " de " + arquivos.length + ": " + f.name : "enviando " + f.name + "…");
       const dados = await lerBase64(f);
-      const r = await api("/api/arquivo", { pasta, nome: f.name, dados });
+      const r = await api("/api/arquivo", { pasta, nome: f.name, dados, prefixo: pasta });
       if (projetoAtual() !== p) return;
       if (k > 0) { p.media.splice(destino + 1, 0, { type: "image", src: "" }); destino += 1; }
       p.media[destino][alvo] = r.caminho;

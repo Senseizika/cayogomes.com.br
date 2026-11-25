@@ -158,12 +158,14 @@ function normalizar(lista) {
   });
 }
 
-function proximoNomeArquivo(dir, ext) {
+function proximoNomeArquivo(dir, ext, prefixo) {
   fs.mkdirSync(dir, { recursive: true });
   const usados = new Set(fs.readdirSync(dir));
+  const pre = slugify(prefixo).slice(0, 60);
+  const nome = n => (pre ? pre + '-' : '') + String(n).padStart(2, '0') + '.' + ext;
   let n = 1;
-  while (usados.has(String(n).padStart(2, '0') + '.' + ext)) n++;
-  return String(n).padStart(2, '0') + '.' + ext;
+  while (usados.has(nome(n))) n++;
+  return nome(n);
 }
 
 function realocarPastasTemporarias(lista) {
@@ -274,7 +276,7 @@ function extensaoSegura(nome) {
   return ext;
 }
 
-function salvarArquivo(pasta, nomeOriginal, dataUrl) {
+function salvarArquivo(pasta, nomeOriginal, dataUrl, prefixo) {
   const buf = decodificarDataUrl(dataUrl);
   const ext = extensaoSegura(nomeOriginal);
   if (!EXTENSOES_PERMITIDAS.has(ext)) throw new Error('tipo de arquivo não permitido: .' + ext);
@@ -283,7 +285,7 @@ function salvarArquivo(pasta, nomeOriginal, dataUrl) {
   if (!seg) throw new Error('pasta inválida');
 
   const dir = path.join(DIR_IMG, seg);
-  const arq = proximoNomeArquivo(dir, ext);
+  const arq = proximoNomeArquivo(dir, ext, prefixo);
 
   fs.writeFileSync(path.join(dir, arq), buf);
   return { caminho: 'img/projetos/' + seg + '/' + arq, bytes: buf.length };
@@ -467,7 +469,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (rota === '/api/arquivo' && req.method === 'POST') {
         const dados = await corpo(req);
-        const r = salvarArquivo(dados.pasta, dados.nome, dados.dados);
+        const r = salvarArquivo(dados.pasta, dados.nome, dados.dados, dados.prefixo);
         console.log(`  arquivo: ${r.caminho} (${Math.round(r.bytes / 1024)} KB)`);
         return json(res, 200, r);
       }
