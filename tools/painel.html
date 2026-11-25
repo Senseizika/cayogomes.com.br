@@ -13,7 +13,7 @@ body{margin:0;background:var(--ink);color:var(--white);font:400 14px/1.5 system-
 
 header{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line);background:#07080a;flex:0 0 auto;z-index:40}
 header strong{font:400 1rem ui-monospace,Consolas,monospace;letter-spacing:.22em}
-#sujo{font:400 .78rem ui-monospace,Consolas,monospace;color:#f0b429;border:1px solid rgba(240,180,41,.4);border-radius:4px;padding:.15rem .45rem}
+#sujo{font:400 .78rem ui-monospace,Consolas,monospace;color:#f0b429;border:1px solid rgba(240,180,41,.4);border-radius:4px;padding:.15rem .45rem;cursor:help}
 #sujo[hidden]{display:none}
 #status{font:400 .78rem ui-monospace,Consolas,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #status.ok{color:#39d98a} #status.err{color:#ff5a5f}
@@ -345,7 +345,7 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 const token = "__PAINEL_TOKEN__";
 let projetos = [], areas = [], areasEditaveis = [], ordemTodos = {};
 let projetoSelecionado = null, areaSelecionada = null, categoriaSelecionada = null;
-let sujo = false, modoAtual = 'projetos';
+let sujo = false, modoAtual = 'projetos', estadoSalvo = null;
 let editorOrigem = null;
 let idOriginalArea = '';
 
@@ -498,8 +498,48 @@ function status(msg, erro) {
   tempo = setTimeout(() => { el.textContent = ""; el.className = ""; }, 5000);
 }
 
-function marcarSujo(){ sujo = true; $("#sujo").hidden = false; }
-function limparSujo(){ sujo = false; $("#sujo").hidden = true; }
+const chaveProjeto = p => String(p?.id || JSON.stringify(p?.title));
+function snapshotConteudo() {
+  return {
+    projetos: new Map(projetos.map(p => [chaveProjeto(p), JSON.stringify(p)])),
+    ordemProjetos: projetos.map(chaveProjeto).join("|"),
+    areas: JSON.stringify(areasEditaveis),
+    ordem: JSON.stringify(ordemTodos)
+  };
+}
+function resumoAlteracoes() {
+  if (!estadoSalvo) return [];
+  const partes = [];
+  let mudados = 0;
+  const vistos = new Set();
+  for (const p of projetos) {
+    const chave = chaveProjeto(p);
+    vistos.add(chave);
+    if (!estadoSalvo.projetos.has(chave) || estadoSalvo.projetos.get(chave) !== JSON.stringify(p)) mudados++;
+  }
+  for (const chave of estadoSalvo.projetos.keys()) if (!vistos.has(chave)) mudados++;
+  if (mudados) partes.push(mudados + (mudados === 1 ? " projeto" : " projetos"));
+  if (projetos.map(chaveProjeto).join("|") !== estadoSalvo.ordemProjetos) partes.push("ordem dos projetos");
+  if (JSON.stringify(ordemTodos) !== estadoSalvo.ordem) partes.push("ordem do Todos");
+  if (JSON.stringify(areasEditaveis) !== estadoSalvo.areas) partes.push("áreas/categorias");
+  return partes;
+}
+function atualizarBadgeSujo() {
+  const b = $("#sujo");
+  if (!b) return;
+  const partes = resumoAlteracoes();
+  const total = partes.reduce((n, parte) => n + (parseInt(parte, 10) || 1), 0);
+  b.textContent = total ? total + (total === 1 ? " alteração" : " alterações") : "não salvo";
+  b.title = partes.length ? "Não salvo: " + partes.join(", ") : "Alterações não salvas";
+}
+function marcarSujo(){ sujo = true; $("#sujo").hidden = false; atualizarBadgeSujo(); }
+function limparSujo(){
+  sujo = false;
+  const b = $("#sujo");
+  b.hidden = true;
+  b.textContent = "não salvo";
+  b.title = "Alterações não salvas";
+}
 
 // Desfazer só das mudanças estruturais: os campos de texto já têm undo nativo.
 const pilhaDesfazer = [];
@@ -1302,6 +1342,7 @@ async function salvar() {
     categoriaSelecionada = areaDaCategoriaNova?.cats?.find(c => c.id === categoriaSelecionadaId) || null;
 
     limparSujo();
+    estadoSalvo = snapshotConteudo();
     limparDesfazer();
     await carregarPreview();
     abrirFormulario();
@@ -3069,6 +3110,7 @@ window.addEventListener("beforeunload", e => {
     areas = r.areas;
     areasEditaveis = r.areasCompletas || r.areas;
     garantirIdsProjetos();
+    estadoSalvo = snapshotConteudo();
     sincronizarSoftwares();
     const modoSalvo = aplicarPreferenciasUI();
     desenharLista();
