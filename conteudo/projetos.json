@@ -3,32 +3,6 @@
     "area": "design",
     "galeria": "carrossel",
     "cat": "estampa",
-    "id": "p-mwtkwh0p-sly1o",
-    "h": 0,
-    "tools": "Affinity",
-    "title": {
-      "pt": "Camisa Xerifes 13 Anos",
-      "en": "Xerife's 13th Anniversary Shirt"
-    },
-    "desc": {
-      "pt": "",
-      "en": ""
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/camisa-xerifes-13-anos/camisa-xerifes-13-anos-01.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/camisa-xerifes-13-anos/camisa-xerifes-13-anos-02.webp"
-      }
-    ]
-  },
-  {
-    "area": "design",
-    "galeria": "carrossel",
-    "cat": "estampa",
     "id": "p-mwtkwh0p-rw1b5",
     "h": 0,
     "tools": "Affinity",
@@ -48,6 +22,32 @@
       {
         "type": "image",
         "src": "img/projetos/21-moto-romaria/21-moto-romaria-04.webp"
+      }
+    ]
+  },
+  {
+    "area": "design",
+    "galeria": "carrossel",
+    "cat": "estampa",
+    "id": "p-mwtkwh0p-sly1o",
+    "h": 0,
+    "tools": "Affinity",
+    "title": {
+      "pt": "Camisa Xerifes 13 Anos",
+      "en": "Xerife's 13th Anniversary Shirt"
+    },
+    "desc": {
+      "pt": "",
+      "en": ""
+    },
+    "media": [
+      {
+        "type": "image",
+        "src": "img/projetos/camisa-xerifes-13-anos/camisa-xerifes-13-anos-01.webp"
+      },
+      {
+        "type": "image",
+        "src": "img/projetos/camisa-xerifes-13-anos/camisa-xerifes-13-anos-02.webp"
       }
     ]
   },
