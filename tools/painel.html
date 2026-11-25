@@ -367,16 +367,43 @@ function sincronizarAccordionsDOM(modo = modoAtual) {
     if (d.open) gruposFechados.delete(k);
     else gruposFechados.add(k);
   });
+  gravarPreferenciasUI();
 }
 
 function abrirGrupoDoProjeto(p) {
   if (!p) return;
   gruposFechados.delete(`projetos:area:${p.area}`);
   gruposFechados.delete(`projetos:cat:${p.area}:${p.cat || 'sem-cat'}`);
+  gravarPreferenciasUI();
 }
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// Preferências só da interface do painel — nunca são salvas no site.
+const KEY_PREF_UI = "painel_preferencias_ui";
+function lerPreferenciasUI() {
+  try { return JSON.parse(localStorage.getItem(KEY_PREF_UI) || "{}") || {}; } catch (e) { return {}; }
+}
+function gravarPreferenciasUI() {
+  try {
+    localStorage.setItem(KEY_PREF_UI, JSON.stringify({
+      modo: modoAtual,
+      largura: $("#moldura")?.style.getPropertyValue("--larg") || "",
+      grupos: [...gruposFechados]
+    }));
+  } catch (e) {}
+}
+function aplicarPreferenciasUI() {
+  const pref = lerPreferenciasUI();
+  if (Array.isArray(pref.grupos)) pref.grupos.forEach(k => gruposFechados.add(k));
+  if (pref.largura) {
+    $("#moldura")?.style.setProperty("--larg", pref.largura);
+    document.querySelectorAll("[data-largura]").forEach(b =>
+      b.classList.toggle("on", b.dataset.largura === pref.largura));
+  }
+  return pref.modo;
+}
 const indiceProjeto = p => projetos.indexOf(p);
 const indiceArea = a => areasEditaveis.indexOf(a);
 const areaDaCategoria = c => areasEditaveis.find(a => (a.cats || []).includes(c)) || null;
@@ -678,6 +705,7 @@ function mudarModo(m) {
     document.body.classList.remove("editando");
     atualizarSelecaoVisual();
   }
+  gravarPreferenciasUI();
 }
 
 function temProblema(p) {
@@ -860,6 +888,7 @@ $("#lista").addEventListener("toggle", e => {
   if (!k) return;
   if (d.open) gruposFechados.delete(k);
   else gruposFechados.add(k);
+  gravarPreferenciasUI();
 }, true);
 
 $("#lista").addEventListener("dragstart", e => {
@@ -1321,6 +1350,7 @@ document.querySelectorAll("[data-largura]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-largura]").forEach(x => x.classList.toggle("on", x === b));
     $("#moldura").style.setProperty("--larg", b.dataset.largura);
+    gravarPreferenciasUI();
   };
 });
 
@@ -2953,7 +2983,10 @@ window.addEventListener("beforeunload", e => {
     areasEditaveis = r.areasCompletas || r.areas;
     garantirIdsProjetos();
     sincronizarSoftwares();
+    const modoSalvo = aplicarPreferenciasUI();
     desenharLista();
+    if (["projetos", "areas", "categorias", "todos"].includes(modoSalvo) && modoSalvo !== modoAtual)
+      mudarModo(modoSalvo);
     ligarFrame();
     if (!token || token.indexOf("__PAINEL") === 0)
       status("abra com node tools/painel.js (o servidor entrega o token)", true);
