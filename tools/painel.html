@@ -2415,7 +2415,7 @@ async function aplicarMarcaDagua(canvas, ctx) {
     ctx.save();
     ctx.globalAlpha = 0.2;
 
-    const largura = Math.min(canvas.width * 0.11, 240);
+    const largura = canvas.width * 0.05;
     const proporcao = (assinatura.naturalHeight || 168) / (assinatura.naturalWidth || 356);
     const altura = largura * proporcao;
     const x = Math.max(0, Math.min(canvas.width - largura, canvas.width * 0.56 - largura / 2));
