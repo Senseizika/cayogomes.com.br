@@ -1389,6 +1389,16 @@ $("#duplicar").onclick = () => {
   desenharLista();
   abrir(copia);
   status("Projeto duplicado!");
+  requestAnimationFrame(() => {
+    const titulo = $("#form [data-campo='title.pt']");
+    if (!titulo) return;
+    titulo.focus();
+    const sufixo = " (cópia)";
+    const pos = titulo.value.lastIndexOf(sufixo);
+    if (pos >= 0) titulo.setSelectionRange(pos, pos + sufixo.length);
+    else titulo.select();
+    titulo.scrollIntoView({ block: "center" });
+  });
 };
 
 $("#preview-projeto").onclick = atualizarPreviewProjeto;
