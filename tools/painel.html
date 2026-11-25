@@ -2756,9 +2756,15 @@ function jaMarcadosNoAcervo() {
 $("#marcar-acervo").onclick = async e => {
   const refazer = e.shiftKey;
   const feitos = refazer ? new Set() : jaMarcadosNoAcervo();
-  const lista = imagensMarcaveis().filter(c => !feitos.has(c));
+  const todas = imagensMarcaveis();
+  const lista = todas.filter(c => !feitos.has(c));
   if (!lista.length) { status("acervo já marcado (shift+clique para refazer)"); return; }
-  if (!confirm("Aplicar a marca em " + lista.length + " imagem(ns) do acervo?\n\n" +
+  const ja = todas.length - lista.length;
+  const detalhe = refazer
+    ? "Modo refazer: " + lista.length + " imagem(ns) serão processadas novamente."
+    : "A marcar agora: " + lista.length + " imagem(ns)" +
+      (ja ? " · já marcadas e ignoradas: " + ja : "") + ". Shift+clique refaz as já marcadas.";
+  if (!confirm("Aplicar a marca d'água no acervo?\n\n" + detalhe + "\n\n" +
       "Serão criados arquivos novos, as referências serão atualizadas e os originais " +
       "sairão de img/projetos. Cópias locais ficam fora do repositório para você desfazer depois.\n" +
       "Depois clique em salvar e em ↑ push.")) return;
