@@ -100,6 +100,7 @@ ol li {
 }
 ol li:hover { background: rgba(255,255,255,.05); }
 ol li.sel { border-color: var(--accent); background: rgba(239,43,49,.1); }
+ol li:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 ol li b { font: 400 .78rem ui-monospace, Consolas, monospace; color: var(--mute); width: 1.5rem; flex-shrink: 0; text-align: left; }
 ol li span:not(.handle) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; display: flex; align-items: center; gap: 4px; flex-grow: 1; }
 ol li .handle { flex: 0 0 1.5rem; }
@@ -642,7 +643,7 @@ function renderizarLinhasProjetos(lista) {
     const avisos = temProblema(p);
     const avisoHTML = avisos.length ? `<span class="aviso-icon" title="${avisos.join(' • ')}">⚠️</span>` : "";
     const conta = p.media?.length ? p.media.length + " mídia(s)" : "sem mídia";
-    return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" title="${esc(p.title?.pt || "")}">
+    return `<li class="${p === projetoSelecionado ? "sel" : ""}" data-i="${i}" draggable="true" tabindex="0" title="${esc(p.title?.pt || "")}">
       <span class="handle" draggable="true" title="Arraste para reordenar">☰</span>
       <b>${String(i + 1).padStart(2, "0")}</b>
       <span>${esc(p.title?.pt || "(sem título)")} ${avisoHTML}</span>
@@ -2812,6 +2813,26 @@ $("#form").addEventListener("drop", e => {
   else enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
+function campoEditavel(el) {
+  return !!el && (el.matches?.("input,textarea,select,[contenteditable='true']") || el.isContentEditable);
+}
+
+// ↑/↓ percorrem as linhas visíveis da lista (respeitando busca e grupos abertos).
+function navegarListaProjetos(delta) {
+  if (modoAtual !== "projetos") return false;
+  const itens = [...document.querySelectorAll("#lista li[data-i]")].filter(li => li.getClientRects().length);
+  if (!itens.length) return false;
+  const atual = projetos.indexOf(projetoSelecionado);
+  let pos = itens.findIndex(li => +li.dataset.i === atual);
+  if (pos < 0) pos = delta > 0 ? -1 : 0;
+  const novaPos = Math.max(0, Math.min(itens.length - 1, pos + delta));
+  const p = projetos[+itens[novaPos].dataset.i];
+  if (!p) return false;
+  abrir(p);
+  itens[novaPos].scrollIntoView({ block: "nearest" });
+  return true;
+}
+
 document.addEventListener("keydown", e => {
   const editorAberto = $("#editor-texto")?.open;
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
@@ -2821,7 +2842,20 @@ document.addEventListener("keydown", e => {
     return;
   }
   if (e.key === "Escape" && editorAberto) return; // o próprio dialog fecha
-  if (e.key === "Escape" && document.body.classList.contains("editando")) fechar();
+  if (e.key === "Escape" && document.body.classList.contains("editando")) { fechar(); return; }
+  if (editorAberto || campoEditavel(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    if (navegarListaProjetos(e.key === "ArrowDown" ? 1 : -1)) e.preventDefault();
+    return;
+  }
+  if (e.key === "Enter") {
+    const li = document.activeElement?.closest?.("#lista li[data-i]");
+    if (!li) return;
+    e.preventDefault();
+    const p = projetos[+li.dataset.i];
+    if (p) abrir(p);
+  }
 });
 window.addEventListener("beforeunload", e => {
   if (!sujo) return;
