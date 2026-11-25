@@ -42,6 +42,10 @@ body.editando main{grid-template-columns:300px 1fr min(560px,46vw)}
 #filtros-lista{padding:.5rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;flex:0 0 auto}
 #filtros-lista input { width:100%; background:#0f1114; border:1px solid var(--line); color:var(--white); padding:.4rem .5rem; border-radius:4px; font-size:.8rem; outline:none; }
 #filtros-lista input:focus { border-color:var(--accent); }
+.linha-busca{display:flex;align-items:center;gap:.45rem}
+.linha-busca input{flex:1;min-width:0}
+#busca-contador{font:400 .72rem var(--mono);color:var(--mute);white-space:nowrap}
+#busca-contador[hidden]{display:none}
 #lateral-conteudo{overflow:auto;padding:.45rem;min-height:0;flex:1}
 
 details.grupo { margin-bottom: .3rem; border-radius:6px; }
@@ -286,7 +290,10 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 <main>
   <nav id="lateral">
     <div id="filtros-lista">
-      <input type="search" id="busca-projeto" placeholder="Buscar projeto..." autocomplete="off">
+      <div class="linha-busca">
+        <input type="search" id="busca-projeto" placeholder="Buscar projeto...  (/)" autocomplete="off">
+        <span id="busca-contador" hidden></span>
+      </div>
     </div>
     <div id="lateral-conteudo">
       <div id="lista"></div>
@@ -869,6 +876,16 @@ function desenharListaTodos(){
   $("#lista").innerHTML = html || '<p class="vazio">nenhuma área</p>';
 }
 
+function atualizarContadorBusca() {
+  const el = $("#busca-contador");
+  if (!el) return;
+  const visivel = modoAtual === "projetos" && !!buscaProjeto;
+  el.hidden = !visivel;
+  if (!visivel) { el.textContent = ""; return; }
+  const n = document.querySelectorAll("#lista li[data-i]").length;
+  el.textContent = n + (n === 1 ? " resultado" : " resultados");
+}
+
 function desenharLista(jaSincronizado = false) {
   const lateral = $("#lateral-conteudo");
   const rolagem = lateral ? lateral.scrollTop : 0;
@@ -877,6 +894,7 @@ function desenharLista(jaSincronizado = false) {
   else if (modoAtual === 'areas') desenharListaAreas();
   else if (modoAtual === 'categorias') desenharListaCategorias();
   else if (modoAtual === 'todos') desenharListaTodos();
+  atualizarContadorBusca();
   if (lateral) lateral.scrollTop = rolagem;
 }
 
@@ -2932,6 +2950,15 @@ function campoEditavel(el) {
   return !!el && (el.matches?.("input,textarea,select,[contenteditable='true']") || el.isContentEditable);
 }
 
+function limparBusca() {
+  if (!buscaProjeto) return false;
+  buscaProjeto = "";
+  const campo = $("#busca-projeto");
+  if (campo) campo.value = "";
+  if (modoAtual === "projetos") desenharLista(true);
+  return true;
+}
+
 // ↑/↓ percorrem as linhas visíveis da lista (respeitando busca e grupos abertos).
 function navegarListaProjetos(delta) {
   if (modoAtual !== "projetos") return false;
@@ -2957,7 +2984,31 @@ document.addEventListener("keydown", e => {
     return;
   }
   if (e.key === "Escape" && editorAberto) return; // o próprio dialog fecha
-  if (e.key === "Escape" && document.body.classList.contains("editando")) { fechar(); return; }
+  if (e.key === "Escape") {
+    const naBusca = e.target === $("#busca-projeto");
+    if ((naBusca || !campoEditavel(e.target)) && limparBusca()) {
+      e.preventDefault();
+      if (naBusca) $("#busca-projeto").focus();
+      return;
+    }
+    if (naBusca) { e.preventDefault(); $("#busca-projeto").blur(); return; }
+    if (campoEditavel(e.target)) {
+      // primeiro Esc sai do campo; o segundo fecha o drawer (undo nativo preservado)
+      e.preventDefault();
+      document.activeElement?.blur?.();
+      return;
+    }
+    if (document.body.classList.contains("editando")) { e.preventDefault(); fechar(); }
+    return;
+  }
+  if (e.key === "/" && !editorAberto && !campoEditavel(e.target) &&
+      !e.ctrlKey && !e.metaKey && !e.altKey && modoAtual === "projetos") {
+    e.preventDefault();
+    const campo = $("#busca-projeto");
+    campo.focus();
+    campo.select();
+    return;
+  }
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "z" && !e.shiftKey &&
       !editorAberto && !campoEditavel(e.target)) {
     e.preventDefault();
