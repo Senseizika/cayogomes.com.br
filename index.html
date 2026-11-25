@@ -24,8 +24,8 @@
 <meta name="twitter:image" content="https://cayogomes.com.br/img/og-cat.png">
 <!-- logo do topo: prioridade máxima -->
 <link rel="preload" as="image" href="img/cayo_gomes.webp" fetchpriority="high">
-<link rel="preload" as="script" href="conteudo/projetos.js?v=mwvky0qr">
-<link rel="preload" as="script" href="content.js?v=mwvky0qr">
+<link rel="preload" as="script" href="conteudo/projetos.js?v=mwvla7xq">
+<link rel="preload" as="script" href="content.js?v=mwvla7xq">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fontes carregadas sem bloquear a renderização (com fallback sem JS) -->
@@ -738,9 +738,9 @@ dialog[open]{animation:in .22s ease-out}
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
 </div>
-<script src="conteudo/projetos.js?v=mwvky0qr"></script>
-<script src="content.js?v=mwvky0qr"></script>
-<script src="conteudo/ordem-todos.js?v=mwvky0qr"></script>
+<script src="conteudo/projetos.js?v=mwvla7xq"></script>
+<script src="content.js?v=mwvla7xq"></script>
+<script src="conteudo/ordem-todos.js?v=mwvla7xq"></script>
 <script>
 /* ============================================================
    ESTE ARQUIVO TEM SÓ O CÓDIGO.
@@ -752,16 +752,28 @@ dialog[open]{animation:in .22s ease-out}
    ============================================================ */
 const FUNDOS = {
   base:   { pasta:"img/Fundo",  prefixo:"fundo",  total:16, ext:"webp" },
-  camada: { pasta:"img/Fundo2", prefixo:"camada", total:6,  ext:"webp" },
+  camada: { pasta:"img/Fundo2", prefixo:"camada", total:10,  ext:"webp" },
   parallax: .5
 };
 
 /* PALETA:INICIO (gerado por tools/paleta.js - não edite à mão) */
 const PALETA = {
-  "fundo1.webp": "#d42d9d", "fundo2.webp": "#ef0606", "fundo3.webp": "#0cd925", "fundo4.webp": "#2f73df",
-  "fundo5.webp": "#25c1a8", "fundo6.webp": "#06c1e0", "fundo7.webp": "#06e0ba", "fundo8.webp": "#ef0606",
-  "fundo9.webp": "#ef0606", "fundo10.webp": "#ef0606", "fundo11.webp": "#06e0bb", "fundo12.webp": "#ec0f06",
-  "fundo13.webp": "#ca06e7", "fundo14.webp": "#06e0ba", "fundo15.webp": "#09dc52", "fundo16.webp": "#6262fb"
+  "fundo1.webp": "#d42d9d",
+  "fundo2.webp": "#ef0606",
+  "fundo3.webp": "#0cd925",
+  "fundo4.webp": "#2f73df",
+  "fundo5.webp": "#25c1a8",
+  "fundo6.webp": "#06c1e0",
+  "fundo7.webp": "#06e0ba",
+  "fundo8.webp": "#ef0606",
+  "fundo9.webp": "#ef0606",
+  "fundo10.webp": "#ef0606",
+  "fundo11.webp": "#06e0bb",
+  "fundo12.webp": "#ec0f06",
+  "fundo13.webp": "#ca06e7",
+  "fundo14.webp": "#06e0ba",
+  "fundo15.webp": "#09dc52",
+  "fundo16.webp": "#6262fb"
 };
 /* PALETA:FIM */
 
