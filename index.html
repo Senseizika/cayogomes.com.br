@@ -1097,7 +1097,7 @@ function renderGradeHTML(list, comCategoria = false){
   const u = UI[lang];
   if (!list.length) return `<p class="vazio">${esc(u.empty)}</p>`;
   return `<div class="grid">${list.map(([p, j], idx) => `
-      <button class="item" type="button" data-i="${j}" title="Shift+clique: abrir no painel">
+      <button class="item" type="button" data-i="${j}">
         <div class="thumb">${capaHTML(p, idx < 3)}${comCategoria && p.cat ? `<span class="cat-etiqueta">${esc(nomeCategoria(p))}</span>` : ""}</div>
         <h3>${esc(tr(p.title))}</h3>
       </button>`).join("")}</div>`;
@@ -1953,13 +1953,6 @@ document.addEventListener("click", e => {
   if (b) {
     current = +b.dataset.i;
     const p = PROJECTS[current];
-    if (e.shiftKey && p) {
-      const url = new URL("http://127.0.0.1:4173/");
-      url.searchParams.set("editar", String(p.id || slugProj(p)));
-      if (p.area) url.searchParams.set("area", p.area);
-      try { window.open(url.toString(), "painel-cayo"); } catch (err) {}
-      return;
-    }
     fill(current);
     $("#dlg").showModal();
     $("#d-scroll").scrollTop = 0;

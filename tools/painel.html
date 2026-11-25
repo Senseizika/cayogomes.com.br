@@ -1949,28 +1949,6 @@ function abrir(p) {
   atualizarSelecaoVisual();
   if (projetoAtual()) desenharForm();
 }
-// Chamado quando o site abre o painel com ?editar=<id>. Também aceita o slug
-// do título como fallback para projetos antigos sem id.
-function abrirProjetoPorLink() {
-  const q = new URLSearchParams(location.search);
-  const alvo = q.get("editar");
-  if (!alvo) return;
-  const area = q.get("area");
-  const slugAlvo = slug(alvo);
-  const p = projetos.find(pp => String(pp.id || "") === alvo)
-    || projetos.find(pp => slug(pp.title?.pt || pp.title?.en || "") === slugAlvo && (!area || pp.area === area))
-    || projetos.find(pp => slug(pp.title?.pt || "") === slugAlvo);
-  if (p) {
-    abrir(p);
-    status("editando: " + (p.title?.pt || "sem título"));
-  } else {
-    status("projeto não encontrado para edição: " + alvo, true);
-  }
-  const url = new URL(location.href);
-  url.searchParams.delete("editar");
-  url.searchParams.delete("area");
-  try { history.replaceState(null, "", url.pathname + url.search + url.hash); } catch (e) {}
-}
 function abrirArea(a) {
   areaSelecionada = a && areasEditaveis.includes(a) ? a : null;
   categoriaSelecionada = null;
@@ -2862,7 +2840,6 @@ window.addEventListener("beforeunload", e => {
     sincronizarSoftwares();
     desenharLista();
     ligarFrame();
-    abrirProjetoPorLink();
     if (!token || token.indexOf("__PAINEL") === 0)
       status("abra com node tools/painel.js (o servidor entrega o token)", true);
   } catch (e) { status("erro ao carregar: " + e.message, true); }
