@@ -1,30 +1,5 @@
 [
   {
-    "id": "p-mwv6jwat-d248f",
-    "area": "design",
-    "galeria": "carrossel",
-    "h": 0,
-    "tools": "",
-    "title": {
-      "pt": "asda",
-      "en": "sdasd"
-    },
-    "desc": {
-      "pt": "asdasd",
-      "en": "asda"
-    },
-    "media": [
-      {
-        "type": "image",
-        "src": "img/projetos/asda/01.webp"
-      },
-      {
-        "type": "image",
-        "src": "img/projetos/asda/01.png"
-      }
-    ]
-  },
-  {
     "area": "design",
     "galeria": "carrossel",
     "cat": "estampa",
@@ -42,11 +17,11 @@
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/21-moto-romaria/01.webp"
+        "src": "img/projetos/21-moto-romaria/03.webp"
       },
       {
         "type": "image",
-        "src": "img/projetos/21-moto-romaria/02.webp"
+        "src": "img/projetos/21-moto-romaria/04.webp"
       }
     ]
   },
@@ -240,82 +215,82 @@
     "media": [
       {
         "type": "image",
-        "src": "img/projetos/asd/19.webp",
+        "src": "img/projetos/asd/01.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/20.webp",
+        "src": "img/projetos/asd/02.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/21.webp",
+        "src": "img/projetos/asd/03.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/22.webp",
+        "src": "img/projetos/asd/04.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/23.webp",
+        "src": "img/projetos/asd/05.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/24.webp",
+        "src": "img/projetos/asd/06.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/25.webp",
+        "src": "img/projetos/asd/07.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/26.webp",
+        "src": "img/projetos/asd/08.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/27.webp",
+        "src": "img/projetos/asd/09.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/28.webp",
+        "src": "img/projetos/asd/10.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/29.webp",
+        "src": "img/projetos/asd/11.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/30.webp",
+        "src": "img/projetos/asd/12.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/31.webp",
+        "src": "img/projetos/asd/13.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/32.webp",
+        "src": "img/projetos/asd/14.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/33.webp",
+        "src": "img/projetos/asd/15.webp",
         "fullscreen": true
       },
       {
         "type": "image",
-        "src": "img/projetos/asd/34.webp",
+        "src": "img/projetos/asd/16.webp",
         "fullscreen": true
       }
     ]
