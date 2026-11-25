@@ -738,6 +738,7 @@ dialog[open]{animation:in .22s ease-out}
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
 </div>
+<script src="conteudo/cards.js?v=mwvluaa8"></script>
 <script src="conteudo/projetos.js?v=mwvluaa8"></script>
 <script src="content.js?v=mwvluaa8"></script>
 <script src="conteudo/ordem-todos.js?v=mwvluaa8"></script>
@@ -925,10 +926,14 @@ function capaMidia(m){
 
 const capa = p => (p.media && p.media[0]) || null;
 
-function capaHTML(p, eager){
+function capaHTML(p){
   const { src, fb } = capaMidia(capa(p));
-  if (!src) return `<div class="ph" style="--h:${p.h || 0}">${UI[lang].img}</div>`;
-  return `<img src="${esc(src)}" alt="${esc(tr(p.title))}" width="600" height="450" decoding="async"${eager ? "" : ' loading="lazy"'} data-h="${p.h || 0}"${fb ? ` data-fb="${esc(fb)}"` : ""}>`;
+  // Miniatura gerada por tools/gerar-cards.js; o detalhe continua usando p.media[].src.
+  const mini = typeof CARD_IMGS !== "undefined" ? CARD_IMGS[String(p?.id)] : null;
+  const final = mini?.src || src;
+  if (!final) return `<div class="ph" style="--h:${p.h || 0}">${UI[lang].img}</div>`;
+  const dim = mini ? ` width="${mini.width}" height="${mini.height}"` : ' width="600" height="450"';
+  return `<img data-src="${esc(final)}" alt="${esc(tr(p.title))}"${dim} decoding="async" loading="lazy" data-h="${p.h || 0}"${fb ? ` data-fb="${esc(fb)}"` : ""}>`;
 }
 
 const DLG = `<dialog id="dlg" aria-labelledby="d-title"><div class="d-scroll" id="d-scroll"><header class="d-header"><div class="d-header-copy"><span id="d-bar"></span><h3 id="d-title"></h3></div><div class="d-cta"><a id="cta-modal" href="#" target="_blank" rel="noopener"></a><button id="close" type="button"></button></div></header>
@@ -1108,11 +1113,40 @@ function nomeCategoria(p){
 function renderGradeHTML(list, comCategoria = false){
   const u = UI[lang];
   if (!list.length) return `<p class="vazio">${esc(u.empty)}</p>`;
-  return `<div class="grid">${list.map(([p, j], idx) => `
+  return `<div class="grid">${list.map(([p, j]) => `
       <button class="item" type="button" data-i="${j}">
-        <div class="thumb">${capaHTML(p, idx < 3)}${comCategoria && p.cat ? `<span class="cat-etiqueta">${esc(nomeCategoria(p))}</span>` : ""}</div>
+        <div class="thumb">${capaHTML(p)}${comCategoria && p.cat ? `<span class="cat-etiqueta">${esc(nomeCategoria(p))}</span>` : ""}</div>
         <h3>${esc(tr(p.title))}</h3>
       </button>`).join("")}</div>`;
+}
+
+// Só as capas na dobra (ou a ~120 px dela) recebem src de imediato.
+// As demais ficam com loading="lazy" e entram quando o scroll se aproxima.
+let obsCapas = null;
+function ativarCapasVisiveis(){
+  if (obsCapas) { obsCapas.disconnect(); obsCapas = null; }
+  const carregar = img => {
+    if (!img.dataset.src) return;
+    img.loading = "eager";
+    img.src = img.dataset.src;
+    delete img.dataset.src;
+  };
+  const perto = img => {
+    const r = img.getBoundingClientRect();
+    return r.bottom >= -120 && r.top <= innerHeight + 120 && r.right >= 0 && r.left <= innerWidth;
+  };
+  const imgs = [...document.querySelectorAll('#grade .thumb img[data-src]')];
+  imgs.filter(perto).forEach(carregar);
+  const restantes = imgs.filter(img => img.dataset.src);
+  if (!restantes.length || !("IntersectionObserver" in window)) { restantes.forEach(carregar); return; }
+  obsCapas = new IntersectionObserver(entradas => {
+    for (const en of entradas) {
+      if (!en.isIntersecting) continue;
+      carregar(en.target);
+      obsCapas.unobserve(en.target);
+    }
+  }, { rootMargin: "120px 0px", threshold: 0 });
+  restantes.forEach(img => obsCapas.observe(img));
 }
 
 // Ordem personalizada do "Todos", salva pelo painel por área.
@@ -1168,7 +1202,8 @@ function renderPainel(soGrade){
 
   if (soGrade && $("#grade")) {
     $("#panel").querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", String(ch.dataset.c === filter)));
-    $("#grade").innerHTML = renderGradeHTML(exibida, filter === "all");
+    $("#grade").innerHTML = renderGradeHTML(exibida);
+    ativarCapasVisiveis();
     if ($("#cta-bloco")) $("#cta-bloco").innerHTML = blocoCTA();
     return;
   }
@@ -1184,8 +1219,9 @@ function renderPainel(soGrade){
     <span class="hud-plus bl" aria-hidden="true"></span>
     <div class="head"><h2>${esc(tr(a.name))}</h2><p class="lead">${esc(tr(a.lead))}</p></div>
     ${chips}
-    <div id="grade">${renderGradeHTML(exibida, filter === "all")}</div>
+    <div id="grade">${renderGradeHTML(exibida)}</div>
     <div id="cta-bloco">${blocoCTA()}</div>`;
+  ativarCapasVisiveis();
 }
 
 function render(){
