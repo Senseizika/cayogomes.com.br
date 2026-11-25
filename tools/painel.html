@@ -183,6 +183,9 @@ h3{font:400 .82rem ui-monospace,Consolas,monospace;letter-spacing:.1em;margin:1.
 .arquivo{display:inline-block;width:fit-content;margin:0;text-transform:none;letter-spacing:0;cursor:pointer;border:1px dashed var(--line);padding:.3rem .55rem;border-radius:6px;color:var(--mute);font-size:.78rem}
 .arquivo:hover,.arquivo.recebendo{border-color:var(--mute);color:var(--white)}
 .arquivo.recebendo{border-color:var(--accent);background:rgba(239,43,49,.08)}
+.arquivo.reupload{border-style:solid;border-color:rgba(239,43,49,.45);color:var(--white)}
+.arquivo.reupload:hover{border-color:var(--accent);background:rgba(239,43,49,.08)}
+.acoes-arquivo{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem}
 
 /* Bloco de mídias: importação + processamento por imagem */
 .midias-bloco{border:1px solid var(--line);border-radius:10px;background:#0a0c0f;padding:.8rem;margin:.2rem 0 1rem}
@@ -1473,7 +1476,10 @@ function linhaMidia(m, i, total) {
         <input data-mcampo="src" value="${esc(m.src || "")}" placeholder="${ehImg ? "img/projetos/nome/01.webp" : tipo === "video" ? "https://youtu.be/..." : "https://sketchfab.com/3d-models/..."}">
       </label>
       ${ehImg ? "" : `<label>capa (opcional) <input data-mcampo="poster" value="${esc(m.poster || "")}" placeholder="imagem de capa"></label>`}
-      <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
+      <div class="acoes-arquivo">
+        <button type="button" class="arquivo" data-escolher="${ehImg ? "src" : "poster"}">${ehImg ? "escolher imagem" : "escolher capa"}${ehImg ? " (pode escolher várias)" : ""}</button>
+        ${ehImg ? `<button type="button" class="arquivo reupload" data-reupload title="Substitui esta imagem por um arquivo escolhido no PC">↻ reupload</button>` : ""}
+      </div>
       ${!ehImg && imagensDoProjeto.length ? `<label>ou usar imagem do projeto
         <select data-mcampo="poster-pick">
           <option value="">— nenhuma —</option>
@@ -2306,7 +2312,10 @@ $("#form").addEventListener("click", async e => {
   const mi = caixa ? +caixa.dataset.mi : -1;
   const media = projetoAtual()?.media || [];
 
-  if (b.hasAttribute("data-escolher")) {
+  if (b.hasAttribute("data-reupload")) {
+    if (caixa) abrirSeletor("src", mi, "reupload");
+  }
+  else if (b.hasAttribute("data-escolher")) {
     if (caixa) abrirSeletor(b.dataset.escolher, mi);
   }
   else if (b.id === "add-midia") {
@@ -2332,12 +2341,15 @@ $("#form").addEventListener("click", async e => {
 });
 
 const seletor = $("#seletor");
-function abrirSeletor(alvo, mi) {
+function abrirSeletor(alvo, mi, modo) {
   seletor.value = "";
-  seletor.multiple = alvo === "src";
+  seletor.multiple = alvo === "src" && modo !== "reupload";
+  seletor.accept = modo === "reupload" ? "image/*" : "";
   seletor.dataset.alvo = alvo;
   seletor.dataset.mi = String(mi);
-  status(alvo === "src" ? "escolha uma ou mais imagens…" : "escolha a imagem de capa…");
+  seletor.dataset.modo = modo || "inserir";
+  status(modo === "reupload" ? "escolha a nova imagem para esta linha…" :
+    alvo === "src" ? "escolha uma ou mais imagens…" : "escolha a imagem de capa…");
   seletor.click();
 }
 
@@ -2345,8 +2357,12 @@ seletor.addEventListener("change", () => {
   const lista = [...seletor.files];
   const alvo = seletor.dataset.alvo;
   const mi = +seletor.dataset.mi;
+  const modo = seletor.dataset.modo || "inserir";
   seletor.value = "";
-  if (lista.length) enviarArquivos(lista, alvo, mi);
+  seletor.dataset.modo = "";
+  if (!lista.length) return;
+  if (modo === "reupload") reuploadImagem(lista[0], mi);
+  else enviarArquivos(lista, alvo, mi);
 });
 
 // Teto de resolução de qualquer imagem enviada pelo painel: FullHD (1920x1080).
@@ -2630,10 +2646,11 @@ function pastaDoProjeto(p) {
   return p._pastaTemp;
 }
 
-async function enviarArquivos(lista, alvo, mi0) {
+async function enviarArquivos(lista, alvo, mi0, opcoes) {
   const p = projetoAtual();
-  if (!p || !p.media || !lista.length) return;
+  if (!p || !p.media || !lista.length) return null;
   if (!p.media[mi0]) p.media[mi0] = { type: "image", src: "" };
+  const anterior = opcoes && opcoes.substituir ? (p.media[mi0].src || "") : "";
 
   const arquivos = [...lista];
   if (alvo !== "src") arquivos.length = 1;
@@ -2675,7 +2692,19 @@ async function enviarArquivos(lista, alvo, mi0) {
       marcarSujo();
       desenharForm();
       status("erro ao enviar " + original.name + ": " + (err && err.message ? err.message : String(err)), true);
-      return;
+      return null;
+    }
+  }
+
+  // Reupload: o arquivo antigo sai do repositório se ninguém mais o usa.
+  if (anterior && anterior !== (ultimo && ultimo.caminho)) {
+    const refs = referenciasMidia();
+    if (!refs.has(anterior)) {
+      delete estadoMidia[anterior];
+      delete pendenteMidia[anterior];
+      gravarMapa(KEY_ESTADO_MIDIA, estadoMidia);
+      gravarMapa(KEY_PENDENTE_MIDIA, pendenteMidia);
+      await removerArquivosMidia([anterior]);
     }
   }
 
@@ -2683,6 +2712,22 @@ async function enviarArquivos(lista, alvo, mi0) {
   const aviso = foraDoSite.length ? " — " + foraDoSite.join(", ") + (foraDoSite.length > 1 ? " não aparecem" : " não aparece") + " no site (use webp, jpg, png, gif ou avif)" : "";
   if (arquivos.length === 1) status("arquivo salvo: " + ultimo.caminho + " (" + kb(ultimo) + ")" + aviso, aviso !== "");
   else status(arquivos.length + " arquivos salvos" + aviso, aviso !== "");
+  return ultimo;
+}
+
+async function reuploadImagem(file, mi) {
+  const p = projetoAtual();
+  if (!p || !p.media || !p.media[mi] || !file) return;
+  const nome = String(file.name || "");
+  if (!/^image\//i.test(file.type || "") && !/\.(png|jpe?g|bmp|webp|avif|gif)$/i.test(nome)) {
+    status("escolha um arquivo de imagem para o reupload", true);
+    return;
+  }
+  const anterior = p.media[mi].src || "";
+  const r = await enviarArquivos([file], "src", mi, { substituir: true });
+  if (!r) return;
+  status("imagem substituída: " + r.caminho + " (" + formatBytesImg(r.bytes) + ")" +
+    (anterior && anterior !== r.caminho ? " · arquivo anterior removido" : ""));
 }
 
 let midiaDragIdx = null;
@@ -2711,7 +2756,7 @@ $("#form").addEventListener("dragover", e => {
     }
     return;
   }
-  const alvo = e.target.closest("[data-escolher]");
+  const alvo = e.target.closest("[data-escolher],[data-reupload]");
   if (!alvo) return;
   e.preventDefault();
   e.dataTransfer.dropEffect = "copy";
@@ -2723,7 +2768,7 @@ $("#form").addEventListener("dragleave", e => {
     if (caixa && !caixa.contains(e.relatedTarget)) caixa.classList.remove("drag-over");
     return;
   }
-  const alvo = e.target.closest("[data-escolher]");
+  const alvo = e.target.closest("[data-escolher],[data-reupload]");
   if (alvo) alvo.classList.remove("recebendo");
 });
 $("#form").addEventListener("drop", e => {
@@ -2747,13 +2792,15 @@ $("#form").addEventListener("drop", e => {
     }
     return;
   }
-  const alvo = e.target.closest("[data-escolher]");
+  const alvo = e.target.closest("[data-escolher],[data-reupload]");
   if (!alvo) return;
   e.preventDefault();
   alvo.classList.remove("recebendo");
   const lista = [...(e.dataTransfer?.files || [])];
   const caixa = alvo.closest("[data-mi]");
-  if (caixa && lista.length) enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
+  if (!caixa || !lista.length) return;
+  if (alvo.hasAttribute("data-reupload")) reuploadImagem(lista[0], +caixa.dataset.mi);
+  else enviarArquivos(lista, alvo.dataset.escolher, +caixa.dataset.mi);
 });
 
 document.addEventListener("keydown", e => {
