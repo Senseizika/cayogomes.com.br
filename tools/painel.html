@@ -2975,6 +2975,26 @@ function navegarListaProjetos(delta) {
   return true;
 }
 
+// Alt+↑/↓ move o projeto selecionado um passo na ordem global.
+function moverProjetoSelecionado(delta) {
+  if (modoAtual !== "projetos" || !projetoSelecionado) return false;
+  if (buscaProjeto) { status("Limpe a busca para reordenar", true); return false; }
+  const de = projetos.indexOf(projetoSelecionado);
+  const para = de + delta;
+  if (de < 0 || para < 0 || para >= projetos.length) return false;
+  const p = projetos[de];
+  const snapshot = projetos.slice();
+  const areaAntes = p.area, catAntes = p.cat, selecionadoAntes = projetoSelecionado;
+  [projetos[de], projetos[para]] = [projetos[para], projetos[de]];
+  registrarDesfazerReordemProjeto(p, snapshot, areaAntes, catAntes, selecionadoAntes);
+  abrirGrupoDoProjeto(p);
+  marcarSujo();
+  atualizarTudo();
+  document.querySelector(`#lista li[data-i="${para}"]`)?.scrollIntoView({ block: "nearest" });
+  status(delta < 0 ? "Projeto movido para cima" : "Projeto movido para baixo");
+  return true;
+}
+
 document.addEventListener("keydown", e => {
   const editorAberto = $("#editor-texto")?.open;
   if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "s") {
@@ -3015,7 +3035,13 @@ document.addEventListener("keydown", e => {
     desfazerUltimo();
     return;
   }
-  if (editorAberto || campoEditavel(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (editorAberto || campoEditavel(e.target) || e.ctrlKey || e.metaKey) return;
+  if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+    e.preventDefault();
+    moverProjetoSelecionado(e.key === "ArrowUp" ? -1 : 1);
+    return;
+  }
+  if (e.altKey) return;
 
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
     if (navegarListaProjetos(e.key === "ArrowDown" ? 1 : -1)) e.preventDefault();
