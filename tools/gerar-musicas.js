@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /*
- * tools/gerar-musicas.js — gera conteudo/musicas.js a partir de uma playlist pública.
+ * tools/gerar-musicas.js — gera conteudo/musicas.js a partir de playlists públicas.
  *
  * Uso:
- *   node tools/gerar-musicas.js          -> lê a playlist e grava conteudo/musicas.js
+ *   node tools/gerar-musicas.js          -> lê as playlists e grava conteudo/musicas.js
  *   node tools/gerar-musicas.js --dry    -> só mostra as faixas encontradas
  *
- * A playlist é apenas FONTE DE DADOS: o site não carrega YouTube, não toca áudio
- * e não faz requisição externa. Tudo fica num arquivo local pequeno.
+ * As playlists são apenas FONTE DE DADOS: o site não carrega YouTube, não toca
+ * áudio e não faz requisição externa. Tudo fica num arquivo local pequeno.
  *
- * Para trocar a playlist, edite PLAYLIST abaixo e rode novamente.
+ * Para trocar ou acrescentar playlists, edite PLAYLISTS abaixo e rode novamente.
+ * Repetições são removidas por ID do vídeo e por título+artista normalizados.
  * Se o YouTube mudar o formato da página, a extração pode precisar de ajuste.
  */
 
@@ -19,8 +20,11 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const PLAYLIST = 'PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C';
-const URL_PLAYLIST = `https://www.youtube.com/playlist?list=${PLAYLIST}&hl=pt-BR&gl=BR`;
+const PLAYLISTS = [
+  'PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C',
+  'PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH'
+];
+const urlPlaylist = id => `https://www.youtube.com/playlist?list=${id}&hl=pt-BR&gl=BR`;
 const ARQ_SAIDA = path.join(ROOT, 'conteudo', 'musicas.js');
 const DRY = process.argv.includes('--dry');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -58,7 +62,8 @@ async function conectar(porta) {
   throw new Error('Não consegui conectar ao navegador.');
 }
 
-const EXTRACAO = `(() => {
+const EXTRACAO = id => `(() => {
+  if (!location.href.includes(${JSON.stringify(id)})) return { totalPagina: '', faixas: [] };
   const achados = [];
   const ver = x => {
     if (!x || typeof x !== 'object') return;
@@ -75,16 +80,32 @@ const EXTRACAO = `(() => {
   for (const o of achados) {
     const md = o.metadata?.lockupMetadataViewModel || {};
     const linhas = md.metadata?.contentMetadataViewModel?.metadataRows || [];
-    const id = o.contentId || '';
+    const idVideo = o.contentId || '';
     const titulo = txt(md.title);
     const artista = txt(linhas[0]?.metadataParts?.[0]?.text);
     const bruto = JSON.stringify(o);
     const duracao = (bruto.match(/"text":"(\\d+:\\d\\d)"/) || [])[1] || '';
-    if (!/^[A-Za-z0-9_-]{11}$/.test(id) || !titulo || !duracao) continue;
-    faixas.push({ id, titulo, artista, duracao });
+    if (!/^[A-Za-z0-9_-]{11}$/.test(idVideo) || !titulo || !duracao) continue;
+    faixas.push({ id: idVideo, titulo, artista, duracao });
   }
   return { totalPagina: document.body.innerText, faixas };
 })()`;
+
+// Remove acentos, caixa, sufixos automáticos, "(ao vivo)"/"(remix)"/"feat..." e
+// pontuação antes de comparar — assim a mesma música com outro upload não entra duas vezes.
+function chaveMusica(m) {
+  const limpo = s => {
+    let t = String(s || '');
+    t = t.replace(/\s*[(\[][^)\]]*[)\]]\s*$/g, '');
+    return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s*[-–—]\s*(topic|oficial|official)\s*$/i, '')
+      .replace(/\s+feat\b.*$/i, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  };
+  return limpo(m.titulo) + '|' + limpo(m.artista);
+}
 
 (async () => {
   const navegador = acharNavegador();
@@ -117,32 +138,53 @@ const EXTRACAO = `(() => {
     });
     await send('Page.enable');
     await send('Runtime.enable');
-    await send('Page.navigate', { url: URL_PLAYLIST });
 
-    let valor;
-    for (let i = 0; i < 300; i++) {
-      const r = await send('Runtime.evaluate', { expression: EXTRACAO, awaitPromise: true, returnByValue: true });
+    const porId = new Set();
+    const porMusica = new Set();
+    const faixas = [];
+    const resumos = [];
+
+    for (const id of PLAYLISTS) {
+      await send('Page.navigate', { url: urlPlaylist(id) });
+
+      let valor;
+      for (let i = 0; i < 300; i++) {
+        const r = await send('Runtime.evaluate', { expression: EXTRACAO(id), awaitPromise: true, returnByValue: true });
+        valor = r.result && r.result.result && r.result.result.value;
+        if (valor && valor.faixas && valor.faixas.length) break;
+        await sleep(250);
+      }
+      await sleep(1200);
+      const r = await send('Runtime.evaluate', { expression: EXTRACAO(id), awaitPromise: true, returnByValue: true });
       valor = r.result && r.result.result && r.result.result.value;
-      if (valor && valor.faixas && valor.faixas.length) break;
-      await sleep(250);
+
+      const modelo = String(valor && valor.totalPagina || '').match(/(\d+) vídeos/);
+      let novas = 0, repetidas = 0;
+      for (const f of (valor && valor.faixas) || []) {
+        const chave = chaveMusica(f);
+        if (porId.has(f.id) || porMusica.has(chave)) { repetidas++; continue; }
+        porId.add(f.id);
+        porMusica.add(chave);
+        faixas.push(f);
+        novas++;
+      }
+      resumos.push({ id, modelo: modelo ? modelo[1] : '', novas, repetidas });
     }
-    await sleep(1500);
-    const r = await send('Runtime.evaluate', { expression: EXTRACAO, awaitPromise: true, returnByValue: true });
-    valor = r.result && r.result.result && r.result.result.value;
-    if (!valor || !Array.isArray(valor.faixas) || !valor.faixas.length) {
+
+    if (!faixas.length) {
       console.error('Nenhuma faixa encontrada. O YouTube pode ter mudado o formato da página.');
       process.exit(1);
     }
 
-    const vistos = new Set();
-    const faixas = valor.faixas.filter(f => {
-      if (vistos.has(f.id)) return false;
-      vistos.add(f.id);
-      return true;
-    });
+    for (const s of resumos) {
+      console.log('\n  PLAYLIST ' + s.id);
+      if (s.modelo) console.log('  YouTube informa ' + s.modelo + ' vídeos (indisponíveis ficam ocultos).');
+      console.log('  novas: ' + s.novas + '  |  repetidas (ignoradas): ' + s.repetidas);
+    }
 
     const cabecalho = '// Gerado por tools/gerar-musicas.js — não edite à mão.\n' +
-      '// playlist: ' + URL_PLAYLIST + '\n' +
+      '// playlists:\n' + PLAYLISTS.map(id => '//   ' + urlPlaylist(id) + '\n').join('') +
+      '// Sem duplicatas: por ID do vídeo e por título+artista normalizados.\n' +
       '// Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.\n';
     const corpo = faixas.map(f => '  { id: ' + JSON.stringify(f.id) +
       ', t: ' + JSON.stringify(f.titulo) +
@@ -150,21 +192,20 @@ const EXTRACAO = `(() => {
       ', d: ' + JSON.stringify(f.duracao) + ' }').join(',\n');
     const conteudo = cabecalho + 'const MUSICAS = [\n' + corpo + '\n];\n';
 
-    const modelo = String(valor.totalPagina).match(/(\d+) vídeos/);
-    console.log('\n  PLAYLIST ' + PLAYLIST);
-    if (modelo) console.log('  YouTube informa ' + modelo[1] + ' vídeos (indisponíveis ficam ocultos).');
-    console.log('  faixas extraídas: ' + faixas.length);
+    console.log('\n  LISTA FINAL — ' + faixas.length + ' faixas únicas');
     console.log('  ' + 'faixa'.padEnd(46) + 'artista'.padEnd(24) + 'duração');
     console.log('  ' + '-'.repeat(78));
     for (const f of faixas) {
       console.log('  ' + f.titulo.slice(0, 45).padEnd(46) + f.artista.slice(0, 23).padEnd(24) + f.duracao);
     }
 
-    if (DRY) { console.log('\n  --dry: nada foi gravado.\n'); process.exit(0); }
-
-    fs.mkdirSync(path.dirname(ARQ_SAIDA), { recursive: true });
-    fs.writeFileSync(ARQ_SAIDA, conteudo, 'utf8');
-    console.log('\n  gravado: conteudo/musicas.js (' + Math.round(Buffer.byteLength(conteudo) / 1024) + ' KB)\n');
+    if (DRY) {
+      console.log('\n  --dry: nada foi gravado.\n');
+    } else {
+      fs.mkdirSync(path.dirname(ARQ_SAIDA), { recursive: true });
+      fs.writeFileSync(ARQ_SAIDA, conteudo, 'utf8');
+      console.log('\n  gravado: conteudo/musicas.js (' + Math.round(Buffer.byteLength(conteudo) / 1024) + ' KB)\n');
+    }
   } finally {
     try { ws && ws.close(); } catch (e) {}
     try {
