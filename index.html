@@ -24,8 +24,8 @@
 <meta name="twitter:image" content="https://cayogomes.com.br/img/og-cat.png">
 <!-- logo do topo: prioridade máxima -->
 <link rel="preload" as="image" href="img/cayo_gomes.webp" fetchpriority="high">
-<link rel="preload" as="script" href="conteudo/projetos.js?v=mwwzy8ym">
-<link rel="preload" as="script" href="content.js?v=mwwzy8ym">
+<link rel="preload" as="script" href="conteudo/projetos.js?v=mwx02ddh">
+<link rel="preload" as="script" href="content.js?v=mwx02ddh">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fontes carregadas sem bloquear a renderização (com fallback sem JS) -->
@@ -305,7 +305,6 @@ a{color:inherit}
 .pl-btns{display:flex;justify-content:space-around;align-items:center;padding-top:.2rem}
 .pl-btn{background:none;border:0;padding:.35rem .5rem;color:var(--accent);cursor:pointer;display:grid;place-items:center;opacity:.7;transition:opacity .18s,transform .18s}
 .pl-btn:hover,.pl-btn.lit{opacity:1;transform:scale(1.08)}
-.player-hud.paused [data-pl="play"]{opacity:.4}
 .pl-ico{width:20px;height:18px;display:block}
 .pl-btn.main .pl-ico{width:22px;height:22px}
 
@@ -747,11 +746,11 @@ dialog[open]{animation:in .22s ease-out}
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
 </div>
-<script src="conteudo/musicas.js?v=mwwzy8ym"></script>
-<script src="conteudo/cards.js?v=mwwzy8ym"></script>
-<script src="conteudo/projetos.js?v=mwwzy8ym"></script>
-<script src="content.js?v=mwwzy8ym"></script>
-<script src="conteudo/ordem-todos.js?v=mwwzy8ym"></script>
+<script src="conteudo/musicas.js?v=mwx02ddh"></script>
+<script src="conteudo/cards.js?v=mwx02ddh"></script>
+<script src="conteudo/projetos.js?v=mwx02ddh"></script>
+<script src="content.js?v=mwx02ddh"></script>
+<script src="conteudo/ordem-todos.js?v=mwx02ddh"></script>
 <script>
 /* ============================================================
    ESTE ARQUIVO TEM SÓ O CÓDIGO.
@@ -2169,7 +2168,10 @@ document.addEventListener("click", e => {
   const pb = e.target.closest("[data-pl]");
   if (pb) {
     const hud = pb.closest(".player-hud"), op = pb.dataset.pl;
-    if (op === "play") hud.classList.toggle("paused");
+    if (op === "play") {
+      const use = pb.querySelector("use");
+      if (use) use.setAttribute("href", use.getAttribute("href") === "#i-play" ? "#i-pause" : "#i-play");
+    }
     else if (op === "shuffle") { pb.classList.toggle("lit"); renderPlaylist(); }
     else if (op === "repeat") pb.classList.toggle("lit");
     else {
