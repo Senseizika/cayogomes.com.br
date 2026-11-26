@@ -8,6 +8,9 @@
 <title>Cayo Gomes — Artista digital, designer gráfico e modelador 3D</title>
 <meta name="description" content="Portfólio de Cayo Gomes: design gráfico e modelagem 3D. Petrópolis, RJ.">
 <link rel="canonical" href="https://cayogomes.com.br/">
+<link rel="alternate" hreflang="pt-BR" href="https://cayogomes.com.br/">
+<link rel="alternate" hreflang="en" href="https://cayogomes.com.br/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://cayogomes.com.br/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
 <!-- Open Graph / redes sociais -->
 <meta property="og:type" content="website">
@@ -787,9 +790,32 @@ const PALETA = {
 };
 /* PALETA:FIM */
 
-let lang = "pt", current = null, filter = "all";
-try { lang = localStorage.getItem("lang") || "pt"; } catch(e){}
-if (!UI[lang]) lang = "pt";
+// Negociação de locale: URL > escolha salva > idioma do navegador > pt-BR.
+// Sem geolocalização nem fuso horário: segue o padrão BCP 47 do navegador.
+function negociarIdioma() {
+  let param = null;
+  try { param = new URLSearchParams(location.search).get("lang"); } catch(e){}
+  if (param) {
+    const p = param.toLowerCase();
+    if (/^pt([-_]|$)/.test(p)) return "pt";
+    if (/^en([-_]|$)/.test(p)) return "en";
+  }
+  let salvo = null;
+  try { salvo = localStorage.getItem("lang"); } catch(e){}
+  if (salvo && UI[salvo]) return salvo;
+  const preferidos = [];
+  try {
+    if (Array.isArray(navigator.languages) && navigator.languages.length) preferidos.push(...navigator.languages);
+    if (navigator.language) preferidos.push(navigator.language);
+  } catch(e){}
+  for (const pref of preferidos) {
+    const p = String(pref || "").toLowerCase();
+    if (/^pt([-_]|$)/.test(p)) return "pt";
+    if (/^en([-_]|$)/.test(p)) return "en";
+  }
+  return "pt";
+}
+let lang = negociarIdioma(), current = null, filter = "all";
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1087,6 +1113,15 @@ const BC_PATHS = {
 function aplicarIdioma(){
   const u = UI[lang];
   document.documentElement.lang = u.lang;
+  // Canonical e Open Graph acompanham o locale efetivo.
+  try {
+    const canon = document.querySelector('link[rel="canonical"]');
+    if (canon) canon.href = lang === "en" ? "https://cayogomes.com.br/?lang=en" : "https://cayogomes.com.br/";
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) ogLocale.content = lang === "en" ? "en_US" : "pt_BR";
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.content = lang === "en" ? "https://cayogomes.com.br/?lang=en" : "https://cayogomes.com.br/";
+  } catch(e){}
   garantirDialogo();
   $("#close").textContent = u.close;
   $("#cta-modal").textContent = u.cta_modal;
@@ -2155,6 +2190,13 @@ document.addEventListener("click", e => {
   if (e.target.closest("#lang")) {
     lang = lang === "pt" ? "en" : "pt";
     try { localStorage.setItem("lang", lang); } catch(err){}
+    // Mantém o idioma explícito na URL para links compartilháveis.
+    try {
+      const url = new URL(location.href);
+      if (lang === "en") url.searchParams.set("lang", "en");
+      else url.searchParams.delete("lang");
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+    } catch(err){}
     render();
     return;
   }
