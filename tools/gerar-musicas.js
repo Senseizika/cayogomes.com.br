@@ -30,6 +30,11 @@ const CANAIS = [
   { nome: 'Black Pantera', handle: '@BlackPanteraOficial', limite: 12 },
   { nome: 'Baiana System', handle: '@baianasystem', limite: 12 }
 ];
+// Playlists "Músicas em alta" do YouTube: ordena por visualizações.
+const POPULARES = [
+  { id: 'OLAK5uy_lTtrRulwHl2WsspO1wj33uLrpNK8tBZjo', nome: 'Repudiyo', limite: 12 },
+  { id: 'OLAK5uy_lvpm_RRAsqd0eaTrWf9XtLz_EEwbWrxK8', nome: 'Último Sopro', limite: 99 }
+];
 const urlPlaylist = id => `https://www.youtube.com/playlist?list=${id}&hl=pt-BR&gl=BR`;
 const urlCanal = handle => `https://www.youtube.com/${handle}/videos?hl=pt-BR&gl=BR`;
 const ARQ_SAIDA = path.join(ROOT, 'conteudo', 'musicas.js');
@@ -92,8 +97,10 @@ const EXTRACAO = id => `(() => {
     const artista = txt(linhas[0]?.metadataParts?.[0]?.text);
     const bruto = JSON.stringify(o);
     const duracao = (bruto.match(/"text":"(\\d+:\\d\\d)"/) || [])[1] || '';
+    // Na playlist a 1ª linha é o artista e a 2ª traz views + idade.
+    const views = txt(linhas[1]?.metadataParts?.[0]?.text) || txt(linhas[0]?.metadataParts?.[1]?.text);
     if (!/^[A-Za-z0-9_-]{11}$/.test(idVideo) || !titulo || !duracao) continue;
-    faixas.push({ id: idVideo, titulo, artista, duracao });
+    faixas.push({ id: idVideo, titulo, artista, duracao, views });
   }
   return { totalPagina: document.body.innerText, faixas };
 })()`;
@@ -164,6 +171,16 @@ function limparTitulo(titulo, nome) {
 function segundos(duracao) {
   const partes = String(duracao || '').split(':').map(Number);
   return partes.length === 2 ? partes[0] * 60 + partes[1] : Infinity;
+}
+
+// "770", "1,1 mil", "2,3 mi" etc.
+function numeroViews(texto) {
+  const bruto = String(texto || '').trim();
+  const numero = parseFloat(bruto.replace(/\./g, '').replace(',', '.'));
+  if (!isFinite(numero)) return 0;
+  if (/mil/i.test(bruto)) return numero * 1e3;
+  if (/\bmi\b|\bmilh(?:ões|ão)\b/i.test(bruto)) return numero * 1e6;
+  return numero;
 }
 
 (async () => {
@@ -269,6 +286,37 @@ function segundos(duracao) {
       });
     }
 
+    for (const popular of POPULARES) {
+      await send('Page.navigate', { url: urlPlaylist(popular.id) });
+
+      let valor;
+      for (let i = 0; i < 300; i++) {
+        const r = await send('Runtime.evaluate', { expression: EXTRACAO(popular.id), awaitPromise: true, returnByValue: true });
+        valor = r.result && r.result.result && r.result.result.value;
+        if (valor && valor.faixas && valor.faixas.length) break;
+        await sleep(250);
+      }
+      await sleep(1200);
+      const r = await send('Runtime.evaluate', { expression: EXTRACAO(popular.id), awaitPromise: true, returnByValue: true });
+      valor = r.result && r.result.result && r.result.result.value;
+
+      const ordenadas = ((valor && valor.faixas) || [])
+        .slice()
+        .sort((a, b) => numeroViews(b.views) - numeroViews(a.views));
+      let novas = 0, repetidas = 0;
+      for (const f of ordenadas) {
+        if (novas >= popular.limite) break;
+        const chave = chaveMusica(f);
+        if (porId.has(f.id) || porMusica.has(chave)) { repetidas++; continue; }
+        porId.add(f.id); porMusica.add(chave); faixas.push(f); novas++;
+      }
+      resumos.push({
+        tipo: 'EM ALTA', id: popular.id + ' (' + popular.nome + ')',
+        modelo: 'por visualizações' + (popular.limite < 99 ? ', até ' + popular.limite : ', todas'),
+        novas, repetidas
+      });
+    }
+
     if (!faixas.length) {
       console.error('Nenhuma faixa encontrada. O YouTube pode ter mudado o formato da página.');
       process.exit(1);
@@ -288,6 +336,7 @@ function segundos(duracao) {
     const cabecalho = '// Gerado por tools/gerar-musicas.js — não edite à mão.\n' +
       '// playlists:\n' + PLAYLISTS.map(id => '//   ' + urlPlaylist(id) + '\n').join('') +
       '// canais (em alta):\n' + CANAIS.map(c => '//   ' + urlCanal(c.handle) + '\n').join('') +
+      '// em alta (por visualizações):\n' + POPULARES.map(p => '//   ' + urlPlaylist(p.id) + '\n').join('') +
       '// Sem duplicatas: por ID do vídeo e por título+artista normalizados.\n' +
       '// Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.\n';
     const corpo = faixas.map(f => '  { id: ' + JSON.stringify(f.id) +

@@ -6,6 +6,9 @@
 // canais (em alta):
 //   https://www.youtube.com/@BlackPanteraOficial/videos?hl=pt-BR&gl=BR
 //   https://www.youtube.com/@baianasystem/videos?hl=pt-BR&gl=BR
+// em alta (por visualizações):
+//   https://www.youtube.com/playlist?list=OLAK5uy_lTtrRulwHl2WsspO1wj33uLrpNK8tBZjo&hl=pt-BR&gl=BR
+//   https://www.youtube.com/playlist?list=OLAK5uy_lvpm_RRAsqd0eaTrWf9XtLz_EEwbWrxK8&hl=pt-BR&gl=BR
 // Sem duplicatas: por ID do vídeo e por título+artista normalizados.
 // Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.
 const MUSICAS = [
@@ -189,5 +192,30 @@ const MUSICAS = [
   { id: "cMQoeEvxkis", t: "BALACOBACO", a: "Baiana System", d: "4:02" },
   { id: "g495jcpmRhM", t: "Amendoim Pão de Mel", a: "Baiana System", d: "3:32" },
   { id: "X2SpCAJcgXg", t: "BATUKERÊ", a: "Baiana System", d: "5:41" },
-  { id: "BlwIb2ZakEU", t: "PRAIA DO FUTURO", a: "Baiana System", d: "5:20" }
+  { id: "BlwIb2ZakEU", t: "PRAIA DO FUTURO", a: "Baiana System", d: "5:20" },
+  { id: "DJm_ke3AQVU", t: "Destruição", a: "Repudiyo - Topic", d: "2:42" },
+  { id: "dPGOnwFFUTk", t: "Bella Ciao", a: "Repudiyo - Topic", d: "4:12" },
+  { id: "hNBr9AvGsVU", t: "Sentir Repulsa", a: "Repudiyo - Topic", d: "1:04" },
+  { id: "n2zzL6WRiBQ", t: "Peculato", a: "Repudiyo - Topic", d: "2:20" },
+  { id: "5825aAqaClw", t: "Idéia Forte", a: "Repudiyo - Topic", d: "1:36" },
+  { id: "jjbPjrEkKRk", t: "Desigualdade", a: "Repudiyo - Topic", d: "1:39" },
+  { id: "gNSJnKUYfoE", t: "Simplicidade e Humildade", a: "Repudiyo - Topic", d: "1:39" },
+  { id: "yqmaibsaURQ", t: "Foda-Se Hipócrita", a: "Repudiyo - Topic", d: "1:03" },
+  { id: "72MxeeufF0I", t: "Liberdade e Contestação", a: "Repudiyo - Topic", d: "1:37" },
+  { id: "QkZq3kmK_aY", t: "Liberdade para Quem (Jão Rdp)", a: "Repudiyo - Topic", d: "2:03" },
+  { id: "EcvoodqkRt8", t: "Porras do Governo", a: "Repudiyo - Topic", d: "1:16" },
+  { id: "u55cf-DTgiA", t: "Continuar a Protestar", a: "Repudiyo - Topic", d: "1:25" },
+  { id: "i5OsK-O22IY", t: "Contra o Tempo", a: "Último Sopro", d: "4:02" },
+  { id: "2NyHkm2aEvA", t: "Requiem", a: "Último Sopro", d: "3:38" },
+  { id: "ymx7uNhFblw", t: "Alto Mar", a: "Último Sopro", d: "3:34" },
+  { id: "vD5BFunmCb0", t: "Cafeína", a: "Último Sopro", d: "3:33" },
+  { id: "R5w3YjUiCVs", t: "A Cada Novo Dia", a: "Último Sopro", d: "3:50" },
+  { id: "7gANz2RWwn8", t: "Palace II", a: "Último Sopro", d: "4:38" },
+  { id: "BG2INR6ytKU", t: "Rogai por Nós", a: "Último Sopro", d: "3:27" },
+  { id: "o6cRxQJjdkI", t: "Quando Afeta o Corpo e a Alma", a: "Último Sopro", d: "3:36" },
+  { id: "O9SAJG8sGhg", t: "Sobrevivência", a: "Último Sopro", d: "3:57" },
+  { id: "SLGQ3_2B6W4", t: "Onde os Fracos Não Tem Vez", a: "Último Sopro", d: "3:58" },
+  { id: "I7pjNaQynqE", t: "Dar Dor à Euforia", a: "Último Sopro", d: "3:44" },
+  { id: "uEOF4imzi38", t: "Guerra", a: "Último Sopro", d: "3:24" },
+  { id: "sX85yjcxLMg", t: "Vitória", a: "Último Sopro", d: "4:45" }
 ];
