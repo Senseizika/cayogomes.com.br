@@ -533,14 +533,16 @@ dialog[open]{animation:in .22s ease-out}
 
 /* cabeçalho fixo + abas */
 .tabbar{position:sticky;top:0;z-index:30;background:rgba(5,5,6,.9);backdrop-filter:blur(12px) saturate(120%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)} /* sticky = menu cola no topo */
-.tabs{display:flex;flex-wrap:nowrap;align-items:center;gap:clamp(.65rem,3vw,1.8rem);overflow-x:auto;scrollbar-width:none}
+.tabbar-inner{display:flex;align-items:center;gap:1rem}
+.tabs{flex:1 1 auto;min-width:0;display:flex;flex-wrap:nowrap;align-items:center;gap:clamp(.65rem,3vw,1.8rem);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;white-space:nowrap;background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);font:500 clamp(.95rem,2.8vw,1.45rem) var(--tech);letter-spacing:.08em;text-transform:uppercase;padding:.9rem .3rem;cursor:pointer} /* tamanho/fonte das abas */
-.tab:first-child{margin-left:auto}
-.tab:last-child{margin-right:auto}
 .tab:hover{color:var(--white)}
 .tab[aria-selected="true"]{color:var(--white);border-bottom-color:var(--accent)}
 .sep{flex:0 0 1px;width:1px;height:clamp(1.2rem,2.5vw,1.7rem);background:rgba(255,255,255,.72)}
+.share-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;background:none;border:1px solid var(--line);border-radius:999px;color:var(--mute);cursor:pointer}
+.share-btn:hover{color:var(--white);border-color:var(--mute)}
+.share-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 #panel{margin-top:clamp(1.2rem,3vw,2rem)} /* espaço entre as abas e o painel */
 .chips{display:flex;flex-wrap:wrap;gap:.5rem;padding:1.1rem 1.2rem 0} /* botões de filtro */
 .chip{background:none;border:1px solid var(--line);color:var(--mute);font:500 .85rem var(--mono);letter-spacing:.06em;padding:.4rem .9rem;border-radius:999px;cursor:pointer}
@@ -654,7 +656,19 @@ dialog[open]{animation:in .22s ease-out}
 </header>
 
 <!-- menu de abas (gerado pelo JS a partir do array AREAS) -->
-<div class="tabbar"><div class="wrap tabs" id="tabs" role="tablist"></div></div>
+<div class="tabbar">
+  <div class="wrap tabbar-inner">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <button class="share-btn" type="button" aria-label="Compartilhar" title="Compartilhar">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="18" cy="5" r="2.4"></circle>
+        <circle cx="6" cy="12" r="2.4"></circle>
+        <circle cx="18" cy="19" r="2.4"></circle>
+        <path d="M8.2 10.9 15.8 6.1M8.2 13.1l7.6 4.8"></path>
+      </svg>
+    </button>
+  </div>
+</div>
 
 <main>
   <!-- painel de projetos (preenchido pelo JS) -->
