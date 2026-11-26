@@ -36,6 +36,14 @@ const POPULARES = [
   { id: 'OLAK5uy_lTtrRulwHl2WsspO1wj33uLrpNK8tBZjo', nome: 'Repudiyo', limite: 12 },
   { id: 'OLAK5uy_lvpm_RRAsqd0eaTrWf9XtLz_EEwbWrxK8', nome: 'Último Sopro', limite: 99 }
 ];
+// Singles avulsos pedidos à parte (dados conferidos no YouTube).
+const AVULSAS = [
+  { id: 'WgxMVXDobT4', titulo: 'Centelha', artista: 'Controle - Topic', duracao: '2:53' },
+  { id: 'kRnSu2DK-5g', titulo: 'Ignorância Suicida', artista: 'Controle - Topic', duracao: '2:55' },
+  { id: 'sGoocg-S2cw', titulo: 'A Miséria É um Insulto', artista: 'Controle - Topic', duracao: '3:07' },
+  { id: 'Bevaaghr26s', titulo: 'Com as Próprias Mãos', artista: 'Controle - Topic', duracao: '3:52' }
+];
+const urlVideo = id => `https://www.youtube.com/watch?v=${id}&hl=pt-BR&gl=BR`;
 const urlPlaylist = id => `https://www.youtube.com/playlist?list=${id}&hl=pt-BR&gl=BR`;
 const urlCanal = handle => `https://www.youtube.com/${handle}/videos?hl=pt-BR&gl=BR`;
 const ARQ_SAIDA = path.join(ROOT, 'conteudo', 'musicas.js');
@@ -318,6 +326,17 @@ function numeroViews(texto) {
       });
     }
 
+    let novasAvulsas = 0;
+    for (const f of AVULSAS) {
+      const chave = chaveMusica(f);
+      if (porId.has(f.id) || porMusica.has(chave)) continue;
+      porId.add(f.id); porMusica.add(chave); faixas.push(f); novasAvulsas++;
+    }
+    resumos.push({
+      tipo: 'AVULSOS', id: 'Controle (singles)', modelo: '',
+      novas: novasAvulsas, repetidas: AVULSAS.length - novasAvulsas
+    });
+
     if (!faixas.length) {
       console.error('Nenhuma faixa encontrada. O YouTube pode ter mudado o formato da página.');
       process.exit(1);
@@ -338,6 +357,7 @@ function numeroViews(texto) {
       '// playlists:\n' + PLAYLISTS.map(id => '//   ' + urlPlaylist(id) + '\n').join('') +
       '// canais (em alta):\n' + CANAIS.map(c => '//   ' + urlCanal(c.handle) + '\n').join('') +
       '// em alta (por visualizações):\n' + POPULARES.map(p => '//   ' + urlPlaylist(p.id) + '\n').join('') +
+      '// singles avulsos:\n' + AVULSAS.map(f => '//   ' + urlVideo(f.id) + '\n').join('') +
       '// Sem duplicatas: por ID do vídeo e por título+artista normalizados.\n' +
       '// Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.\n';
     const corpo = faixas.map(f => '  { id: ' + JSON.stringify(f.id) +

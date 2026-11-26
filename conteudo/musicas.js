@@ -10,6 +10,11 @@
 // em alta (por visualizações):
 //   https://www.youtube.com/playlist?list=OLAK5uy_lTtrRulwHl2WsspO1wj33uLrpNK8tBZjo&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=OLAK5uy_lvpm_RRAsqd0eaTrWf9XtLz_EEwbWrxK8&hl=pt-BR&gl=BR
+// singles avulsos:
+//   https://www.youtube.com/watch?v=WgxMVXDobT4&hl=pt-BR&gl=BR
+//   https://www.youtube.com/watch?v=kRnSu2DK-5g&hl=pt-BR&gl=BR
+//   https://www.youtube.com/watch?v=sGoocg-S2cw&hl=pt-BR&gl=BR
+//   https://www.youtube.com/watch?v=Bevaaghr26s&hl=pt-BR&gl=BR
 // Sem duplicatas: por ID do vídeo e por título+artista normalizados.
 // Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.
 const MUSICAS = [
@@ -222,5 +227,9 @@ const MUSICAS = [
   { id: "SLGQ3_2B6W4", t: "Onde os Fracos Não Tem Vez", a: "Último Sopro", d: "3:58" },
   { id: "I7pjNaQynqE", t: "Dar Dor à Euforia", a: "Último Sopro", d: "3:44" },
   { id: "uEOF4imzi38", t: "Guerra", a: "Último Sopro", d: "3:24" },
-  { id: "sX85yjcxLMg", t: "Vitória", a: "Último Sopro", d: "4:45" }
+  { id: "sX85yjcxLMg", t: "Vitória", a: "Último Sopro", d: "4:45" },
+  { id: "WgxMVXDobT4", t: "Centelha", a: "Controle - Topic", d: "2:53" },
+  { id: "kRnSu2DK-5g", t: "Ignorância Suicida", a: "Controle - Topic", d: "2:55" },
+  { id: "sGoocg-S2cw", t: "A Miséria É um Insulto", a: "Controle - Topic", d: "3:07" },
+  { id: "Bevaaghr26s", t: "Com as Próprias Mãos", a: "Controle - Topic", d: "3:52" }
 ];
