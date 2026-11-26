@@ -129,7 +129,7 @@ const UI = {
        cta_titulo:"Pedir orçamento", wa_base:"Olá Cayo, vi seu portfólio e quero um orçamento.",
        wa_design:"Olá Cayo, vi seus projetos de design e quero um orçamento.",
        wa_3d:"Olá Cayo, vi seus modelos 3D e quero um orçamento.",
-       close:"FECHAR", img:"IMAGEM DO PROJETO", btn:"EN", lang:"pt-BR",
+       close:"FECHAR", share:"Compartilhar", share_ok:"Link copiado", share_fail:"Não foi possível copiar", img:"IMAGEM DO PROJETO", btn:"EN", lang:"pt-BR",
        prev:"Mídia anterior", next:"Próxima mídia", play:"Reproduzir", model3d:"Ver modelo 3D",
        media:"Mídia", media_error:"Mídia indisponível",
        empty:"Nenhum projeto publicado ainda." },
@@ -144,7 +144,7 @@ const UI = {
        cta_titulo:"Request a quote", wa_base:"Hi Cayo, I saw your portfolio and I'd like a quote.",
        wa_design:"Hi Cayo, I saw your design projects and I'd like a quote.",
        wa_3d:"Hi Cayo, I saw your 3D models and I'd like a quote.",
-       close:"CLOSE", img:"PROJECT IMAGE", btn:"PT", lang:"en",
+       close:"CLOSE", share:"Share", share_ok:"Link copied", share_fail:"Couldn't copy link", img:"PROJECT IMAGE", btn:"PT", lang:"en",
        prev:"Previous media", next:"Next media", play:"Play", model3d:"View 3D model",
        media:"Media", media_error:"Media unavailable",
        empty:"No projects published yet." }
