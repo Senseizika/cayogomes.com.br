@@ -3,6 +3,7 @@
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5&hl=pt-BR&gl=BR
+//   https://www.youtube.com/playlist?list=OLAK5uy_kenTnVDHqrvrI-c0r8rqZQkN4Oj9OIegE&hl=pt-BR&gl=BR
 // canais (em alta):
 //   https://www.youtube.com/@BlackPanteraOficial/videos?hl=pt-BR&gl=BR
 //   https://www.youtube.com/@baianasystem/videos?hl=pt-BR&gl=BR
@@ -169,6 +170,10 @@ const MUSICAS = [
   { id: "s1GZ2xY5bNU", t: "Oh! Chuva", a: "BandaFalamansa", d: "3:49" },
   { id: "RxHGl1vSMlE", t: "Espumas Ao Vento", a: "Trio Sabiá - Topic", d: "4:27" },
   { id: "JpwchsQkTso", t: "Pagode Russo", a: "Luiz Gonzaga", d: "2:11" },
+  { id: "RkO08zEJpYs", t: "Anti-Humano", a: "Controle - Topic", d: "3:13" },
+  { id: "X8B_ouT5Eus", t: "O Fractal Eu", a: "Controle - Topic", d: "3:06" },
+  { id: "iCG8vYQ8y18", t: "Sacrifício Capital", a: "Controle - Topic", d: "3:14" },
+  { id: "djDfeO1AbUE", t: "Apática", a: "Controle - Topic", d: "2:45" },
   { id: "TFvoLzmEr_s", t: "TRADUÇÃO", a: "Black Pantera", d: "3:41" },
   { id: "yZJhRNmiMvg", t: "Fogo Nos Racistas", a: "Black Pantera", d: "4:15" },
   { id: "5XQGNYFejSI", t: "Punk Rock Nigga Roll", a: "Black Pantera", d: "4:42" },

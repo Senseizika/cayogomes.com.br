@@ -23,7 +23,8 @@ const ROOT = path.resolve(__dirname, '..');
 const PLAYLISTS = [
   'PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C',
   'PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH',
-  'PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5'
+  'PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5',
+  'OLAK5uy_kenTnVDHqrvrI-c0r8rqZQkN4Oj9OIegE'
 ];
 // Canais oficiais: pega as faixas em alta (mais tocadas) de cada um.
 const CANAIS = [
