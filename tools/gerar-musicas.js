@@ -25,7 +25,13 @@ const PLAYLISTS = [
   'PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH',
   'PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5'
 ];
+// Canais oficiais: pega as faixas em alta (mais tocadas) de cada um.
+const CANAIS = [
+  { nome: 'Black Pantera', handle: '@BlackPanteraOficial', limite: 12 },
+  { nome: 'Baiana System', handle: '@baianasystem', limite: 12 }
+];
 const urlPlaylist = id => `https://www.youtube.com/playlist?list=${id}&hl=pt-BR&gl=BR`;
+const urlCanal = handle => `https://www.youtube.com/${handle}/videos?hl=pt-BR&gl=BR`;
 const ARQ_SAIDA = path.join(ROOT, 'conteudo', 'musicas.js');
 const DRY = process.argv.includes('--dry');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -92,6 +98,37 @@ const EXTRACAO = id => `(() => {
   return { totalPagina: document.body.innerText, faixas };
 })()`;
 
+// Mesma extração, mas para a aba "Em alta" dos canais oficiais: a linha de
+// metadados traz as visualizações, então o artista é o próprio canal.
+const EXTRACAO_CANAL = handle => `(() => {
+  if (!location.href.includes(${JSON.stringify(handle)})) return { totalPagina: '', faixas: [] };
+  const achados = [];
+  const ver = x => {
+    if (!x || typeof x !== 'object') return;
+    if (Array.isArray(x)) { x.forEach(ver); return; }
+    for (const k of Object.keys(x)) {
+      if (k === 'lockupViewModel') achados.push(x[k]);
+      ver(x[k]);
+    }
+  };
+  ver(window.ytInitialData || {});
+
+  const txt = v => (v && v.content) ? String(v.content).trim() : '';
+  const faixas = [];
+  for (const o of achados) {
+    const md = o.metadata?.lockupMetadataViewModel || {};
+    const linhas = md.metadata?.contentMetadataViewModel?.metadataRows || [];
+    const idVideo = o.contentId || '';
+    const titulo = txt(md.title);
+    const bruto = JSON.stringify(o);
+    const duracao = (bruto.match(/"text":"(\\d+:\\d\\d)"/) || [])[1] || '';
+    const views = txt(linhas[0]?.metadataParts?.[0]?.text);
+    if (!/^[A-Za-z0-9_-]{11}$/.test(idVideo) || !titulo || !duracao) continue;
+    faixas.push({ id: idVideo, titulo, duracao, views });
+  }
+  return { totalPagina: document.body.innerText, faixas };
+})()`;
+
 // Remove acentos, caixa, sufixos automáticos, "(ao vivo)"/"(remix)"/"feat..." e
 // pontuação antes de comparar — assim a mesma música com outro upload não entra duas vezes.
 function chaveMusica(m) {
@@ -106,6 +143,27 @@ function chaveMusica(m) {
       .trim();
   };
   return limpo(m.titulo) + '|' + limpo(m.artista);
+}
+
+// Nos canais o título vem como "Black Pantera - Música" / "BaianaSystem - Música".
+function limparTitulo(titulo, nome) {
+  let t = String(titulo || '').trim();
+  for (const p of [nome, nome.replace(/\s+/g, '')]) {
+    const esc = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // "Banda - Música" e "Banda e Convidado - Música"
+    t = t.replace(new RegExp('^' + esc + '(?:\\s*(?:e|&|,|com|ft\\.?|feat\\.?)\\s*[^\\-–—:]{0,60})?\\s*[-–—:]\\s*', 'i'), '');
+    // "Música - Banda e Convidado" e "MÚSICA Banda, Convidado feat..."
+    t = t.replace(new RegExp('\\s*[-–—]\\s*' + esc + '\\b.*$', 'i'), '');
+    t = t.replace(new RegExp('^([^\\s\\-–—]+)\\s+' + esc + '\\s*,.*$', 'i'), '$1');
+  }
+  t = t.replace(/\s*\((?:videoclipe\s*oficial|lyric\s*v[íi]deo|clipe\s*oficial|official\s*video)\)\s*$/i, '');
+  t = t.replace(/\s*[-–—|]\s*(lyric\s*v[íi]deo|videoclipe\s*oficial|clipe\s*oficial|official\s*video|áudio\s*oficial)\s*$/i, '');
+  return t.trim();
+}
+
+function segundos(duracao) {
+  const partes = String(duracao || '').split(':').map(Number);
+  return partes.length === 2 ? partes[0] * 60 + partes[1] : Infinity;
 }
 
 (async () => {
@@ -169,7 +227,46 @@ function chaveMusica(m) {
         faixas.push(f);
         novas++;
       }
-      resumos.push({ id, modelo: modelo ? modelo[1] : '', novas, repetidas });
+      resumos.push({ tipo: 'PLAYLIST', id, modelo: modelo ? modelo[1] : '', novas, repetidas });
+    }
+
+    for (const canal of CANAIS) {
+      await send('Page.navigate', { url: urlCanal(canal.handle) });
+
+      for (let i = 0; i < 300; i++) {
+        const r = await send('Runtime.evaluate', { expression: EXTRACAO_CANAL(canal.handle), awaitPromise: true, returnByValue: true });
+        const v = r.result && r.result.result && r.result.result.value;
+        if (v && v.faixas && v.faixas.length) break;
+        await sleep(250);
+      }
+      // Seleciona "Em alta" — a ordenação pelas músicas mais tocadas do canal.
+      for (let i = 0; i < 100; i++) {
+        const r = await send('Runtime.evaluate', {
+          expression: `(()=>{const e=[...document.querySelectorAll('button,yt-chip-cloud-chip-renderer,[role="tab"],a')].find(x=>(x.innerText||'').trim()==='Em alta');if(e){e.click();return true}return false})()`,
+          awaitPromise: true, returnByValue: true
+        });
+        if (r.result && r.result.result && r.result.result.value) break;
+        await sleep(200);
+      }
+      await sleep(2500);
+      const r = await send('Runtime.evaluate', { expression: EXTRACAO_CANAL(canal.handle), awaitPromise: true, returnByValue: true });
+      const valor = r.result && r.result.result && r.result.result.value;
+
+      let novas = 0, repetidas = 0, ignoradas = 0;
+      for (const f of (valor && valor.faixas) || []) {
+        if (novas >= canal.limite) break;
+        const titulo = limparTitulo(f.titulo, canal.nome);
+        // Álbuns completos e vídeos longos não são faixas do HUD.
+        if (/full\s*album|álbum\s*completo/i.test(titulo) || segundos(f.duracao) > 600) { ignoradas++; continue; }
+        const item = { id: f.id, titulo, artista: canal.nome, duracao: f.duracao };
+        const chave = chaveMusica(item);
+        if (porId.has(f.id) || porMusica.has(chave)) { repetidas++; continue; }
+        porId.add(f.id); porMusica.add(chave); faixas.push(item); novas++;
+      }
+      resumos.push({
+        tipo: 'CANAL', id: canal.handle + ' (' + canal.nome + ')',
+        modelo: 'Em alta', novas, repetidas, ignoradas
+      });
     }
 
     if (!faixas.length) {
@@ -178,13 +275,19 @@ function chaveMusica(m) {
     }
 
     for (const s of resumos) {
-      console.log('\n  PLAYLIST ' + s.id);
-      if (s.modelo) console.log('  YouTube informa ' + s.modelo + ' vídeos (indisponíveis ficam ocultos).');
-      console.log('  novas: ' + s.novas + '  |  repetidas (ignoradas): ' + s.repetidas);
+      console.log('\n  ' + s.tipo + ' ' + s.id);
+      if (s.modelo) {
+        console.log(s.tipo === 'PLAYLIST'
+          ? '  YouTube informa ' + s.modelo + ' vídeos (indisponíveis ficam ocultos).'
+          : '  Ordenação: ' + s.modelo);
+      }
+      console.log('  novas: ' + s.novas + '  |  repetidas (ignoradas): ' + s.repetidas +
+        (s.ignoradas ? '  |  álbuns/vídeos longos: ' + s.ignoradas : ''));
     }
 
     const cabecalho = '// Gerado por tools/gerar-musicas.js — não edite à mão.\n' +
       '// playlists:\n' + PLAYLISTS.map(id => '//   ' + urlPlaylist(id) + '\n').join('') +
+      '// canais (em alta):\n' + CANAIS.map(c => '//   ' + urlCanal(c.handle) + '\n').join('') +
       '// Sem duplicatas: por ID do vídeo e por título+artista normalizados.\n' +
       '// Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.\n';
     const corpo = faixas.map(f => '  { id: ' + JSON.stringify(f.id) +

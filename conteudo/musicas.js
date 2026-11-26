@@ -3,6 +3,9 @@
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5&hl=pt-BR&gl=BR
+// canais (em alta):
+//   https://www.youtube.com/@BlackPanteraOficial/videos?hl=pt-BR&gl=BR
+//   https://www.youtube.com/@baianasystem/videos?hl=pt-BR&gl=BR
 // Sem duplicatas: por ID do vídeo e por título+artista normalizados.
 // Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.
 const MUSICAS = [
@@ -162,5 +165,29 @@ const MUSICAS = [
   { id: "KX8CuNxobKQ", t: "Dona da Minha Cabeça", a: "Geraldo Azevedo Oficial", d: "3:26" },
   { id: "s1GZ2xY5bNU", t: "Oh! Chuva", a: "BandaFalamansa", d: "3:49" },
   { id: "RxHGl1vSMlE", t: "Espumas Ao Vento", a: "Trio Sabiá - Topic", d: "4:27" },
-  { id: "JpwchsQkTso", t: "Pagode Russo", a: "Luiz Gonzaga", d: "2:11" }
+  { id: "JpwchsQkTso", t: "Pagode Russo", a: "Luiz Gonzaga", d: "2:11" },
+  { id: "TFvoLzmEr_s", t: "TRADUÇÃO", a: "Black Pantera", d: "3:41" },
+  { id: "yZJhRNmiMvg", t: "Fogo Nos Racistas", a: "Black Pantera", d: "4:15" },
+  { id: "5XQGNYFejSI", t: "Punk Rock Nigga Roll", a: "Black Pantera", d: "4:42" },
+  { id: "O-AS6_wiKZw", t: "A Besta", a: "Black Pantera", d: "3:19" },
+  { id: "U1vm20-1Qz4", t: "PERPÉTUO", a: "Black Pantera", d: "4:42" },
+  { id: "TA_c4WKLupo", t: "CANDEIA", a: "Black Pantera", d: "4:28" },
+  { id: "7yIAlsW-BEY", t: "Padrão É O Caralho", a: "Black Pantera", d: "3:11" },
+  { id: "KpK76TfjvlY", t: "Mosha (Ao Vivo no Circo Voador)", a: "Black Pantera", d: "2:40" },
+  { id: "14hvcjeXsFE", t: "Rede Social", a: "Black Pantera", d: "3:56" },
+  { id: "CpV_tfutf54", t: "PROVÉRBIOS", a: "Black Pantera", d: "3:57" },
+  { id: "fwoHWyotf7c", t: "Hórus", a: "Black Pantera", d: "2:53" },
+  { id: "XKkLHU3y-Hs", t: "Start The Game", a: "Black Pantera", d: "3:41" },
+  { id: "y7NJN0MFnTw", t: "Lucro (Descomprimindo)", a: "Baiana System", d: "4:07" },
+  { id: "ne7E5geBMWE", t: "PLAYSOM", a: "Baiana System", d: "4:14" },
+  { id: "CrDuorXjTV0", t: "Terapia", a: "Baiana System", d: "4:30" },
+  { id: "P8hOiJOlSQo", t: "Capim Guiné feat. Margareth Menezes", a: "Baiana System", d: "4:00" },
+  { id: "2PrQwMFGMUc", t: "Invisível", a: "Baiana System", d: "3:16" },
+  { id: "m_YuGaaUuWU", t: "Reza Forte", a: "Baiana System", d: "6:06" },
+  { id: "BD2Ff_ZKCdE", t: "Saci (Remix)", a: "Baiana System", d: "5:01" },
+  { id: "EXRmHYcPyMc", t: "ALFAZEMA", a: "Baiana System", d: "3:44" },
+  { id: "cMQoeEvxkis", t: "BALACOBACO", a: "Baiana System", d: "4:02" },
+  { id: "g495jcpmRhM", t: "Amendoim Pão de Mel", a: "Baiana System", d: "3:32" },
+  { id: "X2SpCAJcgXg", t: "BATUKERÊ", a: "Baiana System", d: "5:41" },
+  { id: "BlwIb2ZakEU", t: "PRAIA DO FUTURO", a: "Baiana System", d: "5:20" }
 ];
