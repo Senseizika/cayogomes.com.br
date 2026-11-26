@@ -48,13 +48,6 @@ const AREAS = [
           "pt": "Impresso",
           "en": "Print"
         }
-      },
-      {
-        "id": "ilustracao",
-        "name": {
-          "pt": "Ilustração",
-          "en": "Illustration"
-        }
       }
     ],
     "lead": {
