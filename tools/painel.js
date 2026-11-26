@@ -361,13 +361,13 @@ function servirArquivo(res, abs, soCabecalho = false) {
 }
 
 // Muda o ?v= dos scripts a cada push para o navegador não misturar
-// HTML novo com content.js/projetos.js/cards.js antigos do cache do GitHub Pages.
+// HTML novo com content.js/projetos.js/cards.js/musicas.js antigos do cache do GitHub Pages.
 function carimbarVersao() {
   const arq = path.join(ROOT, 'index.html');
   const marca = Date.now().toString(36);
   const html = fs.readFileSync(arq, 'utf8');
   const novo = html.replace(
-    /(\b(?:src|href)=")((?:content\.js|conteudo\/projetos\.js|conteudo\/ordem-todos\.js|conteudo\/cards\.js))(?:\?v=[^"]*)?(")/g,
+    /(\b(?:src|href)=")((?:content\.js|conteudo\/projetos\.js|conteudo\/ordem-todos\.js|conteudo\/cards\.js|conteudo\/musicas\.js))(?:\?v=[^"]*)?(")/g,
     (m, abre, arquivo, fecha) => abre + arquivo + '?v=' + marca + fecha
   );
   if (novo !== html) fs.writeFileSync(arq, novo);

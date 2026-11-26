@@ -24,8 +24,8 @@
 <meta name="twitter:image" content="https://cayogomes.com.br/img/og-cat.png">
 <!-- logo do topo: prioridade máxima -->
 <link rel="preload" as="image" href="img/cayo_gomes.webp" fetchpriority="high">
-<link rel="preload" as="script" href="conteudo/projetos.js?v=mwwyeu5q">
-<link rel="preload" as="script" href="content.js?v=mwwyeu5q">
+<link rel="preload" as="script" href="conteudo/projetos.js?v=mwwz7o5o">
+<link rel="preload" as="script" href="content.js?v=mwwz7o5o">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fontes carregadas sem bloquear a renderização (com fallback sem JS) -->
@@ -694,14 +694,7 @@ dialog[open]{animation:in .22s ease-out}
       <!-- PLAYER HUD (vetores extraídos de img/assets.svg) -->
       <aside class="player-hud" aria-label="Playlist">
         <div class="pl-wrap">
-          <div class="pl-list">
-            <button class="trk" type="button" data-pct="18"><strong>Roots Bloody Roots</strong><small>Sepultura - 3:33</small></button>
-            <button class="trk" type="button" data-pct="31"><strong>Bulls On Parade</strong><small><span class="trk-e">E</span>Rage Against The Machine - 3:50</small></button>
-            <button class="trk" type="button" data-pct="42"><strong>Linha de Frente</strong><small>Criolo - 4:31</small></button>
-            <button class="trk" type="button" data-pct="56"><strong>O Drama da Humana...</strong><small>El Efecto - 7:51</small></button>
-            <button class="trk" type="button" data-pct="70"><strong>Lucro</strong><small>BaianaSystem - 4:07</small></button>
-            <button class="trk on" type="button" data-pct="41"><strong>Cafeína</strong><small>Último Sopro - 3:33</small></button>
-          </div>
+          <div class="pl-list" id="pl-list"></div>
           <svg class="pl-menu" aria-hidden="true"><use href="#i-list"/></svg>
         </div>
         <div class="pl-bar" aria-hidden="true"><span class="pl-fill"></span><span class="pl-knob"></span></div>
@@ -752,10 +745,11 @@ dialog[open]{animation:in .22s ease-out}
   <img class="fs-img" alt="" draggable="false">
   <button type="button" class="fs-nav fs-next" aria-label="próxima imagem">›</button>
 </div>
-<script src="conteudo/cards.js?v=mwwyeu5q"></script>
-<script src="conteudo/projetos.js?v=mwwyeu5q"></script>
-<script src="content.js?v=mwwyeu5q"></script>
-<script src="conteudo/ordem-todos.js?v=mwwyeu5q"></script>
+<script src="conteudo/musicas.js?v=mwwz7o5o"></script>
+<script src="conteudo/cards.js?v=mwwz7o5o"></script>
+<script src="conteudo/projetos.js?v=mwwz7o5o"></script>
+<script src="content.js?v=mwwz7o5o"></script>
+<script src="conteudo/ordem-todos.js?v=mwwz7o5o"></script>
 <script>
 /* ============================================================
    ESTE ARQUIVO TEM SÓ O CÓDIGO.
@@ -2092,7 +2086,32 @@ async function compartilhar(btn){
   }
 }
 
-// Um único "ouvinte" de cliques para: abas, filtros, cards, compartilhar, fechar modal e idioma.
+/* ---------- HUD musical: 6 faixas sorteadas da playlist local ---------- */
+// MUSICAS vem de conteudo/musicas.js (gerado pela playlist pública). Aqui é só visual:
+// nada é tocado e nenhuma requisição externa é feita.
+const PCTS_TRK = [18, 31, 42, 56, 70, 41];
+
+function renderPlaylist(){
+  const lista = $("#pl-list");
+  if (!lista || typeof MUSICAS === "undefined" || !MUSICAS.length) return;
+  const pool = MUSICAS.slice();
+  // Fisher–Yates: embaralha a playlist inteira e mostra 6 faixas diferentes.
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const faixas = pool.slice(0, 6);
+  if (!faixas.length) return;
+  const ultima = faixas.length - 1;
+  lista.innerHTML = faixas.map((m, i) => {
+    const pct = PCTS_TRK[i % PCTS_TRK.length];
+    const e = i === 0 ? '<span class="trk-e">E</span>' : '';
+    return `<button class="trk${i === ultima ? " on" : ""}" type="button" data-pct="${pct}"><strong>${esc(m.t)}</strong><small>${e}${esc(m.a)} - ${esc(m.d)}</small></button>`;
+  }).join("");
+  lista.closest(".player-hud").style.setProperty("--prog", PCTS_TRK[ultima % PCTS_TRK.length] + "%");
+}
+
+// Um único "ouvinte" de cliques para: abas, filtros, cards, compartilhar, playlist, fechar modal e idioma.
 document.addEventListener("click", e => {
   const share = e.target.closest(".share-btn");
   if (share) { compartilhar(share); return; }
@@ -2148,7 +2167,8 @@ document.addEventListener("click", e => {
   if (pb) {
     const hud = pb.closest(".player-hud"), op = pb.dataset.pl;
     if (op === "play") hud.classList.toggle("paused");
-    else if (op === "repeat" || op === "shuffle") pb.classList.toggle("lit");
+    else if (op === "shuffle") { pb.classList.toggle("lit"); renderPlaylist(); }
+    else if (op === "repeat") pb.classList.toggle("lit");
     else {
       const list = [...hud.querySelectorAll(".trk")];
       const idx = list.findIndex(x => x.classList.contains("on"));
@@ -2237,7 +2257,7 @@ $("#tabs").addEventListener("keydown", e => {
 });
 
 rotearHash();
-
+renderPlaylist();
 
 /* aplica a cor de destaque do fundo sorteado (tabela PALETA, gerada por tools/paleta.js) */
 function aplicarDestaque(url){
