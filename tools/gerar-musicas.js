@@ -22,7 +22,8 @@ const { spawn } = require('child_process');
 const ROOT = path.resolve(__dirname, '..');
 const PLAYLISTS = [
   'PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C',
-  'PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH'
+  'PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH',
+  'PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5'
 ];
 const urlPlaylist = id => `https://www.youtube.com/playlist?list=${id}&hl=pt-BR&gl=BR`;
 const ARQ_SAIDA = path.join(ROOT, 'conteudo', 'musicas.js');

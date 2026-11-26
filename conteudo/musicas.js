@@ -2,6 +2,7 @@
 // playlists:
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MamWh588rTmtXh5tvBp5M-C&hl=pt-BR&gl=BR
 //   https://www.youtube.com/playlist?list=PLh16GoOWM6MZOpliWOCksEADwAzqMlKgH&hl=pt-BR&gl=BR
+//   https://www.youtube.com/playlist?list=PLh16GoOWM6MYiaIyf3LxYSC4bnr7RYRg5&hl=pt-BR&gl=BR
 // Sem duplicatas: por ID do vídeo e por título+artista normalizados.
 // Somente dados para o HUD visual: o site não toca áudio nem acessa o YouTube.
 const MUSICAS = [
@@ -137,5 +138,29 @@ const MUSICAS = [
   { id: "ANwQQawmZ4w", t: "Neurose", a: "Síntese", d: "1:41" },
   { id: "s7Eo-tCfy1A", t: "Instrumental (Instrumental)", a: "Síntese", d: "3:10" },
   { id: "kW6dPhD9GFQ", t: "Pais e Filhos", a: "Síntese", d: "1:31" },
-  { id: "XVHhR0MATYQ", t: "Agora", a: "Síntese", d: "0:55" }
+  { id: "XVHhR0MATYQ", t: "Agora", a: "Síntese", d: "0:55" },
+  { id: "d_9nMBzj9XQ", t: "100 Anos", a: "BandaFalamansa", d: "3:40" },
+  { id: "J1asvRNIPq4", t: "Xote Dos Milagres", a: "BandaFalamansa", d: "4:27" },
+  { id: "OUyQZjhsMfU", t: "Esperando na janela", a: "Gilberto Gil", d: "4:17" },
+  { id: "4Uwf3nJRFNE", t: "Colo De Menina", a: "Rastapé", d: "3:25" },
+  { id: "tDFKMlOWU-8", t: "Nosso Xote", a: "Banda Bicho de Pé", d: "3:44" },
+  { id: "n6Q4do2n0rI", t: "Qui Nem Jilo", a: "Release - Topic", d: "2:55" },
+  { id: "m6Mdue0dEJ4", t: "Eu Só Quero um Xodó", a: "Dominguinho - Topic", d: "3:12" },
+  { id: "S4ObrQTz2m8", t: "Xote Das Meninas", a: "Luiz Gonzaga", d: "2:36" },
+  { id: "-1iKYof-C7o", t: "Xote Da Alegria", a: "BandaFalamansa", d: "4:14" },
+  { id: "nwIWRE83Kuk", t: "Feira De Mangaio", a: "Clara Nunes - Topic", d: "3:19" },
+  { id: "_TtlvUSN7U8", t: "Incendiar", a: "Valentina Nóbrega - Topic", d: "2:52" },
+  { id: "TuX5Nf_VIZU", t: "Táxi Lunar", a: "Geraldo Azevedo Oficial", d: "3:52" },
+  { id: "e1qEdpSHy2w", t: "A Porta Escorada", a: "Valentina Nóbrega - Topic", d: "2:37" },
+  { id: "xFlvHK-skrQ", t: "Confidencia", a: "BandaFalamansa", d: "3:40" },
+  { id: "StqVEgjm7kY", t: "Me Diz Amor", a: "FLÁVIO JOSÉ", d: "3:20" },
+  { id: "H05qf9VmDlQ", t: "O Cheiro Da Carolina", a: "Luiz Gonzaga", d: "2:40" },
+  { id: "0DHTsCHapMM", t: "Morena Tropicana", a: "Trio Nordestino - Topic", d: "2:34" },
+  { id: "IKJrMSrDca8", t: "Asa Branca", a: "Luiz Gonzaga", d: "2:49" },
+  { id: "o4G26NDKbEQ", t: "Asas", a: "BandaFalamansa", d: "3:51" },
+  { id: "ilhOR9B_4e0", t: "Menina Mulher da Pele Preta", a: "Forróçacana - Topic", d: "3:56" },
+  { id: "KX8CuNxobKQ", t: "Dona da Minha Cabeça", a: "Geraldo Azevedo Oficial", d: "3:26" },
+  { id: "s1GZ2xY5bNU", t: "Oh! Chuva", a: "BandaFalamansa", d: "3:49" },
+  { id: "RxHGl1vSMlE", t: "Espumas Ao Vento", a: "Trio Sabiá - Topic", d: "4:27" },
+  { id: "JpwchsQkTso", t: "Pagode Russo", a: "Luiz Gonzaga", d: "2:11" }
 ];
