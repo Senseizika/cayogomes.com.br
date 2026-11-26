@@ -108,8 +108,8 @@ const AREAS = [
 
 /* SERVIÇOS exibidos na seção Sobre (edite as listas pt/en) */
 const SERVICES = {
-  pt:["Identidade visual","Logotipos","Social media","Design gráfico","Artes e eventos","Modelagem 3D"],
-  en:["Visual identity","Logos","Social media","Graphic design","Event art","3D modeling"]
+  pt:["Marcas com identidade","Estampas para vestir","Imagens para eventos","Conteúdo para redes","Personagens e objetos 3D","Mundos prontos para jogos"],
+  en:["Brands with identity","Prints to wear","Images for events","Content for social media","3D characters and objects","Game-ready worlds"]
 };
 
 /* TEXTOS DA INTERFACE (pt/en). Edite aqui títulos, frases e botões.
